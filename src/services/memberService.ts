@@ -1,0 +1,154 @@
+import * as XLSX from 'xlsx';
+import { Member } from '@/types';
+import { INITIAL_MEMBERS } from '@/data/mockData';
+
+const STORAGE_KEY = '11a10_members_list';
+
+export function loadMembersFromStorage(): Member[] {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const list = JSON.parse(raw);
+    // Tự động dọn sạch nếu dữ liệu cũ còn chứa các thành viên demo
+    const DEMO_NAMES = [
+      'Trần Nguyễn Hoàng Anh',
+      'Lê Thị Mai Phương',
+      'Nguyễn Văn Minh Khang',
+      'Phạm Bảo Ngọc',
+      'Võ Đức Trọng',
+      'Đặng Thảo Vy',
+      'Bùi Gia Huy',
+      'Nguyễn Kiều Oanh',
+    ];
+
+    if (
+      Array.isArray(list) &&
+      list.length > 0 &&
+      list.some((m: Member) => /^m[1-8]$/.test(m.id) || DEMO_NAMES.includes(m.fullName))
+    ) {
+      const cleaned = list.filter(
+        (m: Member) => !/^m[1-8]$/.test(m.id) && !DEMO_NAMES.includes(m.fullName)
+      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
+      return cleaned;
+    }
+    return list;
+  } catch {
+    return [];
+  }
+}
+
+export function saveMembersToStorage(members: Member[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+}
+
+export function clearDemoMembers(): Member[] {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+  return [];
+}
+
+/**
+ * Tải file Excel mẫu danh sách học sinh
+ */
+export function downloadSampleMembersExcel() {
+  const wsData = [
+    ['DANH SÁCH HỌC SINH LỚP 11A10 - THPT CÁT TIÊN (NĂM HỌC 2026 - 2027)'],
+    ['(Điền thông tin các thành viên của lớp vào bên dưới)'],
+    [],
+    ['STT', 'Họ và tên', 'Chức vụ', 'Ngày sinh', 'Số điện thoại', 'Châm ngôn / Lời nhắn', 'Sở thích'],
+    [1, 'Trần Nguyễn Hoàng Anh', 'Lớp trưởng', '15/03/2009', '0912 345 678', 'Quyết tâm dẫn đầu phong trào', 'Đọc sách, Guitar'],
+    [2, 'Lê Thị Mai Phương', 'Lớp phó học tập', '22/07/2009', '0987 654 321', 'Chăm chỉ là chìa khóa tri thức', 'Vẽ tranh, Tiếng Anh'],
+    [3, 'Nguyễn Văn Minh Khang', 'Bí thư Chi đoàn', '10/11/2009', '0934 567 890', 'Nhiệt huyết tuổi trẻ', 'Cầu lông, Tình nguyện'],
+    [4, 'Phạm Bảo Ngọc', 'Lớp phó phong trào', '05/01/2009', '0978 123 456', 'Cuộc sống không thể thiếu âm nhạc', 'Ca hát, Múa'],
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [
+    { wch: 6 },
+    { wch: 26 },
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 36 },
+    { wch: 22 },
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Danh_Sach_11A10');
+  XLSX.writeFile(wb, 'Mau_Danh_Sach_Hoc_Sinh_11A10.xlsx');
+}
+
+/**
+ * Nhập danh sách học sinh từ file Excel
+ */
+export async function parseMembersFromExcel(file: File): Promise<Member[]> {
+  const data = await file.arrayBuffer();
+  const workbook = XLSX.read(data, { type: 'array' });
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  const rows: (string | number)[][] = XLSX.utils.sheet_to_json(worksheet, {
+    header: 1,
+    defval: '',
+  });
+
+  // Tìm header row
+  let headerRow = -1;
+  let nameCol = -1;
+  let roleCol = -1;
+  let birthCol = -1;
+  let phoneCol = -1;
+  let quoteCol = -1;
+  let hobbyCol = -1;
+
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r];
+    for (let c = 0; c < row.length; c++) {
+      const val = String(row[c]).toLowerCase().trim();
+      if (val.includes('họ và tên') || val.includes('họ tên') || val === 'tên') {
+        nameCol = c;
+        headerRow = r;
+      } else if (val.includes('chức vụ') || val.includes('vai trò')) {
+        roleCol = c;
+      } else if (val.includes('ngày sinh')) {
+        birthCol = c;
+      } else if (val.includes('điện thoại') || val.includes('sđt')) {
+        phoneCol = c;
+      } else if (val.includes('châm ngôn') || val.includes('quote') || val.includes('lời nhắn')) {
+        quoteCol = c;
+      } else if (val.includes('sở thích')) {
+        hobbyCol = c;
+      }
+    }
+    if (headerRow !== -1 && nameCol !== -1) break;
+  }
+
+  if (headerRow === -1 || nameCol === -1) {
+    throw new Error('Không tìm thấy cột "Họ và tên" trong tệp Excel.');
+  }
+
+  const result: Member[] = [];
+  for (let r = headerRow + 1; r < rows.length; r++) {
+    const row = rows[r];
+    const fullName = String(row[nameCol] || '').trim();
+    if (!fullName || fullName.length < 2) continue;
+
+    const role = roleCol !== -1 && row[roleCol] ? String(row[roleCol]).trim() : 'Thành viên';
+    const birthDate = birthCol !== -1 && row[birthCol] ? String(row[birthCol]).trim() : '01/01/2009';
+    const phone = phoneCol !== -1 && row[phoneCol] ? String(row[phoneCol]).trim() : undefined;
+    const quote = quoteCol !== -1 && row[quoteCol] ? String(row[quoteCol]).trim() : undefined;
+    const hobbiesStr = hobbyCol !== -1 && row[hobbyCol] ? String(row[hobbyCol]).trim() : '';
+    const hobbies = hobbiesStr ? hobbiesStr.split(/[,;]+/).map((s) => s.trim()) : [];
+
+    result.push({
+      id: `m-${Date.now()}-${r}`,
+      fullName,
+      role,
+      birthDate,
+      phone,
+      quote,
+      hobbies,
+    });
+  }
+
+  return result;
+}
