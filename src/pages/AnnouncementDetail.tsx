@@ -41,7 +41,7 @@ export const AnnouncementDetailPage: React.FC = () => {
         <div className="space-y-3 pb-6 border-b border-slate-800">
           <div className="flex flex-wrap items-center gap-2">
             {announcement.priority === 'urgent' ? (
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-red-300">
                 <Flame className="w-3.5 h-3.5 text-red-400" /> THÔNG BÁO KHẨN CẤP
               </span>
             ) : (

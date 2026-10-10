@@ -136,7 +136,7 @@ export const AdminAnnouncementsPage: React.FC = () => {
               <div className="space-y-1.5 flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   {item.priority === 'urgent' ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-300">
                       <Flame className="w-3 h-3 text-red-400" /> Khẩn cấp
                     </span>
                   ) : (

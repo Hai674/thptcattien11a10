@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-slate-200 font-bold">Tập thể Lớp 11A10 • THPT Cát Tiên</span>
-              <span className="text-[10px] text-amber-300 font-mono font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+              <span className="text-[10px] text-amber-300 font-mono font-semibold">
                 Gắn kết &amp; Vươn xa
               </span>
             </div>

@@ -363,7 +363,7 @@ export const LibraryPage: React.FC = () => {
       {/* Header Banner Thư viện */}
       <Card className="p-6 sm:p-8 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-mono mb-2">
+          <div className="inline-flex items-center gap-2 text-blue-300 text-xs font-mono mb-2">
             <Camera className="w-3.5 h-3.5 text-blue-400" />
             <span>Kỷ Yếu Kỹ Thuật Số • 11A10</span>
           </div>
@@ -500,7 +500,7 @@ export const LibraryPage: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="font-bold text-sm text-white">{post.authorName}</h4>
-                      <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                      <span className="text-[10px] font-mono text-blue-300">
                         {post.role}
                       </span>
                     </div>

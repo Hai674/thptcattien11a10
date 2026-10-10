@@ -160,7 +160,7 @@ export const AdminLibraryPage: React.FC = () => {
                       )}
                     </td>
                     <td className="p-4">
-                      <span className="px-2.5 py-0.5 rounded-full font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                      <span className="font-semibold text-indigo-300">
                         {it.category}
                       </span>
                     </td>

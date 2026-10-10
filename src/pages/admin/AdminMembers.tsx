@@ -215,7 +215,7 @@ export const AdminMembersPage: React.FC = () => {
                     {m.quote && <p className="text-[11px] text-slate-400 italic">"{m.quote}"</p>}
                   </td>
                   <td className="p-4">
-                    <span className="px-2.5 py-0.5 rounded-full font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                    <span className="font-semibold text-blue-300">
                       {m.role}
                     </span>
                   </td>

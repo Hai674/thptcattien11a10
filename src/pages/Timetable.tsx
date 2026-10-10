@@ -119,7 +119,7 @@ export const TimetablePage: React.FC = () => {
       {/* Page Header */}
       <Card className="rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-mono">
+            <div className="inline-flex items-center gap-2 text-blue-300 text-xs font-mono">
               <Calendar className="w-3.5 h-3.5 text-blue-400" />
               <span>Năm học 2026 - 2027 • Lớp 11A10</span>
             </div>
@@ -208,7 +208,7 @@ export const TimetablePage: React.FC = () => {
           Hệ thống sẽ tự động phân tích các cột Thứ 2 đến Thứ 7 (Sáng 4 tiết, Chiều 4 tiết) và cập nhật thời khóa biểu lên website ngay lập tức
         </p>
         {totalSlots > 0 && (
-          <span className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] font-mono">
+          <span className="mt-2 inline-flex items-center gap-1.5 text-emerald-300 text-[11px] font-mono">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Đang hiển thị {totalSlots} tiết học thực tế</span>
           </span>

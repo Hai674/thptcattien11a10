@@ -142,10 +142,10 @@ export const AdminUsersPage: React.FC = () => {
 
                   <td className="p-4">
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold ${
+                      className={`inline-flex items-center gap-1 font-bold ${
                         u.role === 'admin'
-                          ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
-                          : 'bg-slate-800 text-slate-300'
+                          ? 'text-indigo-300'
+                          : 'text-slate-300'
                       }`}
                     >
                       {u.role === 'admin' ? (
@@ -160,10 +160,10 @@ export const AdminUsersPage: React.FC = () => {
 
                   <td className="p-4">
                     <span
-                      className={`px-2.5 py-1 rounded-full font-semibold ${
+                      className={`font-semibold ${
                         u.status === 'blocked'
-                          ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          ? 'text-red-400'
+                          : 'text-emerald-400'
                       }`}
                     >
                       {u.status === 'blocked' ? 'Bị khóa' : 'Đang hoạt động'}

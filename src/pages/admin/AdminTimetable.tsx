@@ -138,7 +138,7 @@ export const AdminTimetablePage: React.FC = () => {
         </div>
 
         {uploadedFile && (
-          <div className="inline-flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 text-emerald-300 text-xs font-medium">
             <CheckCircle2 className="w-4 h-4" />
             <span>Đã nhận diện lớp: <strong>11A10</strong> (Tệp: {uploadedFile})</span>
           </div>

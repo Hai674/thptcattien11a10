@@ -124,7 +124,7 @@ export const Home: React.FC = () => {
                 <h3 className="font-display font-bold text-base text-white">
                   {member.fullName}
                 </h3>
-                <span className="inline-block mt-1 text-xs font-medium px-3 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                <span className="inline-block mt-1 text-xs font-medium text-blue-300">
                   {member.role}
                 </span>
               </div>

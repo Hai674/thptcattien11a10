@@ -171,7 +171,7 @@ export const ProfilePage: React.FC = () => {
                 <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                   {displayName}
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold">
+                <span className="text-blue-400 text-xs font-semibold">
                   {user?.role === 'admin' ? 'Quản Trị Viên' : 'Ban Cán Sự / Học Sinh'}
                 </span>
               </div>

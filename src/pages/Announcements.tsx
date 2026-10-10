@@ -107,7 +107,7 @@ export const AnnouncementsPage: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     {item.priority === 'urgent' ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-red-300">
                         <Flame className="w-3.5 h-3.5 text-red-400" /> THÔNG BÁO KHẨN
                       </span>
                     ) : (

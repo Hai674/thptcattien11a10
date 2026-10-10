@@ -30,3 +30,6 @@ scratch/
 *.sln
 *.sw?
 Thumbs.db
+
+.vercel
+.env*

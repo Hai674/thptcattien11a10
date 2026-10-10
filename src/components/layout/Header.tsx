@@ -119,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="font-display font-bold text-base tracking-tight text-white group-hover:text-blue-400 transition-colors">
                 Lớp 11A10
               </span>
-              <span className="text-[10px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/20 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-medium text-blue-300">
                 THPT Cát Tiên
               </span>
             </div>
@@ -253,7 +253,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="overflow-hidden min-w-0 flex-1">
                     <p className="text-xs font-bold text-white truncate">{user.displayName || 'Thành viên 11A10'}</p>
                     <p className="text-[10px] text-slate-400 truncate">{user.email || '11a10@cattien.edu.vn'}</p>
-                    <span className="inline-block mt-1 text-[9px] font-mono font-medium bg-blue-500/15 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/25">
+                    <span className="inline-block mt-1 text-[9px] font-mono font-medium text-blue-300">
                       {user.role === 'admin' ? 'Quản trị viên' : 'Học sinh 11A10'}
                     </span>
                   </div>

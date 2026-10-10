@@ -140,7 +140,7 @@ export const MembersPage: React.FC = () => {
       {/* Header Banner */}
       <Card className="rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-mono">
+            <div className="inline-flex items-center gap-2 text-blue-300 text-xs font-mono">
               <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
               <span>Năm học 2026 - 2027 • THPT Cát Tiên</span>
             </div>
@@ -284,7 +284,7 @@ export const MembersPage: React.FC = () => {
                     <h3 className="font-bold text-sm text-white group-hover:text-blue-300 transition-colors">
                       {member.fullName}
                     </h3>
-                    <span className="inline-block mt-0.5 text-[11px] font-mono px-2 py-0.2 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                    <span className="inline-block mt-0.5 text-[11px] font-mono text-blue-300">
                       {member.role}
                     </span>
                   </div>
@@ -344,7 +344,7 @@ export const MembersPage: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">{selectedMember.fullName}</h3>
-                <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                <span className="text-xs font-mono text-blue-300">
                   {selectedMember.role}
                 </span>
                 <p className="text-[11px] text-slate-400 mt-1 font-mono">

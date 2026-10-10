@@ -295,7 +295,7 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
               <div className="flex items-baseline justify-between gap-2">
                 <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight leading-tight flex items-center gap-2">
                   <span>{currentDayInfo.fullLabel}</span>
-                  <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/25">
+                  <span className="text-xs font-mono font-medium text-purple-300">
                     Hôm nay
                   </span>
                 </h3>
@@ -306,14 +306,14 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
 
               {/* Status Badge */}
               <div className="mt-2.5 flex items-center gap-2">
-                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${
+                <div className={`inline-flex items-center gap-1.5 text-xs font-medium ${
                   isOffDay
-                    ? 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+                    ? 'text-amber-300'
                     : livePeriodKey
-                    ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                    ? 'text-emerald-300'
                     : isRecess
-                    ? 'bg-sky-500/10 text-sky-300 border-sky-500/20'
-                    : 'bg-white/[0.03] text-slate-300 border-white/5'
+                    ? 'text-sky-300'
+                    : 'text-slate-300'
                 }`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${
                     isOffDay
@@ -477,12 +477,12 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
                       {/* Right Status */}
                       <div className="shrink-0 flex items-center gap-2">
                         {isPast ? (
-                          <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400/80 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                          <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
                             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                             <span className="hidden sm:inline">Đã học</span>
                           </span>
                         ) : isLiveNow ? (
-                          <span className="text-[10px] font-mono text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded border border-purple-500/30 font-medium">
+                          <span className="text-[10px] font-mono text-purple-300 font-medium">
                             Tiết này
                           </span>
                         ) : hasSubject ? (

@@ -61,7 +61,7 @@ export const AdminLayout: React.FC = () => {
                 <span className="font-display font-black text-white text-base tracking-wider">
                   11A10 CONTROL CENTER
                 </span>
-                <span className="text-[10px] bg-cyan-500/15 text-cyan-300 font-mono font-bold px-2 py-0.5 rounded-full border border-cyan-500/30">
+                <span className="text-[10px] text-cyan-300 font-mono font-bold">
                   SYSTEM ACTIVE
                 </span>
               </div>

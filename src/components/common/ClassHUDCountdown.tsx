@@ -69,7 +69,7 @@ export const ClassHUDCountdown: React.FC = () => {
         {/* Left: Info */}
         <div className="space-y-2.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-mono">
+            <div className="inline-flex items-center gap-1.5 text-blue-300 text-xs font-mono">
               <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
               <span>{currentTarget.badge}</span>
             </div>

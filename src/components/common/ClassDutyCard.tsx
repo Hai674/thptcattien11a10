@@ -145,11 +145,11 @@ export const ClassDutyCard: React.FC<ClassDutyCardProps> = ({ onClose }) => {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-md bg-blue-500/15 border border-blue-400/30 text-blue-300 font-mono text-xs font-semibold">
+                <span className="text-blue-300 font-mono text-xs font-semibold">
                   {currentDuty.dayName}
                 </span>
                 {isTodaySelected && (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-mono animate-pulse">
+                  <span className="text-emerald-300 text-[10px] font-mono animate-pulse">
                     Hôm nay
                   </span>
                 )}

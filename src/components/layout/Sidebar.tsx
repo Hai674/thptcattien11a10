@@ -153,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <p className="text-[10px] font-mono font-medium uppercase tracking-wider text-slate-400">
                       QUẢN TRỊ
                     </p>
-                    <span className="text-[9px] bg-amber-500/10 text-amber-300 border border-amber-500/20 font-mono font-medium px-1.5 py-0.5 rounded">
+                    <span className="text-[9px] text-amber-300 font-mono font-medium">
                       BAN CÁN SỰ
                     </span>
                   </div>
