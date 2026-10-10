@@ -1,14 +1,17 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const rawUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
+const DEFAULT_SUPABASE_URL = 'https://mncbtgkhonhhjzbzzjkb.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_JONIEu1NKRpi1Ii5C9jlOA_3ckci3Hu';
+
+const rawUrl = (import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL).trim();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY).trim();
 
 // Tự động chuẩn hóa nếu người dùng chỉ nhập Project Reference ID (ví dụ: mncbtgkhonhhjzbzzjkb)
 export const supabaseUrl = rawUrl
   ? rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
     ? rawUrl
     : `https://${rawUrl}.supabase.co`
-  : '';
+  : DEFAULT_SUPABASE_URL;
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl &&
