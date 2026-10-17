@@ -1,170 +1,381 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { loadMembersFromStorage } from '@/services/memberService';
 import { Member } from '@/types';
-import { Button } from '@/components/ui/button';
+import { DEFAULT_11A10_STUDENTS, PURPOSE_PRESETS, StudentCandidate } from '@/data/classDefaultStudents';
+import { LuckyWheelCanvas } from '@/components/games/LuckyWheelCanvas';
+import { CyberSlotRoller } from '@/components/games/CyberSlotRoller';
+import { MysteryCardDeck } from '@/components/games/MysteryCardDeck';
 import { GlassButton } from '@/components/ui/glass-button';
-import { Dices, Trophy, X, RotateCcw, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  Dices,
+  Trophy,
+  X,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  Maximize2,
+  Users,
+  CheckCircle2,
+  Sparkles,
+  Zap,
+  Layers,
+  ArrowRight,
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { cyberAudio } from '@/utils/cyberAudio';
+import { toast } from 'sonner';
 
 interface ClassLotteryModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+type GameMode = 'wheel' | 'slot' | 'card';
+
 export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, onClose }) => {
-  const [members, setMembers] = useState<Member[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentCandidate[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<string>('all');
+  const [purposeId, setPurposeId] = useState<string>('blackboard');
+  const [gameMode, setGameMode] = useState<GameMode>('wheel');
   const [isSpinning, setIsSpinning] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Member | null>(null);
-  const [displayedName, setDisplayedName] = useState('Bấm nút để chọn ngẫu nhiên');
-  const [displayedRole, setDisplayedRole] = useState('Tập thể 11A10 • THPT Cát Tiên');
+  const [winner, setWinner] = useState<StudentCandidate | null>(null);
+  const [calledIds, setCalledIds] = useState<string[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('11a10_called_students');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [excludeCalled, setExcludeCalled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
-      const currentList = loadMembersFromStorage();
-      setMembers(currentList);
-      setSelectedStudent(null);
-      setIsSpinning(false);
-      if (currentList.length === 0) {
-        setDisplayedName('Chưa có danh sách học sinh');
-        setDisplayedRole('Vào trang "Thành viên" để nạp file Excel hoặc thêm bạn mới');
+      const fromStorage = loadMembersFromStorage();
+      if (fromStorage.length > 0) {
+        const mapped: StudentCandidate[] = fromStorage.map((m: Member, idx: number) => ({
+          id: m.id || String(idx + 1),
+          fullName: m.fullName,
+          role: m.role || 'Học sinh',
+          group: (m as any).group || `Tổ ${((idx % 4) + 1)}`,
+        }));
+        setAllStudents(mapped);
       } else {
-        setDisplayedName('Bấm nút để chọn ngẫu nhiên');
-        setDisplayedRole(`Đang sẵn sàng ${currentList.length} học sinh 11A10`);
+        setAllStudents(DEFAULT_11A10_STUDENTS);
       }
+      setWinner(null);
+      setIsSpinning(false);
     }
   }, [isOpen]);
 
-  const handleStartSpin = () => {
-    if (isSpinning || members.length === 0) return;
-    setIsSpinning(true);
-    setSelectedStudent(null);
+  // Lưu session gọi tên
+  useEffect(() => {
+    sessionStorage.setItem('11a10_called_students', JSON.stringify(calledIds));
+  }, [calledIds]);
 
-    let counter = 0;
-    const totalTicks = 36;
-    let speed = 40;
-
-    const runTick = () => {
-      counter++;
-      const randomIdx = Math.floor(Math.random() * members.length);
-      const randomMember = members[randomIdx];
-
-      setDisplayedName(randomMember.fullName);
-      setDisplayedRole(randomMember.role || 'Học sinh 11A10');
-      cyberAudio.playTick();
-
-      if (counter < totalTicks) {
-        if (counter > totalTicks - 10) {
-          speed += 30;
-        } else if (counter > totalTicks - 20) {
-          speed += 14;
-        }
-        setTimeout(runTick, speed);
-      } else {
-        const winner = members[Math.floor(Math.random() * members.length)];
-        setSelectedStudent(winner);
-        setDisplayedName(winner.fullName);
-        setDisplayedRole(winner.role || 'Học sinh 11A10');
-        setIsSpinning(false);
-        cyberAudio.playFanfare();
-
-        try {
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        } catch {
-          // ignore
-        }
+  const activeCandidates = useMemo(() => {
+    return allStudents.filter((student) => {
+      if (selectedGroup !== 'all' && student.group !== selectedGroup) {
+        return false;
       }
-    };
+      if (excludeCalled && calledIds.includes(student.id)) {
+        return false;
+      }
+      return true;
+    });
+  }, [allStudents, selectedGroup, excludeCalled, calledIds]);
 
-    setTimeout(runTick, speed);
+  const currentPurpose = PURPOSE_PRESETS.find((p) => p.id === purposeId) || PURPOSE_PRESETS[0];
+
+  const handleToggleSound = () => {
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    cyberAudio.enabled = next;
+  };
+
+  const handleSpinStart = () => {
+    if (activeCandidates.length === 0) {
+      toast.error('Không còn học sinh khả dụng!');
+      return;
+    }
+    setWinner(null);
+    setIsSpinning(true);
+  };
+
+  const handleSpinEnd = (chosenWinner: StudentCandidate) => {
+    setIsSpinning(false);
+    setWinner(chosenWinner);
+    cyberAudio.playFanfare();
+
+    try {
+      confetti({
+        particleCount: 100,
+        spread: 75,
+        origin: { y: 0.6 },
+      });
+    } catch {}
+  };
+
+  const handleMarkCalled = (studentId: string) => {
+    if (!calledIds.includes(studentId)) {
+      setCalledIds((prev) => [...prev, studentId]);
+      toast.success('Đã ghi nhận bạn lên bảng!');
+    }
+    setWinner(null);
+  };
+
+  const handleResetCalled = () => {
+    setCalledIds([]);
+    setWinner(null);
+    toast.success('Đã đặt lại lượt gọi cho tiết học!');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md rounded-3xl bg-slate-900 border border-white/10 p-6 sm:p-8 text-center space-y-6 shadow-2xl">
-        {/* Close button */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+      <div className="relative w-full max-w-2xl rounded-3xl bg-slate-900 border border-white/10 p-5 sm:p-7 text-center space-y-5 shadow-2xl my-auto">
+        {/* Nút đóng modal */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors"
+          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors z-20"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {/* Header */}
-        <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 text-blue-300 text-xs font-mono">
-            <Dices className="w-3.5 h-3.5 text-blue-400" />
-            <span>Tiện ích lớp học 11A10</span>
+        {/* Tiêu đề Modal & Nút mở toàn màn hình */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Mini-Game Bốc Thăm & Gọi Tên 11A10</span>
+            </span>
+            <Link
+              to="/vong-quay"
+              onClick={onClose}
+              className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1 font-medium bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full"
+            >
+              <Maximize2 className="w-3 h-3" />
+              <span>Chế độ chiếu Tivi</span>
+            </Link>
           </div>
-          <h2 className="font-display text-2xl font-bold text-white">
-            Bốc thăm ngẫu nhiên
+          <h2 className="font-display text-xl sm:text-2xl font-black text-white">
+            Chọn Ngẫu Nhiên Học Sinh Lên Bảng
           </h2>
-          <p className="text-xs text-slate-400">
-            Chọn ngẫu nhiên học sinh phát biểu, kiểm tra bài cũ hoặc nhận nhiệm vụ lớp
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            Hỗ trợ giáo viên & ban cán sự gọi ngẫu nhiên kiểm tra miệng, giải bài tập hoặc trả lời câu hỏi
           </p>
         </div>
 
-        {/* Display Card */}
-        <div className="py-8 px-4 rounded-2xl bg-slate-950/70 border border-white/5 flex flex-col items-center justify-center min-h-[160px]">
-          {selectedStudent ? (
-            <div className="space-y-2 animate-in zoom-in-95 duration-300">
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
-                <Trophy className="w-3.5 h-3.5 text-emerald-400" /> Học sinh được chọn
-              </span>
-              <div className="font-display text-2xl sm:text-3xl font-extrabold text-white">
-                {displayedName}
-              </div>
-              <div className="text-xs font-mono text-slate-400">
-                {displayedRole}
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
-              <div
-                className={`font-display text-xl sm:text-2xl font-bold transition-colors ${
-                  isSpinning ? 'text-blue-400' : members.length === 0 ? 'text-amber-300 text-lg' : 'text-slate-200'
-                }`}
-              >
-                {displayedName}
-              </div>
-              <div className="text-xs font-mono text-slate-400 max-w-xs mx-auto">{displayedRole}</div>
-            </div>
-          )}
+        {/* Chọn Mục đích & Chế độ chơi */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+          {/* 4 Mục đích */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            {PURPOSE_PRESETS.map((p) => {
+              const active = purposeId === p.id;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    setPurposeId(p.id);
+                    cyberAudio.playClick();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-medium transition-all flex items-center gap-1 border ${
+                    active
+                      ? 'bg-blue-600 border-blue-400 text-white shadow-sm'
+                      : 'bg-slate-950/60 border-white/5 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <span>{p.icon}</span>
+                  <span>{p.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3 Chế độ game */}
+          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/5">
+            <button
+              type="button"
+              onClick={() => {
+                setGameMode('wheel');
+                cyberAudio.playClick();
+              }}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                gameMode === 'wheel' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Vòng quay kỳ diệu"
+            >
+              🎡 Vòng quay
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setGameMode('slot');
+                cyberAudio.playClick();
+              }}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                gameMode === 'slot' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Quay số xèng tốc độ"
+            >
+              🎰 Xèng số
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setGameMode('card');
+                cyberAudio.playClick();
+              }}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                gameMode === 'card' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Lật thẻ bài ma thuật"
+            >
+              🃏 Thẻ bài
+            </button>
+          </div>
         </div>
 
-        {/* Action Button */}
-        <div>
-          <GlassButton
-            size="lg"
-            variant="primary"
-            disabled={isSpinning || members.length === 0}
-            onClick={handleStartSpin}
-            className="w-full"
-          >
-            {isSpinning ? (
-              <>
-                <RotateCcw className="w-4 h-4 animate-spin text-purple-400" /> <span>Đang chọn ngẫu nhiên...</span>
-              </>
-            ) : members.length === 0 ? (
-              <>
-                <AlertCircle className="w-4 h-4 text-amber-400" /> <span>Hãy nạp danh sách học sinh trước</span>
-              </>
-            ) : selectedStudent ? (
-              <>
-                <Dices className="w-4 h-4 text-amber-400" /> <span>Bốc thăm bạn khác</span>
-              </>
-            ) : (
-              <>
-                <Dices className="w-4 h-4 text-amber-400" /> <span>Bắt đầu bốc thăm ({members.length} bạn)</span>
-              </>
+        {/* Thanh lọc tổ & trạng thái */}
+        <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 rounded-xl bg-slate-950/60 border border-white/5 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-slate-400 text-[11px]">Tổ:</span>
+            {['all', 'Tổ 1', 'Tổ 2', 'Tổ 3', 'Tổ 4'].map((grp) => (
+              <button
+                key={grp}
+                type="button"
+                onClick={() => {
+                  setSelectedGroup(grp);
+                  cyberAudio.playClick();
+                }}
+                className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                  selectedGroup === grp
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {grp === 'all' ? 'Tất cả' : grp}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 text-[11px] select-none">
+              <input
+                type="checkbox"
+                checked={excludeCalled}
+                onChange={(e) => setExcludeCalled(e.target.checked)}
+                className="rounded border-slate-700 bg-slate-900 text-blue-600"
+              />
+              <span>Tránh gọi trùng ({calledIds.length})</span>
+            </label>
+
+            {calledIds.length > 0 && (
+              <button
+                type="button"
+                onClick={handleResetCalled}
+                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5"
+              >
+                <RotateCcw className="w-2.5 h-2.5" /> Đặt lại
+              </button>
             )}
-          </GlassButton>
+
+            <button
+              type="button"
+              onClick={handleToggleSound}
+              className="text-slate-400 hover:text-white p-1"
+              title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
+            >
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5 text-red-400" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Khung tương tác trò chơi */}
+        <div className="relative py-4 px-2 rounded-2xl bg-slate-950/80 border border-white/5 flex flex-col items-center justify-center min-h-[320px]">
+          {activeCandidates.length === 0 ? (
+            <div className="text-center py-8 space-y-3">
+              <Trophy className="w-10 h-10 text-amber-400 mx-auto" />
+              <h4 className="text-base font-bold text-white">Đã gọi hết học sinh trong danh sách!</h4>
+              <p className="text-xs text-slate-400">Bấm đặt lại để bắt đầu vòng gọi mới.</p>
+              <GlassButton size="sm" variant="primary" onClick={handleResetCalled}>
+                <span>Đặt lại lượt gọi</span>
+              </GlassButton>
+            </div>
+          ) : (
+            <>
+              {gameMode === 'wheel' && (
+                <LuckyWheelCanvas
+                  candidates={activeCandidates}
+                  isSpinning={isSpinning}
+                  onSpinStart={handleSpinStart}
+                  onSpinEnd={handleSpinEnd}
+                  selectedPurpose={currentPurpose.label}
+                />
+              )}
+
+              {gameMode === 'slot' && (
+                <CyberSlotRoller
+                  candidates={activeCandidates}
+                  isSpinning={isSpinning}
+                  onSpinStart={handleSpinStart}
+                  onSpinEnd={handleSpinEnd}
+                />
+              )}
+
+              {gameMode === 'card' && (
+                <MysteryCardDeck
+                  candidates={activeCandidates}
+                  onSelectWinner={handleSpinEnd}
+                />
+              )}
+            </>
+          )}
+
+          {/* Popup trúng giải */}
+          {winner && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md rounded-2xl animate-in zoom-in-95 duration-200">
+              <div className="w-full max-w-xs rounded-2xl bg-slate-900 border-2 border-amber-400 p-5 text-center space-y-4 shadow-2xl">
+                <Trophy className="w-8 h-8 text-amber-400 mx-auto" />
+                <div>
+                  <span className="inline-block px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[11px] font-mono">
+                    {currentPurpose.icon} {currentPurpose.label}
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-black text-white font-display pt-1">
+                    {winner.fullName}
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {winner.group || '11A10'} • {winner.role || 'Học sinh'}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <GlassButton
+                    size="sm"
+                    variant="primary"
+                    onClick={() => handleMarkCalled(winner.id)}
+                    className="w-full"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Đánh dấu đã hoàn thành</span>
+                  </GlassButton>
+
+                  <GlassButton
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setWinner(null)}
+                    className="w-full"
+                  >
+                    <span>Quay bạn tiếp theo</span>
+                  </GlassButton>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

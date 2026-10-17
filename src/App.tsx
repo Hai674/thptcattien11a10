@@ -19,6 +19,7 @@ import { MembersPage } from '@/pages/Members';
 import { LibraryPage } from '@/pages/Library';
 import { TimetablePage } from '@/pages/Timetable';
 import { ProfilePage } from '@/pages/Profile';
+import { RandomGamePage } from '@/pages/RandomGamePage';
 
 // Admin Pages
 import { AdminDashboard } from '@/pages/admin/Dashboard';
@@ -83,6 +84,7 @@ export const App: React.FC = () => {
           <Route path="thanh-vien" element={<MembersPage />} />
           <Route path="thu-vien" element={<LibraryPage />} />
           <Route path="thoi-khoa-bieu" element={<TimetablePage />} />
+          <Route path="vong-quay" element={<RandomGamePage />} />
           <Route path="ca-nhan" element={<ProfilePage />} />
         </Route>
 

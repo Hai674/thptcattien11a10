@@ -12,6 +12,7 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  Dices,
 } from 'lucide-react';
 import { TreeNav, TreeNavItem } from '@/components/ui/tree-nav';
 import { cn } from '@/utils/cn';
@@ -45,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Danh sách học sinh', path: '/thanh-vien', icon: Users },
     { name: 'Kỷ yếu & Ảnh lớp', path: '/thu-vien', icon: Image },
     { name: 'Thời khóa biểu', path: '/thoi-khoa-bieu', icon: Calendar },
+    { name: 'Vòng quay gọi tên', path: '/vong-quay', icon: Dices },
     { name: 'Trang cá nhân', path: '/ca-nhan', icon: User },
   ];
 
@@ -54,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { label: 'Danh sách học sinh', href: '/thanh-vien', icon: Users },
     { label: 'Kỷ yếu & Ảnh lớp', href: '/thu-vien', icon: Image },
     { label: 'Thời khóa biểu', href: '/thoi-khoa-bieu', icon: Calendar, badge: 'LIVE', badgeVariant: 'emerald' },
+    { label: 'Vòng quay gọi tên', href: '/vong-quay', icon: Dices, badge: 'HOT', badgeVariant: 'amber' },
     { label: 'Trang cá nhân', href: '/ca-nhan', icon: User },
   ];
 
