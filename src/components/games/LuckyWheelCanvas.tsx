@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Member } from '@/types';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { cyberAudio } from '@/utils/cyberAudio';
 
 interface LuckyWheelCanvasProps {
@@ -32,14 +31,14 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
   className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const needleRef = useRef<HTMLDivElement | null>(null);
   const currentAngleRef = useRef<number>(0);
   const animFrameRef = useRef<number>(0);
-  const [needleAngle, setNeedleAngle] = useState(0);
 
   const numItems = Math.max(candidates.length, 1);
   const sliceAngle = (2 * Math.PI) / numItems;
 
-  // Vẽ toàn bộ vòng quay lên Canvas
+  // Vẽ toàn bộ vòng quay lên Canvas với độ phân giải cao
   const drawWheel = useCallback(
     (angle: number) => {
       const canvas = canvasRef.current;
@@ -116,8 +115,7 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
 
         // Cắt gọn tên nếu quá dài để hiển thị sắc nét
         const rawName = student.fullName;
-        const shortName =
-          rawName.length > 15 ? rawName.slice(0, 14) + '…' : rawName;
+        const shortName = rawName.length > 15 ? rawName.slice(0, 14) + '…' : rawName;
 
         ctx.fillText(shortName, radius - 16, 4);
         ctx.restore();
@@ -159,18 +157,47 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
     drawWheel(currentAngleRef.current);
   }, [drawWheel]);
 
-  // Vòng lặp vật lý khi quay (Physics Spin Animation)
+  // Vòng lặp vật lý khi quay (Physics Spin Animation với thuật toán định tâm chuẩn)
   useEffect(() => {
     if (!isSpinning || candidates.length === 0) return;
 
-    let startTime = performance.now();
-    // Quay ngẫu nhiên trong khoảng 5.2s - 6.8s
-    const duration = 5600 + Math.random() * 1200;
-    // Tổng số vòng quay (7 đến 12 vòng) + góc ngẫu nhiên dừng lại
-    const extraSpins = 8 + Math.floor(Math.random() * 4);
-    const targetOffset = Math.random() * 2 * Math.PI;
-    const totalRotation = extraSpins * 2 * Math.PI + targetOffset;
+    // 1. CHỌN TRƯỚC NGƯỜI TRÚNG GIẢI NGẪU NHIÊN 100%
+    const winnerIndex = Math.floor(Math.random() * candidates.length);
+    const chosenWinner = candidates[winnerIndex];
+
+    // 2. TÍNH TOÁN GÓC DỪNG CHÍNH XÁC VÀO TÂM CỦA NAN QUẠT NGƯỜI TRÚNG
+    // Mũi kim đặt ở đỉnh 12h: góc = 3 * PI / 2 = 1.5 * PI
+    const pointerAngle = 1.5 * Math.PI;
+
+    // Vị trí tâm của nan quạt winner: (winnerIndex + 0.5) * sliceAngle
+    // Ta thêm 1 độ lệch vi sai an toàn (jitter) trong khoảng ±20% để trông tự nhiên nhưng TUYỆT ĐỐI không bao giờ chạm ranh giới
+    const safeJitter = (Math.random() - 0.5) * 0.4 * sliceAngle;
+    const targetSliceCenter = (winnerIndex + 0.5) * sliceAngle + safeJitter;
+
+    // Góc quay mục tiêu trong khoảng [0, 2*PI)
+    let finalAngleMod = (pointerAngle - targetSliceCenter) % (2 * Math.PI);
+    if (finalAngleMod < 0) {
+      finalAngleMod += 2 * Math.PI;
+    }
+
+    // Góc hiện tại theo modulo
     const startAngle = currentAngleRef.current;
+    const currentMod = ((startAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    // Tính delta quay thêm để dừng chính xác
+    let delta = finalAngleMod - currentMod;
+    if (delta <= 0) {
+      delta += 2 * Math.PI;
+    }
+
+    // Quay từ 7 đến 10 vòng hoàn chỉnh trước khi dừng lại
+    const extraSpins = 7 + Math.floor(Math.random() * 3);
+    const totalRotation = delta + extraSpins * 2 * Math.PI;
+    const targetFinalAngle = startAngle + totalRotation;
+
+    // Thời gian quay từ 5.4s đến 6.5s
+    const startTime = performance.now();
+    const duration = 5400 + Math.random() * 900;
 
     let lastTickSlice = -1;
 
@@ -178,35 +205,43 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      // Hàm hãm tốc mượt mà Ease-Out Cubic/Quartic
-      const easeOut = 1 - Math.pow(1 - progress, 3.8);
+      // Hàm hãm tốc mượt mà Quintic Ease-Out (dừng cực êm dịu, không giật nhảy)
+      const easeOut = 1 - Math.pow(1 - progress, 4.2);
       const currentRotation = startAngle + totalRotation * easeOut;
       currentAngleRef.current = currentRotation;
 
       drawWheel(currentRotation);
 
-      // Tính toán kim chỉ (Kim đặt ở đỉnh 12h: góc -PI / 2)
-      // Góc tương đối của nan quạt dưới kim:
-      const pointerAngle = (3 * Math.PI) / 2;
-      const relativeAngle = ((pointerAngle - currentRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-      const currentSlice = Math.floor(relativeAngle / sliceAngle);
+      // Tính nan quạt hiện tại đang đi qua kim để phát âm thanh click
+      const currentRelative = ((pointerAngle - currentRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+      const currentSlice = Math.floor(currentRelative / sliceAngle);
 
       if (currentSlice !== lastTickSlice) {
         lastTickSlice = currentSlice;
         cyberAudio.playTick();
-        // Hiệu ứng kim nảy
-        setNeedleAngle(18);
-        setTimeout(() => setNeedleAngle(-6), 35);
-        setTimeout(() => setNeedleAngle(0), 70);
+
+        // Tác động trực tiếp lên DOM kim để đạt 60fps mượt mà không re-render component
+        if (needleRef.current) {
+          needleRef.current.style.transform = 'rotate(16deg)';
+          setTimeout(() => {
+            if (needleRef.current) needleRef.current.style.transform = 'rotate(-5deg)';
+          }, 30);
+          setTimeout(() => {
+            if (needleRef.current) needleRef.current.style.transform = 'rotate(0deg)';
+          }, 60);
+        }
       }
 
       if (progress < 1) {
         animFrameRef.current = requestAnimationFrame(animate);
       } else {
-        // Hoàn tất lượt quay, xác định học sinh trúng
-        const winnerIndex = currentSlice % numItems;
-        const winner = candidates[winnerIndex];
-        onSpinEnd(winner);
+        // Hoàn tất lượt quay: ép đúng góc mục tiêu để kim chỉ chính xác 100% vào người trúng
+        currentAngleRef.current = targetFinalAngle;
+        drawWheel(targetFinalAngle);
+        if (needleRef.current) {
+          needleRef.current.style.transform = 'rotate(0deg)';
+        }
+        onSpinEnd(chosenWinner);
       }
     };
 
@@ -219,10 +254,11 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
 
   return (
     <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
-      {/* Kim chỉ thị ở đỉnh 12h (Indicator Needle) */}
+      {/* Kim chỉ thị ở đỉnh 12h (Indicator Needle với CSS mượt mà) */}
       <div
+        ref={needleRef}
         className="absolute -top-3 z-20 pointer-events-none transition-transform duration-75 origin-top"
-        style={{ transform: `rotate(${needleAngle}deg)` }}
+        style={{ transform: 'rotate(0deg)' }}
       >
         <div className="relative flex flex-col items-center">
           {/* Mũi tên nhọn chỉ xuống */}

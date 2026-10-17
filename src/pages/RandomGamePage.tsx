@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { loadMembersFromStorage } from '@/services/memberService';
 import { Member } from '@/types';
 import { DEFAULT_11A10_STUDENTS, StudentCandidate } from '@/data/classDefaultStudents';
@@ -21,18 +21,19 @@ import {
   Zap,
   Layers,
   GraduationCap,
+  RefreshCw,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { cyberAudio } from '@/utils/cyberAudio';
 import { toast } from 'sonner';
 
-type GameMode = 'wheel' | 'slot' | 'card';
+type GameMode = 'wheel' | 'card' | 'slot';
 
 export const RandomGamePage: React.FC = () => {
   // Danh sách học sinh tổng
   const [allStudents, setAllStudents] = useState<StudentCandidate[]>([]);
-  // Chế độ trò chơi
-  const [gameMode, setGameMode] = useState<GameMode>('card');
+  // Chế độ trò chơi: mặc định vòng quay kỳ diệu
+  const [gameMode, setGameMode] = useState<GameMode>('wheel');
   // Trạng thái đang quay
   const [isSpinning, setIsSpinning] = useState(false);
   // Người trúng giải hiện tại
@@ -48,13 +49,13 @@ export const RandomGamePage: React.FC = () => {
   });
   // Lịch sử lượt gọi
   const [history, setHistory] = useState<{ student: StudentCandidate; purpose: string; time: string }[]>([]);
-  // Bật/tắt loại trừ
+  // Bật/tắt loại trừ người đã gọi
   const [excludeCalled, setExcludeCalled] = useState(true);
   // Âm thanh
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  // Nạp danh sách từ storage hoặc 46 bạn chính thức 11A10
-  useEffect(() => {
+  // Hàm đồng bộ danh sách học sinh từ kho lưu trữ chung của website lớp
+  const syncStudentsFromStorage = useCallback(() => {
     const fromStorage = loadMembersFromStorage();
     if (fromStorage.length > 0) {
       const mapped: StudentCandidate[] = fromStorage.map((m: Member, idx: number) => ({
@@ -67,6 +68,15 @@ export const RandomGamePage: React.FC = () => {
       setAllStudents(DEFAULT_11A10_STUDENTS);
     }
   }, []);
+
+  // Tự động nạp dữ liệu khi mở trang và khi tab được focus lại
+  useEffect(() => {
+    syncStudentsFromStorage();
+
+    const handleFocus = () => syncStudentsFromStorage();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [syncStudentsFromStorage]);
 
   // Lưu danh sách đã gọi vào sessionStorage trong tiết học
   useEffect(() => {
@@ -101,6 +111,12 @@ export const RandomGamePage: React.FC = () => {
     } else {
       document.exitFullscreen().catch(() => {});
     }
+  };
+
+  const handleManualSync = () => {
+    syncStudentsFromStorage();
+    toast.success('Đã đồng bộ danh sách học sinh mới nhất!');
+    cyberAudio.playClick();
   };
 
   const handleResetCalled = () => {
@@ -140,7 +156,7 @@ export const RandomGamePage: React.FC = () => {
     ).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
     setHistory((prev) => [
-      { student: chosenWinner, purpose: 'Bốc thăm ngẫu nhiên', time: timeStr },
+      { student: chosenWinner, purpose: 'Gọi ngẫu nhiên', time: timeStr },
       ...prev.slice(0, 9),
     ]);
   };
@@ -154,25 +170,35 @@ export const RandomGamePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 animate-fade-in pb-12">
-      {/* ================= HEADER TIÊU ĐỀ ================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-slate-900/60 border border-white/10 backdrop-blur-xl">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-2">
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>LỚP 11A10 • THPT CÁT TIÊN</span>
+    <div className="space-y-8 animate-in fade-in duration-300 pb-20">
+      {/* ================= HEADER BANNER CHUẨN DESIGN SYSTEM ================= */}
+      <Card className="rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-xl">
+          <div className="inline-flex items-center gap-2 text-blue-300 text-xs font-mono">
+            <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
+            <span>Năm học 2026 - 2027 • THPT Cát Tiên</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white font-display flex items-center gap-2">
-            Bốc Thăm & Gọi Tên Ngẫu Nhiên
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            Vòng Quay & Bốc Thăm 11A10
             <Sparkles className="w-6 h-6 text-amber-400 animate-pulse" />
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Bốc thăm ngẫu nhiên cả lớp 46 học sinh: Vòng quay may mắn, máy xèng tốc độ hoặc lật 46 thẻ bài ma thuật
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Sĩ số lớp: <strong className="text-blue-400 font-semibold">{allStudents.length} học sinh</strong> • Quay ngẫu nhiên gọi lên bảng, phát biểu, kiểm tra miệng và bốc thăm không trùng lặp
           </p>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <GlassButton
+            size="sm"
+            variant="default"
+            onClick={handleManualSync}
+            title="Đồng bộ danh sách học sinh mới nhất từ trang Danh sách lớp"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
+            <span className="hidden sm:inline">Đồng bộ</span>
+          </GlassButton>
+
           <GlassButton
             size="sm"
             onClick={handleToggleSound}
@@ -180,96 +206,69 @@ export const RandomGamePage: React.FC = () => {
             title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-400" /> : <VolumeX className="w-4 h-4 text-red-400" />}
-            <span className="hidden sm:inline">{soundEnabled ? 'Âm thanh: Bật' : 'Âm thanh: Tắt'}</span>
+            <span className="hidden sm:inline">{soundEnabled ? 'Bật âm' : 'Tắt âm'}</span>
           </GlassButton>
 
           <GlassButton
             size="sm"
+            variant="primary"
             onClick={handleToggleFullscreen}
             contentClassName="flex items-center gap-1.5 text-xs text-amber-300"
             title="Mở toàn màn hình trình chiếu máy chiếu/Tivi"
           >
             <Maximize2 className="w-4 h-4 text-amber-400" />
-            <span className="hidden sm:inline">Chiếu Tivi / F11</span>
+            <span>Chiếu Tivi / F11</span>
           </GlassButton>
         </div>
-      </div>
+      </Card>
 
-      {/* ================= THANH TÙY CHỌN CHẾ ĐỘ TRÒ CHƠI ================= */}
-      <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 space-y-2">
-        <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-          Chọn chế độ bốc thăm:
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setGameMode('card');
-              cyberAudio.playClick();
-            }}
-            className={`p-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 border ${
-              gameMode === 'card'
-                ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-950/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Layers className="w-4 h-4 text-pink-300" />
-            <span>🃏 Bốc thăm 46 lá bài bí mật</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setGameMode('wheel');
-              cyberAudio.playClick();
-            }}
-            className={`p-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 border ${
-              gameMode === 'wheel'
-                ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-950/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Dices className="w-4 h-4 text-amber-300" />
-            <span>🎡 Vòng quay kỳ diệu</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setGameMode('slot');
-              cyberAudio.playClick();
-            }}
-            className={`p-3 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 border ${
-              gameMode === 'slot'
-                ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-950/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Zap className="w-4 h-4 text-cyan-300" />
-            <span>🎰 Quay xèng số tốc độ</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ================= THANH TRẠNG THÁI & LOẠI TRỪ TRÙNG ================= */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-3.5 rounded-2xl bg-indigo-950/30 border border-indigo-500/20 text-xs">
-        <div className="flex items-center gap-2 text-slate-300 font-medium">
-          <Users className="w-4 h-4 text-indigo-400" />
-          <span>Sĩ số lớp 11A10: <strong className="text-white">{allStudents.length} học sinh</strong></span>
-          <span className="text-slate-500">•</span>
-          <span>Sẵn sàng: <strong className="text-amber-400">{activeCandidates.length}</strong></span>
+      {/* ================= THANH TÙY CHỌN & BỘ ĐIỀU HƯỚNG CHẾ ĐỘ ================= */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        {/* Bộ chọn chế độ dạng Tabs chuẩn */}
+        <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 w-fit">
+          {[
+            { id: 'wheel', label: '🎡 Vòng quay kỳ diệu' },
+            { id: 'card', label: '🃏 Bốc thăm 46 lá bài' },
+            { id: 'slot', label: '🎰 Máy xèng tốc độ' },
+          ].map((mode) =>
+            gameMode === mode.id ? (
+              <GlassButton
+                key={mode.id}
+                size="sm"
+                onClick={() => {
+                  setGameMode(mode.id as GameMode);
+                  cyberAudio.playClick();
+                }}
+                contentClassName="px-4 py-1.5 text-xs text-white font-semibold flex items-center gap-1.5"
+              >
+                <span>{mode.label}</span>
+              </GlassButton>
+            ) : (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => {
+                  setGameMode(mode.id as GameMode);
+                  cyberAudio.playClick();
+                }}
+                className="h-9 px-4 rounded-full inline-flex items-center justify-center text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+              >
+                {mode.label}
+              </button>
+            )
+          )}
         </div>
 
-        {/* Tùy chọn không gọi lại */}
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer text-slate-300 select-none">
+        {/* Thanh trạng thái loại trừ trùng */}
+        <div className="flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-300">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={excludeCalled}
               onChange={(e) => setExcludeCalled(e.target.checked)}
               className="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-0"
             />
-            <span>Không gọi lại bạn đã kiểm tra ({calledIds.length} đã gọi)</span>
+            <span>Không gọi lại bạn đã kiểm tra ({calledIds.length})</span>
           </label>
 
           {calledIds.length > 0 && (
@@ -292,14 +291,14 @@ export const RandomGamePage: React.FC = () => {
           <div className="absolute top-4 left-4 z-10 flex items-center gap-2 text-xs font-mono text-slate-400">
             <Users className="w-4 h-4 text-blue-400" />
             <span>
-              Ứng viên: <strong className="text-white">{activeCandidates.length}</strong> / {allStudents.length}
+              Sẵn sàng: <strong className="text-white">{activeCandidates.length}</strong> / {allStudents.length} học sinh
             </span>
           </div>
 
           {/* Banner chế độ */}
-          <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium">
+          <div className="mb-4 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Bốc thăm may mắn 11A10</span>
+            <span>Tập thể lớp 11A10 • THPT Cát Tiên</span>
           </div>
 
           {/* HIỂN THỊ TRÒ CHƠI PHÙ HỢP VỚI CHẾ ĐỘ ĐANG CHỌN */}
@@ -323,19 +322,19 @@ export const RandomGamePage: React.FC = () => {
                 />
               )}
 
+              {gameMode === 'card' && (
+                <MysteryCardDeck
+                  candidates={activeCandidates}
+                  onSelectWinner={handleSpinEnd}
+                />
+              )}
+
               {gameMode === 'slot' && (
                 <CyberSlotRoller
                   candidates={activeCandidates}
                   isSpinning={isSpinning}
                   onSpinStart={handleSpinStart}
                   onSpinEnd={handleSpinEnd}
-                />
-              )}
-
-              {gameMode === 'card' && (
-                <MysteryCardDeck
-                  candidates={activeCandidates}
-                  onSelectWinner={handleSpinEnd}
                 />
               )}
             </>
@@ -395,7 +394,7 @@ export const RandomGamePage: React.FC = () => {
               <div className="flex items-center justify-between pb-2 border-b border-white/10">
                 <div className="flex items-center gap-2">
                   <History className="w-4 h-4 text-blue-400" />
-                  <h3 className="font-bold text-sm text-white">Lịch sử lượt bốc thăm</h3>
+                  <h3 className="font-bold text-sm text-white">Lịch sử lượt gọi</h3>
                 </div>
                 <span className="text-xs font-mono text-slate-400">{history.length} lượt</span>
               </div>
