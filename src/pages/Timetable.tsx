@@ -1,25 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Timetable, ScheduleSlot } from '@/types';
 import { TimetableGrid } from '@/components/timetable/TimetableGrid';
+import { TimetableUploadModal } from '@/components/timetable/TimetableUploadModal';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Card } from '@/components/ui/card';
 import {
   Calendar,
   Printer,
   Download,
-  Upload,
   RotateCcw,
-  Sparkles,
   FileSpreadsheet,
-  CheckCircle2,
-  Sun,
-  Sunset,
-  Trash2,
-  Layers,
   X,
+  Sparkles,
 } from 'lucide-react';
 import {
-  parseTimetableFromExcel,
   processMultipleTimetableFiles,
   downloadSampleTimetableExcel,
   saveTimetableToStorage,
@@ -39,12 +33,7 @@ export const TimetablePage: React.FC = () => {
   });
 
   const [isEditable, setIsEditable] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Tham chiếu các ô chọn file chuyên biệt
-  const autoFileInputRef = useRef<HTMLInputElement>(null);
-  const morningFileInputRef = useRef<HTMLInputElement>(null);
-  const afternoonFileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Lưu tự động khi timetable thay đổi
   useEffect(() => {
@@ -96,14 +85,6 @@ export const TimetablePage: React.FC = () => {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleUploadFiles(e.dataTransfer.files, 'auto');
-    }
-  };
-
   const handleClearAll = () => {
     if (window.confirm('Bạn có chắc chắn muốn làm trống toàn bộ thời khóa biểu để nạp hoặc nhập lại từ đầu?')) {
       setTimetable(EMPTY_TIMETABLE);
@@ -152,48 +133,10 @@ export const TimetablePage: React.FC = () => {
   const stats = countTimetableSlots(timetable.schedule);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300 pb-20">
-      {/* Ẩn input file cho từng chế độ */}
-      {/* 1. Nạp cả 2 file cùng lúc hoặc tự động */}
-      <input
-        ref={autoFileInputRef}
-        type="file"
-        accept=".xlsx, .xls"
-        multiple
-        onChange={(e) => {
-          if (e.target.files) handleUploadFiles(e.target.files, 'auto');
-          if (e.target) e.target.value = '';
-        }}
-        className="hidden"
-      />
-
-      {/* 2. Chỉ nạp file Buổi Sáng */}
-      <input
-        ref={morningFileInputRef}
-        type="file"
-        accept=".xlsx, .xls"
-        onChange={(e) => {
-          if (e.target.files?.[0]) handleUploadFiles([e.target.files[0]], 'Sáng');
-          if (e.target) e.target.value = '';
-        }}
-        className="hidden"
-      />
-
-      {/* 3. Chỉ nạp file Buổi Chiều */}
-      <input
-        ref={afternoonFileInputRef}
-        type="file"
-        accept=".xlsx, .xls"
-        onChange={(e) => {
-          if (e.target.files?.[0]) handleUploadFiles([e.target.files[0]], 'Chiều');
-          if (e.target) e.target.value = '';
-        }}
-        className="hidden"
-      />
-
+    <div className="space-y-6 animate-in fade-in duration-300 pb-20">
       {/* Page Header */}
       <Card className="rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border border-white/10 bg-slate-900/60 backdrop-blur-xl shadow-2xl">
-        <div className="space-y-3 max-w-xl">
+        <div className="space-y-2.5 max-w-xl">
           <div className="inline-flex items-center gap-2 text-cyan-300 text-xs font-mono">
             <Calendar className="w-3.5 h-3.5 text-cyan-400" />
             <span>Năm học 2026 - 2027 • THPT Cát Tiên</span>
@@ -204,8 +147,8 @@ export const TimetablePage: React.FC = () => {
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-300 flex items-center gap-2 font-mono">
-            <Calendar className="w-3.5 h-3.5 text-blue-400" />
-            <span>Hỗ trợ trích xuất từ file TKB toàn trường (2 file Sáng & Chiều riêng biệt)</span>
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span>Trích xuất tự động từ file TKB toàn trường (hỗ trợ Sáng & Chiều riêng biệt)</span>
           </p>
         </div>
 
@@ -213,28 +156,31 @@ export const TimetablePage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2.5">
           <GlassButton
             size="sm"
-            variant="success"
-            onClick={downloadSampleTimetableExcel}
-            title="Tải tệp Excel mẫu để điền rồi nạp vào web"
+            variant="primary"
+            onClick={() => setIsUploadModalOpen(true)}
+            title="Cập nhật Thời khóa biểu từ Excel (Sáng / Chiều / Gộp 2 file)"
+            contentClassName="flex items-center gap-1.5 px-3.5 py-1.5 text-xs text-white font-semibold"
           >
-            <Download className="w-3.5 h-3.5 text-white" />
-            <span>Tải file Excel mẫu</span>
+            <FileSpreadsheet className="w-4 h-4 text-cyan-300" />
+            <span>Nạp TKB Excel</span>
           </GlassButton>
 
           <GlassButton
             size="sm"
-            variant="primary"
-            onClick={() => autoFileInputRef.current?.click()}
-            title="Chọn cả 2 file TKB Sáng và Chiều của trường cùng lúc để tự động gộp"
+            variant="success"
+            onClick={downloadSampleTimetableExcel}
+            title="Tải tệp Excel mẫu để điền rồi nạp vào web"
+            contentClassName="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white"
           >
-            <Layers className="w-3.5 h-3.5 text-white" />
-            <span>Nạp 2 file TKB (Gộp Sáng + Chiều)</span>
+            <Download className="w-3.5 h-3.5 text-white" />
+            <span>Tải file mẫu</span>
           </GlassButton>
 
           <GlassButton
             size="sm"
             variant="secondary"
             onClick={() => setIsEditable(!isEditable)}
+            contentClassName="px-3 py-1.5 text-xs text-white"
           >
             <span>{isEditable ? '✓ Xong sửa' : '✎ Sửa trực tiếp'}</span>
           </GlassButton>
@@ -244,6 +190,7 @@ export const TimetablePage: React.FC = () => {
             variant="destructive"
             onClick={handleClearAll}
             title="Làm trống toàn bộ để tự nhập"
+            contentClassName="p-2 text-white"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </GlassButton>
@@ -253,158 +200,58 @@ export const TimetablePage: React.FC = () => {
             variant="secondary"
             onClick={handlePrint}
             title="In thời khóa biểu"
+            contentClassName="p-2 text-white"
           >
             <Printer className="w-3.5 h-3.5" />
           </GlassButton>
         </div>
       </Card>
 
-      {/* Khu vực Tải lên TKB Đa năng (Sáng / Chiều / 2 file gộp) */}
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        className={`p-6 sm:p-7 rounded-3xl border-2 border-dashed transition-all duration-300 text-center flex flex-col items-center justify-center gap-4 ${
-          isDragging
-            ? 'border-cyan-400 bg-cyan-950/30 scale-[1.01]'
-            : 'border-white/10 bg-white/[0.02] hover:border-cyan-400/50 hover:bg-white/[0.03]'
-        }`}
-      >
-        <div className="flex flex-col items-center gap-2 max-w-2xl">
-          <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-            <FileSpreadsheet className="w-7 h-7" />
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-white">
-            Nạp Thời khóa biểu từ Excel toàn trường THPT Cát Tiên
-          </h3>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Trường phát <strong>2 file riêng Sáng & Chiều</strong>? Bạn có thể nạp từng file riêng lẻ hoặc chọn cả 2 file cùng lúc. Hệ thống sẽ tự động quét mọi trang tính, tìm đúng cột/dòng của <strong>Lớp 11A10</strong> và ghép lại mà không lo bị đè mất buổi học!
-          </p>
-        </div>
-
-        {/* 3 Nút bấm chuyên dụng cho từng nhu cầu */}
-        <div className="flex flex-wrap items-center justify-center gap-3 w-full max-w-2xl pt-1">
-          {/* Nút 1: File Sáng */}
-          <button
-            type="button"
-            onClick={() => morningFileInputRef.current?.click()}
-            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 active:scale-[0.99] transition-all text-left flex items-center gap-3 group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:text-amber-300 transition-colors">
-              <Sun className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-white group-hover:text-slate-100 transition-colors">
-                1. Nạp file TKB Sáng
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Chỉ cập nhật lịch Sáng (Tiết 1 - 5)
-              </p>
-            </div>
-          </button>
-
-          {/* Nút 2: File Chiều */}
-          <button
-            type="button"
-            onClick={() => afternoonFileInputRef.current?.click()}
-            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 active:scale-[0.99] transition-all text-left flex items-center gap-3 group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:text-indigo-300 transition-colors">
-              <Sunset className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-white group-hover:text-slate-100 transition-colors">
-                2. Nạp file TKB Chiều
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Chỉ cập nhật lịch Chiều (Tiết 1 - 4)
-              </p>
-            </div>
-          </button>
-
-          {/* Nút 3: Cả 2 file */}
-          <button
-            type="button"
-            onClick={() => autoFileInputRef.current?.click()}
-            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 active:scale-[0.99] transition-all text-left flex items-center gap-3 group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:text-cyan-300 transition-colors">
-              <Layers className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-white group-hover:text-slate-100 transition-colors">
-                3. Gộp cả 2 file cùng lúc
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Chọn cả 2 file hoặc kéo thả vào
-              </p>
-            </div>
-          </button>
-        </div>
-
-        {/* Trạng thái hiện tại của TKB - Tinh gọn, thanh lịch, không nền màu đằng sau chữ */}
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-6 px-4 py-2 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-300 font-mono w-full max-w-xl">
+      {/* Thanh trạng thái tóm tắt siêu mỏng & tinh tế */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-2.5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-mono text-slate-300">
           <div className="flex items-center gap-2">
-            <Sun className="w-3.5 h-3.5 text-slate-400" />
-            <span>Sáng: <strong className="text-white font-semibold">{stats.morning}</strong> tiết</span>
-            {stats.morning > 0 && (
-              <button
-                type="button"
-                onClick={() => handleClearSession('morning')}
-                className="text-slate-500 hover:text-red-400 transition-colors p-0.5 rounded cursor-pointer"
-                title="Xóa lịch học buổi sáng"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
-            )}
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+            <span className="font-semibold text-white">Lớp 11A10</span>
           </div>
 
-          <span className="text-white/20 hidden sm:inline">|</span>
+          <span className="text-white/20 hidden sm:inline">•</span>
 
-          <div className="flex items-center gap-2">
-            <Sunset className="w-3.5 h-3.5 text-slate-400" />
-            <span>Chiều: <strong className="text-white font-semibold">{stats.afternoon}</strong> tiết</span>
-            {stats.afternoon > 0 && (
-              <button
-                type="button"
-                onClick={() => handleClearSession('afternoon')}
-                className="text-slate-500 hover:text-red-400 transition-colors p-0.5 rounded cursor-pointer"
-                title="Xóa lịch học buổi chiều"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
-            )}
+          <div className="flex items-center gap-2 text-slate-300">
+            <span>Sáng: <strong className="text-white">{stats.morning}</strong> tiết</span>
+            <span className="text-white/20">|</span>
+            <span>Chiều: <strong className="text-white">{stats.afternoon}</strong> tiết</span>
+            <span className="text-white/20">|</span>
+            <span>Tổng: <strong className="text-cyan-300">{stats.total}</strong> tiết</span>
           </div>
 
-          <span className="text-white/20 hidden sm:inline">|</span>
-
-          <div className="flex items-center gap-1.5">
-            <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
-            <span>Tổng: <strong className="text-white font-semibold">{stats.total}</strong> tiết</span>
-          </div>
+          {timetable.fileName && (
+            <>
+              <span className="text-white/20 hidden md:inline">•</span>
+              <div className="hidden md:flex items-center gap-1.5 text-slate-400 truncate max-w-sm">
+                <FileSpreadsheet className="w-3 h-3 text-cyan-400 shrink-0" />
+                <span className="truncate">{timetable.fileName}</span>
+                <button
+                  type="button"
+                  onClick={handleClearSourceFile}
+                  className="text-slate-500 hover:text-red-400 p-0.5 rounded transition-colors cursor-pointer"
+                  title="Gỡ nguồn tệp tin"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Nguồn tệp hiện tại - chỉ hiển thị khi có file và cho phép xóa/bỏ tệp bất kỳ lúc nào */}
-        {timetable.fileName ? (
-          <div className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] text-slate-400 font-mono max-w-xl w-full">
-            <FileSpreadsheet className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="truncate">
-              Nguồn tệp: <span className="text-slate-200 font-medium">{timetable.fileName}</span>
-            </span>
-            <button
-              type="button"
-              onClick={handleClearSourceFile}
-              className="text-slate-400 hover:text-red-400 transition-colors p-1 rounded hover:bg-white/10 shrink-0 ml-1 inline-flex items-center gap-1 text-[10px] cursor-pointer"
-              title="Xóa thông tin nguồn tệp tin"
-            >
-              <X className="w-3 h-3" />
-              <span>Bỏ tệp</span>
-            </button>
-          </div>
-        ) : null}
+        <button
+          type="button"
+          onClick={() => setIsUploadModalOpen(true)}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-cyan-300 hover:text-cyan-200 transition-all cursor-pointer"
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5" />
+          <span>{stats.total > 0 ? 'Đổi / Nạp lại Excel' : 'Nạp file Excel'}</span>
+        </button>
       </div>
 
       {/* Bảng Thời khóa biểu chính */}
@@ -412,6 +259,18 @@ export const TimetablePage: React.FC = () => {
         timetable={timetable}
         onUpdateSlot={handleUpdateSlot}
         isEditable={isEditable}
+      />
+
+      {/* Modal nạp file Excel cao cấp */}
+      <TimetableUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        timetable={timetable}
+        onUploadFiles={handleUploadFiles}
+        onClearSession={handleClearSession}
+        onClearSourceFile={handleClearSourceFile}
+        onClearAll={handleClearAll}
+        onDownloadSample={downloadSampleTimetableExcel}
       />
     </div>
   );
