@@ -24,12 +24,25 @@ const glassCardStyles = `
   -webkit-tap-highlight-color: transparent;
   -webkit-backdrop-filter: blur(28px);
   backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(9, 13, 26, 0.72);
+  background: linear-gradient(
+    -75deg,
+    rgba(9, 13, 26, 0.7),
+    rgba(15, 23, 42, 0.8),
+    rgba(9, 13, 26, 0.7)
+  );
   background: linear-gradient(
     -75deg,
     oklch(from var(--background) l c h / 18%),
     oklch(from var(--background) l c h / 32%),
     oklch(from var(--background) l c h / 18%)
   );
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+    0 16px 40px -12px rgba(0, 0, 0, 0.65),
+    0 0 24px -4px rgba(99, 102, 241, 0.12);
   box-shadow:
     inset 0 .15em .15em oklch(from var(--foreground) l c h / 14%),
     inset 0 -.15em .15em oklch(from var(--background) l c h / 50%),
@@ -42,10 +55,21 @@ const glassCardStyles = `
 .glass-card-element:hover {
   background: linear-gradient(
     -75deg,
+    rgba(9, 13, 26, 0.78),
+    rgba(15, 23, 42, 0.88),
+    rgba(9, 13, 26, 0.78)
+  );
+  background: linear-gradient(
+    -75deg,
     oklch(from var(--background) l c h / 24%),
     oklch(from var(--background) l c h / 42%),
     oklch(from var(--background) l c h / 24%)
   );
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.6),
+    0 24px 50px -10px rgba(0, 0, 0, 0.75),
+    0 0 35px 0 rgba(99, 102, 241, 0.22);
   box-shadow:
     inset 0 .2em .2em oklch(from var(--foreground) l c h / 22%),
     inset 0 -.2em .2em oklch(from var(--background) l c h / 60%),

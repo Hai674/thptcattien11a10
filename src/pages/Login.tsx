@@ -130,7 +130,7 @@ export const Login: React.FC = () => {
         <div className="text-center mb-6">
           <div className="relative inline-block mb-3 group">
             <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition duration-500" />
-            <div className="relative w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-amber-400/50 shadow-2xl mx-auto bg-slate-900">
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-amber-400/50 shadow-2xl mx-auto bg-slate-950/80 backdrop-blur-md border border-white/10">
               <img
                 src="/logo-11a10.jpg"
                 alt="Logo Tập Thể Lớp 11A10"
@@ -149,7 +149,7 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
-        <Card className="rounded-3xl shadow-2xl text-slate-100">
+        <Card className="rounded-3xl shadow-2xl text-slate-100 border border-white/15">
           <CardHeader className="space-y-1 text-center pb-4">
             <CardTitle className="text-xl font-bold">Đăng nhập tài khoản</CardTitle>
             <CardDescription className="text-slate-400">
@@ -193,12 +193,12 @@ export const Login: React.FC = () => {
             </GlassButton>
 
             {/* Phân cách 1 hàng ngang chuẩn */}
-            <div className="relative flex items-center justify-center my-3">
-              <div className="border-t border-slate-800 w-full" />
-              <span className="bg-slate-900 px-3 text-xs uppercase tracking-wider text-slate-400 font-medium whitespace-nowrap">
+            <div className="relative flex items-center justify-center my-4">
+              <div className="border-t border-white/10 w-full" />
+              <span className="bg-slate-950/70 backdrop-blur-md px-3 py-0.5 rounded-full border border-white/10 text-xs uppercase tracking-wider text-slate-400 font-medium whitespace-nowrap shadow-sm">
                 Hoặc bằng Email
               </span>
-              <div className="border-t border-slate-800 w-full" />
+              <div className="border-t border-white/10 w-full" />
             </div>
 
             {/* Form đăng nhập Email & Password */}
@@ -233,7 +233,7 @@ export const Login: React.FC = () => {
                       setResetEmail(email);
                       setIsResetModalOpen(true);
                     }}
-                    className="text-xs text-primary hover:underline hover:text-primary/90 font-medium"
+                    className="text-xs text-sky-400 hover:text-sky-300 hover:underline font-medium"
                   >
                     Quên mật khẩu?
                   </button>
@@ -288,7 +288,7 @@ export const Login: React.FC = () => {
                 Chưa có tài khoản lớp 11A10?{' '}
                 <Link
                   to="/register"
-                  className="font-semibold text-primary hover:underline hover:text-primary/90"
+                  className="font-semibold text-sky-400 hover:text-sky-300 hover:underline"
                 >
                   Đăng ký ngay
                 </Link>
@@ -300,7 +300,7 @@ export const Login: React.FC = () => {
         {/* Modal đặt lại mật khẩu */}
         {isResetModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <Card className="p-6 max-w-sm w-full shadow-2xl relative space-y-4 rounded-3xl">
+            <Card className="p-6 max-w-sm w-full shadow-2xl relative space-y-4 rounded-3xl border border-white/15">
               <h3 className="text-lg font-bold text-white mb-2">Quên mật khẩu?</h3>
               <p className="text-xs text-slate-400 mb-4">
                 Nhập email của bạn để hệ thống gửi thư liên kết đặt lại mật khẩu mới

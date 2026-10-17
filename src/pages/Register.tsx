@@ -98,7 +98,7 @@ export const Register: React.FC = () => {
         <div className="text-center mb-6">
           <div className="relative inline-block mb-3 group">
             <div className="absolute -inset-1.5 bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500 rounded-3xl blur-md opacity-70 group-hover:opacity-100 transition duration-500" />
-            <div className="relative w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-amber-400/50 shadow-2xl mx-auto bg-slate-900">
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-amber-400/50 shadow-2xl mx-auto bg-slate-950/80 backdrop-blur-md border border-white/10">
               <img
                 src="/logo-11a10.jpg"
                 alt="Logo Tập Thể Lớp 11A10"
@@ -117,7 +117,7 @@ export const Register: React.FC = () => {
           </p>
         </div>
 
-        <Card className="rounded-3xl shadow-2xl text-slate-100">
+        <Card className="rounded-3xl shadow-2xl text-slate-100 border border-white/15">
           <CardHeader className="space-y-1 text-center pb-4">
             <CardTitle className="text-xl font-bold">Đăng ký thành viên</CardTitle>
             <CardDescription className="text-slate-400">
@@ -180,15 +180,12 @@ export const Register: React.FC = () => {
                   <span>Đăng ký nhanh bằng Google</span>
                 </GlassButton>
 
-                <div className="relative my-2">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-slate-800" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-slate-900 px-3 text-slate-500 tracking-wider whitespace-nowrap font-medium">
-                      Hoặc đăng ký bằng Email
-                    </span>
-                  </div>
+                <div className="relative flex items-center justify-center my-4">
+                  <div className="border-t border-white/10 w-full" />
+                  <span className="bg-slate-950/70 backdrop-blur-md px-3 py-0.5 rounded-full border border-white/10 text-xs uppercase tracking-wider text-slate-400 font-medium whitespace-nowrap shadow-sm">
+                    Hoặc đăng ký bằng Email
+                  </span>
+                  <div className="border-t border-white/10 w-full" />
                 </div>
 
                 <form onSubmit={handleRegister} className="space-y-3.5">
@@ -306,7 +303,7 @@ export const Register: React.FC = () => {
                     Đã có tài khoản?{' '}
                     <Link
                       to="/login"
-                      className="font-semibold text-primary hover:underline hover:text-primary/90"
+                      className="font-semibold text-sky-400 hover:text-sky-300 hover:underline"
                     >
                       Đăng nhập
                     </Link>

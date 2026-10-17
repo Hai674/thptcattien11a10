@@ -55,8 +55,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Tài khoản bị khóa
   if (effectiveUser.status === 'blocked') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-        <div className="max-w-md w-full bg-card p-6 rounded-2xl shadow-lg border border-border text-center">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#060913] text-slate-100">
+        <div className="max-w-md w-full glass-panel p-6 rounded-3xl shadow-2xl border border-white/15 text-center">
           <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-8 h-8" />
           </div>
