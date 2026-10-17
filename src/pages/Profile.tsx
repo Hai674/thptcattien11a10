@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cyberAudio } from '@/utils/cyberAudio';
-import { compressImage } from '@/utils/imageCompressor';
+import { compressAvatar, compressBanner } from '@/utils/imageCompressor';
 
 // Danh sách các mẫu avatar học sinh tuyển chọn
 const PRESET_AVATARS = [
@@ -36,11 +36,24 @@ const PRESET_AVATARS = [
 export const ProfilePage: React.FC = () => {
   const { user, updateUser } = useAuth();
 
-  const [displayName, setDisplayName] = useState(user?.displayName || 'Ban Cán Sự 11A10');
-  const [photoURL, setPhotoURL] = useState(user?.photoURL || '');
-  const [bannerCustomUrl, setBannerCustomUrl] = useState(user?.bannerCustomUrl || '');
-  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || '');
-  const [bio, setBio] = useState(user?.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên');
+  // Khôi phục ngay từ bộ nhớ cục bộ lúc đầu
+  const getInitial = () => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const active = localStorage.getItem('11a10_active_profile');
+      if (active) return JSON.parse(active);
+      const authU = localStorage.getItem('auth_user_11a10');
+      if (authU) return JSON.parse(authU);
+    } catch {}
+    return null;
+  };
+  const cached = getInitial();
+
+  const [displayName, setDisplayName] = useState(user?.displayName || cached?.displayName || 'Ban Cán Sự 11A10');
+  const [photoURL, setPhotoURL] = useState(user?.photoURL || cached?.photoURL || '');
+  const [bannerCustomUrl, setBannerCustomUrl] = useState(user?.bannerCustomUrl || cached?.bannerCustomUrl || '');
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || cached?.phoneNumber || '');
+  const [bio, setBio] = useState(user?.bio || cached?.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên');
 
   // Mật khẩu
   const [currentPass, setCurrentPass] = useState('');
@@ -50,21 +63,19 @@ export const ProfilePage: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bannerFileInputRef = useRef<HTMLInputElement>(null);
-  const isInitializedRef = useRef<boolean>(false);
 
-  // Khởi tạo form khi user được tải lần đầu
+  // Đồng bộ khi user từ hook/store thay đổi
   useEffect(() => {
-    if (user && !isInitializedRef.current) {
-      isInitializedRef.current = true;
+    if (user) {
       if (user.displayName) setDisplayName(user.displayName);
       if (user.photoURL !== undefined) setPhotoURL(user.photoURL || '');
       if (user.bannerCustomUrl !== undefined) setBannerCustomUrl(user.bannerCustomUrl || '');
       if (user.phoneNumber !== undefined) setPhoneNumber(user.phoneNumber || '');
       if (user.bio !== undefined) setBio(user.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên');
     }
-  }, [user]);
+  }, [user?.uid, user?.updatedAt, user?.photoURL, user?.bannerCustomUrl, user?.displayName]);
 
-  // Lắng nghe cập nhật profile
+  // Lắng nghe sự kiện cập nhật profile thời gian thực
   useEffect(() => {
     const handleProfileUpdateEvent = (e: Event) => {
       const customEvt = e as CustomEvent<any>;
@@ -81,7 +92,7 @@ export const ProfilePage: React.FC = () => {
     return () => window.removeEventListener('11a10_profile_updated', handleProfileUpdateEvent);
   }, []);
 
-  // Tải ảnh đại diện từ máy tính (nén tự động)
+  // Tải ảnh đại diện từ máy tính (nén tự động & lưu ngay lập tức)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -92,16 +103,12 @@ export const ProfilePage: React.FC = () => {
     }
 
     try {
-      toast.info('Đang tối ưu hóa ảnh đại diện...');
-      const compressedDataUrl = await compressImage(file, {
-        maxWidth: 400,
-        maxHeight: 400,
-        quality: 0.85,
-        format: 'image/jpeg',
-      });
+      toast.info('Đang tối ưu và lưu ảnh đại diện...');
+      const compressedDataUrl = await compressAvatar(file);
       setPhotoURL(compressedDataUrl);
       cyberAudio.playClick();
-      toast.success('Đã chọn ảnh đại diện mới! Nhấn "Lưu thông tin" để hoàn tất.');
+      await updateUser?.({ photoURL: compressedDataUrl });
+      toast.success('Đã lưu ảnh đại diện mới thành công!');
     } catch (err: any) {
       console.error('Lỗi khi nén ảnh avatar:', err);
       toast.error('Không thể xử lý ảnh: ' + (err?.message || 'Lỗi định dạng'));
@@ -110,7 +117,30 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  // Tải ảnh bìa hồ sơ từ máy tính (nén tự động)
+  // Chọn avatar mẫu có sẵn và lưu ngay
+  const handleSelectPresetAvatar = async (url: string) => {
+    setPhotoURL(url);
+    cyberAudio.playClick();
+    toast.info('Đang lưu avatar mới...');
+    try {
+      await updateUser?.({ photoURL: url });
+      toast.success('Đã cập nhật ảnh đại diện thành công!');
+    } catch (e) {
+      console.warn('Lỗi khi lưu avatar preset:', e);
+    }
+  };
+
+  // Gỡ avatar
+  const handleRemoveAvatar = async () => {
+    setPhotoURL('');
+    cyberAudio.playClick();
+    try {
+      await updateUser?.({ photoURL: null });
+      toast.success('Đã gỡ ảnh đại diện!');
+    } catch {}
+  };
+
+  // Tải ảnh bìa hồ sơ từ máy tính (nén tự động & lưu ngay lập tức)
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -121,16 +151,12 @@ export const ProfilePage: React.FC = () => {
     }
 
     try {
-      toast.info('Đang tối ưu hóa ảnh bìa...');
-      const compressedDataUrl = await compressImage(file, {
-        maxWidth: 1200,
-        maxHeight: 500,
-        quality: 0.85,
-        format: 'image/jpeg',
-      });
+      toast.info('Đang tối ưu và lưu ảnh bìa...');
+      const compressedDataUrl = await compressBanner(file);
       setBannerCustomUrl(compressedDataUrl);
       cyberAudio.playClick();
-      toast.success('Đã chọn ảnh bìa mới! Nhấn "Lưu thông tin" để hoàn tất.');
+      await updateUser?.({ bannerCustomUrl: compressedDataUrl });
+      toast.success('Đã lưu ảnh bìa mới thành công!');
     } catch (err: any) {
       console.error('Lỗi khi nén ảnh bìa:', err);
       toast.error('Không thể xử lý ảnh: ' + (err?.message || 'Lỗi định dạng'));
@@ -139,6 +165,17 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
+  // Gỡ ảnh bìa
+  const handleRemoveBanner = async () => {
+    setBannerCustomUrl('');
+    cyberAudio.playClick();
+    try {
+      await updateUser?.({ bannerCustomUrl: '' });
+      toast.success('Đã gỡ ảnh bìa tùy chỉnh!');
+    } catch {}
+  };
+
+  // Lưu toàn bộ thông tin họ tên, điện thoại, bio
   const handleSaveProfile = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!displayName.trim()) {
@@ -150,8 +187,8 @@ export const ProfilePage: React.FC = () => {
     try {
       await updateUser?.({
         displayName: displayName.trim(),
-        photoURL,
-        bannerCustomUrl,
+        photoURL: photoURL || null,
+        bannerCustomUrl: bannerCustomUrl || '',
         phoneNumber: phoneNumber.trim(),
         bio: bio.trim(),
       });
@@ -165,6 +202,7 @@ export const ProfilePage: React.FC = () => {
       setIsSaving(false);
     }
   };
+
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
@@ -230,7 +268,7 @@ export const ProfilePage: React.FC = () => {
             {bannerCustomUrl && (
               <button
                 type="button"
-                onClick={() => setBannerCustomUrl('')}
+                onClick={handleRemoveBanner}
                 className="px-2.5 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 backdrop-blur-md border border-red-500/30 text-xs text-red-300 hover:text-red-100 flex items-center gap-1 transition-all"
                 title="Gỡ ảnh bìa tùy chỉnh"
               >
@@ -305,7 +343,7 @@ export const ProfilePage: React.FC = () => {
                   {photoURL && (
                     <button
                       type="button"
-                      onClick={() => setPhotoURL('')}
+                      onClick={handleRemoveAvatar}
                       className="text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors"
                     >
                       <Trash2 className="w-3 h-3" /> Gỡ ảnh
@@ -334,16 +372,13 @@ export const ProfilePage: React.FC = () => {
 
                 {/* Danh sách avatar mẫu */}
                 <div className="pt-2">
-                  <p className="text-[10px] text-slate-400 mb-2">Hoặc chọn avatar có sẵn:</p>
+                  <p className="text-[10px] text-slate-400 mb-2">Hoặc chọn avatar có sẵn (tự động lưu):</p>
                   <div className="flex items-center gap-2 overflow-x-auto pb-1.5">
                     {PRESET_AVATARS.map((url, idx) => (
                       <button
                         key={idx}
                         type="button"
-                        onClick={() => {
-                          setPhotoURL(url);
-                          cyberAudio.playClick();
-                        }}
+                        onClick={() => handleSelectPresetAvatar(url)}
                         className={`w-9 h-9 rounded-full overflow-hidden border-2 shrink-0 transition-transform hover:scale-110 ${
                           photoURL === url
                             ? 'border-blue-500 ring-2 ring-blue-500/40'
@@ -356,6 +391,7 @@ export const ProfilePage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
 
               {/* Họ và tên */}
               <div className="space-y-1.5">

@@ -13,8 +13,37 @@ interface AuthState {
 const getStoredUser = (): User | null => {
   if (typeof window === 'undefined') return null;
   try {
+    let user: User | null = null;
     const raw = localStorage.getItem('auth_user_11a10');
-    return raw ? JSON.parse(raw) : null;
+    if (raw) {
+      user = JSON.parse(raw);
+    }
+    // Hợp nhất ngay các tùy biến hồ sơ mới nhất nếu có
+    const activeRaw = localStorage.getItem('11a10_active_profile');
+    if (activeRaw) {
+      const active = JSON.parse(activeRaw);
+      if (user) {
+        user = {
+          ...user,
+          ...active,
+        };
+      } else {
+        user = {
+          uid: 'admin-11a10-master-uid',
+          email: 'admin@11a10.edu.vn',
+          displayName: active.displayName || 'Ban Cán Sự 11A10',
+          photoURL: active.photoURL !== undefined ? active.photoURL : null,
+          bannerCustomUrl: active.bannerCustomUrl,
+          phoneNumber: active.phoneNumber,
+          bio: active.bio,
+          role: 'admin',
+          classId: '11A10',
+          status: 'active',
+          updatedAt: active.updatedAt || new Date().toISOString(),
+        };
+      }
+    }
+    return user;
   } catch {
     return null;
   }
@@ -56,6 +85,16 @@ export const useAuthStore = create<AuthState>((set) => ({
       };
       try {
         localStorage.setItem('auth_user_11a10', JSON.stringify(updated));
+        // Cập nhật luôn active profile đồng thời
+        const activeProfile = {
+          displayName: updated.displayName,
+          photoURL: updated.photoURL,
+          bannerCustomUrl: updated.bannerCustomUrl,
+          phoneNumber: updated.phoneNumber,
+          bio: updated.bio,
+          updatedAt: updated.updatedAt,
+        };
+        localStorage.setItem('11a10_active_profile', JSON.stringify(activeProfile));
       } catch (err) {
         console.warn('Lỗi cập nhật auth_user_11a10 vào localStorage:', err);
       }
@@ -70,3 +109,4 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   setLoading: (loading) => set({ loading }),
 }));
+

@@ -1,13 +1,13 @@
 /**
  * Công cụ nén và tối ưu hóa ảnh tự động bằng HTML Canvas
- * Giảm kích thước ảnh từ nhiều MB xuống còn 20KB - 80KB (dạng Data URL base64)
+ * Giảm kích thước ảnh từ nhiều MB xuống còn 15KB - 40KB (dạng Data URL base64)
  * Giúp lưu trữ an toàn trong LocalStorage không lo QuotaExceededError và tải trang tức thì
  */
 
 export interface CompressOptions {
   maxWidth?: number;
   maxHeight?: number;
-  quality?: number; // 0.1 đến 1.0 (mặc định 0.82)
+  quality?: number; // 0.1 đến 1.0
   format?: 'image/jpeg' | 'image/webp' | 'image/png';
 }
 
@@ -19,9 +19,9 @@ export async function compressImage(
   options: CompressOptions = {}
 ): Promise<string> {
   const {
-    maxWidth = 800,
-    maxHeight = 800,
-    quality = 0.82,
+    maxWidth = 400,
+    maxHeight = 400,
+    quality = 0.75,
     format = 'image/jpeg',
   } = options;
 
@@ -69,7 +69,7 @@ export async function compressImage(
           resolve(dataUrl);
         } catch {
           // Fallback nếu toDataURL thất bại với format yêu cầu
-          resolve(canvas.toDataURL('image/jpeg', 0.8));
+          resolve(canvas.toDataURL('image/jpeg', 0.7));
         }
       };
       img.src = e.target?.result as string;
@@ -77,3 +77,28 @@ export async function compressImage(
     reader.readAsDataURL(file);
   });
 }
+
+/**
+ * Nén ảnh đại diện (avatar) siêu gọn: tối đa 240x240px, chất lượng 0.75 (~15KB)
+ */
+export async function compressAvatar(file: File | Blob): Promise<string> {
+  return compressImage(file, {
+    maxWidth: 240,
+    maxHeight: 240,
+    quality: 0.75,
+    format: 'image/jpeg',
+  });
+}
+
+/**
+ * Nén ảnh bìa (cover/banner) tối ưu tỉ lệ 800x320px, chất lượng 0.72 (~35KB - 45KB)
+ */
+export async function compressBanner(file: File | Blob): Promise<string> {
+  return compressImage(file, {
+    maxWidth: 800,
+    maxHeight: 320,
+    quality: 0.72,
+    format: 'image/jpeg',
+  });
+}
+

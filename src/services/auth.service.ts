@@ -2,38 +2,126 @@ import { supabase, isSupabaseConfigured } from '@/supabase/config';
 import { User } from '@/types';
 import { useAuthStore } from '@/store/authStore';
 
-const OVERRIDES_STORAGE_KEY = '11a10_user_profile_overrides';
+export const OVERRIDES_STORAGE_KEY = '11a10_user_profile_overrides';
+export const ACTIVE_PROFILE_KEY = '11a10_active_profile';
+
+/**
+ * Lưu vào LocalStorage an toàn với cơ chế tự động dọn dẹp cache nếu chạm hạn mức Quota 5MB
+ */
+export function safeSetItem(key: string, value: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err: any) {
+    console.warn(`Cảnh báo QuotaExceededError khi lưu ${key}:`, err);
+    try {
+      // Dọn dẹp các cache phụ không quan trọng
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('sb-') || k.includes('cache') || k.startsWith('11a10_temp'))) {
+          localStorage.removeItem(k);
+        }
+      }
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e2) {
+      console.error('Không thể lưu localStorage sau khi dọn dẹp:', e2);
+      return false;
+    }
+  }
+}
 
 /**
  * Lấy các thông tin tùy biến (Tên, Avatar, Ảnh bìa, Bio, SĐT) đã được người dùng lưu cục bộ
+ * Ưu tiên đọc từ 11a10_active_profile, sau đó đến map overrides và auth_user_11a10
  */
 export function getProfileOverrides(identifier?: string | null): Partial<User> {
-  if (!identifier || typeof window === 'undefined') return {};
+  if (typeof window === 'undefined') return {};
   try {
+    let result: Partial<User> = {};
+
+    // 1. Đọc từ active profile của người dùng hiện tại (ổn định nhất)
+    const activeRaw = localStorage.getItem(ACTIVE_PROFILE_KEY);
+    if (activeRaw) {
+      try {
+        const parsedActive = JSON.parse(activeRaw);
+        if (parsedActive && typeof parsedActive === 'object') {
+          result = { ...parsedActive };
+        }
+      } catch {}
+    }
+
+    // 2. Tra cứu trong bảng overrides map theo email hoặc uid
     const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
-    if (!raw) return {};
-    const map = JSON.parse(raw);
-    return map[identifier.toLowerCase()] || {};
+    if (raw) {
+      try {
+        const map = JSON.parse(raw);
+        if (identifier) {
+          const cleanId = identifier.toLowerCase();
+          if (map[cleanId]) {
+            result = { ...result, ...map[cleanId] };
+          }
+        }
+        if (identifier?.toLowerCase().includes('admin') && map['admin@11a10.edu.vn']) {
+          result = { ...result, ...map['admin@11a10.edu.vn'] };
+        }
+      } catch {}
+    }
+
+    // 3. Dự phòng từ auth_user_11a10 nếu còn thiếu trường nào
+    const authUserRaw = localStorage.getItem('auth_user_11a10');
+    if (authUserRaw) {
+      try {
+        const authUser = JSON.parse(authUserRaw);
+        if (!result.displayName && authUser.displayName) result.displayName = authUser.displayName;
+        if (result.photoURL === undefined && authUser.photoURL !== undefined) result.photoURL = authUser.photoURL;
+        if (result.bannerCustomUrl === undefined && authUser.bannerCustomUrl !== undefined) result.bannerCustomUrl = authUser.bannerCustomUrl;
+        if (result.phoneNumber === undefined && authUser.phoneNumber !== undefined) result.phoneNumber = authUser.phoneNumber;
+        if (result.bio === undefined && authUser.bio !== undefined) result.bio = authUser.bio;
+      } catch {}
+    }
+
+    return result;
   } catch {
     return {};
   }
 }
 
 /**
- * Lưu các thông tin tùy biến vào bộ nhớ cục bộ theo email hoặc uid của người dùng
+ * Lưu các thông tin tùy biến vào bộ nhớ cục bộ đồng thời cả active profile và overrides map
  */
 export function saveProfileOverrides(identifier: string, partial: Partial<User>): void {
-  if (!identifier || typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return;
   try {
-    const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
-    const map = raw ? JSON.parse(raw) : {};
-    const cleanId = identifier.toLowerCase();
-    map[cleanId] = {
-      ...(map[cleanId] || {}),
+    // 1. Cập nhật vào 11a10_active_profile
+    let currentActive: Partial<User> = {};
+    const activeRaw = localStorage.getItem(ACTIVE_PROFILE_KEY);
+    if (activeRaw) {
+      try { currentActive = JSON.parse(activeRaw); } catch {}
+    }
+    const newActive = {
+      ...currentActive,
       ...partial,
       updatedAt: new Date().toISOString(),
     };
-    localStorage.setItem(OVERRIDES_STORAGE_KEY, JSON.stringify(map));
+    safeSetItem(ACTIVE_PROFILE_KEY, JSON.stringify(newActive));
+
+    // 2. Cập nhật vào OVERRIDES_STORAGE_KEY (chỉ 1 khóa duy nhất theo cleanId, không nhân bản)
+    if (identifier) {
+      const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
+      let map: Record<string, any> = {};
+      if (raw) {
+        try { map = JSON.parse(raw); } catch {}
+      }
+      const cleanId = identifier.toLowerCase();
+      map[cleanId] = {
+        ...(map[cleanId] || {}),
+        ...partial,
+        updatedAt: new Date().toISOString(),
+      };
+      safeSetItem(OVERRIDES_STORAGE_KEY, JSON.stringify(map));
+    }
   } catch (err) {
     console.warn('Lỗi khi lưu profile overrides:', err);
   }
@@ -43,6 +131,7 @@ export function saveProfileOverrides(identifier: string, partial: Partial<User>)
  * Lấy thông tin chi tiết của người dùng từ Supabase bảng `profiles`
  */
 export async function getCurrentUser(uid?: string): Promise<User | null> {
+
   if (!isSupabaseConfigured) return null;
 
   try {
@@ -440,18 +529,19 @@ export async function resetPassword(email: string): Promise<void> {
  */
 export async function updateUserProfile(partial: Partial<User>): Promise<User | null> {
   const currentUser = useAuthStore.getState().user;
-  const userIdentifier = currentUser?.email || currentUser?.uid || 'default_user';
+  const userIdentifier = currentUser?.email || currentUser?.uid || 'admin@11a10.edu.vn';
 
-  // 1. Lưu Profile Overrides vào LocalStorage theo email và uid để không bao giờ bị ghi đè sau reload
+  // 1. Lưu Profile Overrides vào LocalStorage (11a10_active_profile và overrides map)
   saveProfileOverrides(userIdentifier, partial);
-  if (currentUser?.email) saveProfileOverrides(currentUser.email, partial);
-  if (currentUser?.uid) saveProfileOverrides(currentUser.uid, partial);
+  if (currentUser?.email && currentUser.email.toLowerCase() !== userIdentifier.toLowerCase()) {
+    saveProfileOverrides(currentUser.email, partial);
+  }
 
   // 2. Cập nhật ngay tức thì vào Zustand store & LocalStorage (auth_user_11a10)
   useAuthStore.getState().updateUser(partial);
   const updatedUser = useAuthStore.getState().user;
 
-  // 3. Đồng bộ với danh sách thành viên đăng ký (11a10_registered_users) nếu có
+  // 3. Đồng bộ với danh sách thành viên đăng ký (11a10_registered_users) nếu có (loại bỏ ảnh bìa lớn để tiết kiệm bộ nhớ)
   try {
     const rawUsers = localStorage.getItem('11a10_registered_users');
     if (rawUsers) {
@@ -462,13 +552,19 @@ export async function updateUserProfile(partial: Partial<User>): Promise<User | 
           (currentUser?.uid && u.uid === currentUser.uid)
       );
       if (idx !== -1) {
-        users[idx] = { ...users[idx], ...partial, updatedAt: new Date().toISOString() };
-        localStorage.setItem('11a10_registered_users', JSON.stringify(users));
+        // Chỉ đồng bộ các trường gọn gàng vào danh sách thành viên lớp
+        const safePartial = { ...partial };
+        if (typeof safePartial.bannerCustomUrl === 'string' && safePartial.bannerCustomUrl.length > 500) {
+          delete safePartial.bannerCustomUrl;
+        }
+        users[idx] = { ...users[idx], ...safePartial, updatedAt: new Date().toISOString() };
+        safeSetItem('11a10_registered_users', JSON.stringify(users));
       }
     }
   } catch (err) {
     console.warn('Lỗi đồng bộ vào 11a10_registered_users:', err);
   }
+
 
   // 4. Nếu có phiên Supabase thực tế, đồng bộ an toàn lên máy chủ Supabase
   if (isSupabaseConfigured) {
