@@ -309,7 +309,7 @@ export const ProfilePage: React.FC = () => {
                     <span>{displayName}</span>
                     <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 drop-shadow" />
                   </h2>
-                  <span className="px-3 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/30 text-blue-200 border border-blue-400/40 backdrop-blur-md uppercase tracking-wider shadow-sm">
+                  <span className="text-xs font-mono font-medium text-blue-300">
                     {user?.role === 'admin' ? 'Ban Cán Sự (Admin)' : 'Thành viên 11A10'}
                   </span>
                 </div>

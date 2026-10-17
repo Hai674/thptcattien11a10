@@ -296,7 +296,7 @@ export const RandomGamePage: React.FC = () => {
           </div>
 
           {/* Banner chế độ */}
-          <div className="mb-4 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium">
+          <div className="mb-4 inline-flex items-center gap-2 text-slate-400 text-xs font-medium">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Tập thể lớp 11A10 • THPT Cát Tiên</span>
           </div>
@@ -349,7 +349,7 @@ export const RandomGamePage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <span className="inline-block px-3 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-xs font-mono font-bold">
+                  <span className="inline-block text-amber-400 text-xs font-mono font-bold tracking-wider uppercase">
                     🎲 BỐC THĂM 11A10
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-black text-white font-display pt-1">

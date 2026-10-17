@@ -242,16 +242,7 @@ export function TreeNav({
               <span className="truncate flex-1">{item.label}</span>
 
               {item.badge && (
-                <span
-                  className={cn(
-                    'inline-flex h-[18px] shrink-0 items-center rounded-md px-1.5 text-[10px] font-mono font-bold tracking-wider',
-                    item.badgeVariant === 'amber'
-                      ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                      : item.badgeVariant === 'emerald'
-                      ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
-                  )}
-                >
+                <span className="text-[10px] font-mono font-semibold text-slate-400 ml-auto">
                   {item.badge}
                 </span>
               )}

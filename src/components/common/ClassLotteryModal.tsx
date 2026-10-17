@@ -138,15 +138,15 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
 
         {/* Tiêu đề Modal & Nút mở toàn màn hình */}
         <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono">
+          <div className="flex items-center justify-center gap-4">
+            <span className="inline-flex items-center gap-1.5 text-slate-400 text-xs font-mono">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>Bốc Thăm & Gọi Tên 11A10</span>
             </span>
             <Link
               to="/vong-quay"
               onClick={onClose}
-              className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1 font-medium bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full"
+              className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1 font-medium"
             >
               <Maximize2 className="w-3 h-3" />
               <span>Chế độ chiếu Tivi</span>
@@ -293,7 +293,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
               <div className="w-full max-w-xs rounded-2xl bg-slate-900 border-2 border-amber-400 p-5 text-center space-y-4 shadow-2xl">
                 <Trophy className="w-8 h-8 text-amber-400 mx-auto" />
                 <div>
-                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[11px] font-mono font-bold">
+                  <span className="inline-block text-amber-400 text-[11px] font-mono font-bold tracking-wider uppercase">
                     🎲 BỐC THĂM 11A10
                   </span>
                   <h3 className="text-xl sm:text-2xl font-black text-white font-display pt-1">

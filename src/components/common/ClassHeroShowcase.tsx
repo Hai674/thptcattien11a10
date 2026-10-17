@@ -272,8 +272,8 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${!isOffDay ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-                <span className={`font-mono text-[10px] font-bold uppercase tracking-wider ${!isOffDay ? 'text-emerald-400' : 'text-slate-400'}`}>
-                  LIVE HÔM NAY
+                <span className={`font-mono text-[10px] font-medium tracking-wider ${!isOffDay ? 'text-emerald-400' : 'text-slate-400'}`}>
+                  HÔM NAY
                 </span>
               </div>
             </div>

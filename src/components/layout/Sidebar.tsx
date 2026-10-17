@@ -52,16 +52,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const treeNavItems: TreeNavItem[] = [
     { label: 'Trang chủ', href: '/', icon: Home },
-    { label: 'Bảng tin thông báo', href: '/thong-bao', icon: Bell, badge: 'MỚI', badgeVariant: 'primary' },
+    { label: 'Bảng tin thông báo', href: '/thong-bao', icon: Bell },
     { label: 'Danh sách học sinh', href: '/thanh-vien', icon: Users },
     { label: 'Kỷ yếu & Ảnh lớp', href: '/thu-vien', icon: Image },
-    { label: 'Thời khóa biểu', href: '/thoi-khoa-bieu', icon: Calendar, badge: 'LIVE', badgeVariant: 'emerald' },
-    { label: 'Vòng quay gọi tên', href: '/vong-quay', icon: Dices, badge: 'HOT', badgeVariant: 'amber' },
+    { label: 'Thời khóa biểu', href: '/thoi-khoa-bieu', icon: Calendar },
+    { label: 'Vòng quay gọi tên', href: '/vong-quay', icon: Dices },
     { label: 'Trang cá nhân', href: '/ca-nhan', icon: User },
   ];
 
   const adminTreeNavItems: TreeNavItem[] = [
-    { label: 'Bảng điều khiển Admin', href: '/admin', icon: Shield, badge: 'BẢN CÁN SỰ', badgeVariant: 'amber' },
+    { label: 'Bảng điều khiển Admin', href: '/admin', icon: Shield },
   ];
 
   return (
