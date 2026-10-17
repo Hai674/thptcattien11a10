@@ -217,11 +217,13 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               contentClassName="flex items-center gap-2 text-xs font-medium text-slate-200"
             >
-              <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-[11px] flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-7 h-7 rounded-full overflow-hidden border border-white/20 flex-shrink-0 shadow-sm bg-slate-900">
                 {user.photoURL ? (
                   <img src={user.photoURL} alt={user.displayName || 'Avatar'} className="w-full h-full object-cover" />
                 ) : (
-                  <span>{getGivenName(user.displayName) || 'U'}</span>
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-[11px]">
+                    <span>{getGivenName(user.displayName) || 'U'}</span>
+                  </div>
                 )}
               </div>
               <span className="hidden md:inline max-w-[90px] truncate">
@@ -244,11 +246,13 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative z-10 space-y-2">
                 {/* Header User Profile Card */}
                 <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3 backdrop-blur-md">
-                  <div className="w-11 h-11 rounded-2xl overflow-hidden border border-blue-400/40 flex-shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xs px-1 select-none">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-cyan-400/40 flex-shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.25)] bg-slate-900 select-none">
                     {user.photoURL ? (
                       <img src={user.photoURL} alt={user.displayName || 'Avatar'} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="truncate max-w-full">{getGivenName(user.displayName) || 'U'}</span>
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs px-1">
+                        <span className="truncate max-w-full">{getGivenName(user.displayName) || 'U'}</span>
+                      </div>
                     )}
                   </div>
                   <div className="overflow-hidden min-w-0 flex-1">
