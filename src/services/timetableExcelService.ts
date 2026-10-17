@@ -21,7 +21,9 @@ export const EMPTY_TIMETABLE: Timetable = {
   classId: '11A10',
   updatedAt: new Date().toISOString(),
   updatedBy: 'Lớp 11A10',
-  fileName: 'TKB_11A10.xlsx',
+  fileName: '',
+  morningFileName: '',
+  afternoonFileName: '',
   schedule: {
     '2': {},
     '3': {},
@@ -381,6 +383,82 @@ export function countTimetableSlots(schedule: Timetable['schedule']): {
 }
 
 /**
+ * Làm sạch tên file, loại bỏ tiền tố đệ quy như "Sáng:", "Chiều:", "(Sáng)", "(Chiều)"
+ */
+export function cleanRawFileName(fileName?: string): string {
+  if (!fileName) return '';
+  let clean = String(fileName).trim();
+  while (/^(?:Sáng|Chiều|Cả ngày):\s*/i.test(clean)) {
+    clean = clean.replace(/^(?:Sáng|Chiều|Cả ngày):\s*/i, '').trim();
+  }
+  clean = clean.replace(/\s*\((?:Sáng|Chiều|Cả ngày)\)$/i, '').trim();
+  if (clean.includes('|')) {
+    const parts = clean.split('|').map((p) => cleanRawFileName(p)).filter(Boolean);
+    if (parts.length > 0) return parts[0];
+  }
+  return clean;
+}
+
+/**
+ * Trích xuất tên file Sáng và Chiều từ một chuỗi fileName bất kỳ (kể cả chuỗi cũ lặp)
+ */
+export function extractSessionFileNames(combinedName?: string): { morning?: string; afternoon?: string } {
+  if (!combinedName) return {};
+  let morning: string | undefined;
+  let afternoon: string | undefined;
+
+  const parts = combinedName.split('|').map((s) => s.trim());
+  for (const part of parts) {
+    if (/^Sáng:/i.test(part)) {
+      const fn = cleanRawFileName(part);
+      if (fn && !morning) morning = fn;
+    } else if (/^Chiều:/i.test(part)) {
+      const fn = cleanRawFileName(part);
+      if (fn && !afternoon) afternoon = fn;
+    } else if (!morning && !afternoon) {
+      const fn = cleanRawFileName(part);
+      if (fn.toLowerCase().includes('sang')) morning = fn;
+      else if (fn.toLowerCase().includes('chieu')) afternoon = fn;
+    }
+  }
+
+  return { morning, afternoon };
+}
+
+/**
+ * Tạo chuỗi hiển thị tên file nguồn chuẩn xác, không bao giờ lặp lại
+ */
+export function formatCombinedFileName(
+  morningFn?: string,
+  afternoonFn?: string,
+  fallbackFn?: string
+): string {
+  const cleanM = cleanRawFileName(morningFn);
+  const cleanA = cleanRawFileName(afternoonFn);
+
+  if (cleanM && cleanA) {
+    if (cleanM === cleanA) return cleanM;
+    return `Sáng: ${cleanM} | Chiều: ${cleanA}`;
+  }
+  if (cleanM) return `Sáng: ${cleanM}`;
+  if (cleanA) return `Chiều: ${cleanA}`;
+  return cleanRawFileName(fallbackFn);
+}
+
+/**
+ * Xóa trắng nguồn tệp đã nạp khỏi Thời khóa biểu
+ */
+export function clearTimetableSourceFiles(timetable: Timetable): Timetable {
+  return {
+    ...timetable,
+    fileName: '',
+    morningFileName: '',
+    afternoonFileName: '',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/**
  * HỢP NHẤT BẢO TOÀN LỊCH HỌC TUYỆT ĐỐI
  * - Khi nạp buổi Chiều: Cập nhật c1..c5, GIỮ NGUYÊN 100% các tiết sáng (1..5)
  * - Khi nạp buổi Sáng: Cập nhật 1..5, GIỮ NGUYÊN 100% các tiết chiều (c1..c5)
@@ -463,20 +541,28 @@ export function mergeTimetableSchedules(
     }
   }
 
-  let fileName = incomingFileName || base?.fileName || 'TKB_11A10.xlsx';
-  if (base?.fileName && incomingFileName && base.fileName !== incomingFileName) {
-    if (session === 'Sáng') {
-      fileName = `Sáng: ${incomingFileName} | Chiều: ${base.fileName}`;
-    } else if (session === 'Chiều') {
-      fileName = `Sáng: ${base.fileName} | Chiều: ${incomingFileName}`;
-    }
+  const cleanIncoming = cleanRawFileName(incomingFileName);
+  let currentMorningFn = base?.morningFileName || extractSessionFileNames(base?.fileName).morning || '';
+  let currentAfternoonFn = base?.afternoonFileName || extractSessionFileNames(base?.fileName).afternoon || '';
+
+  if (session === 'Sáng' || (incomingHasMorning && !incomingHasAfternoon)) {
+    currentMorningFn = cleanIncoming;
+  } else if (session === 'Chiều' || (!incomingHasMorning && incomingHasAfternoon)) {
+    currentAfternoonFn = cleanIncoming;
+  } else {
+    currentMorningFn = cleanIncoming;
+    currentAfternoonFn = cleanIncoming;
   }
+
+  const finalFileName = formatCombinedFileName(currentMorningFn, currentAfternoonFn, cleanIncoming);
 
   return {
     ...base,
     updatedAt: new Date().toISOString(),
     updatedBy: 'Ban Cán Sự 11A10 (Import Excel)',
-    fileName,
+    fileName: finalFileName,
+    morningFileName: currentMorningFn,
+    afternoonFileName: currentAfternoonFn,
     schedule: mergedSchedule,
   };
 }
@@ -540,9 +626,21 @@ export function clearSessionFromTimetable(timetable: Timetable, session: 'mornin
     }
   });
 
+  const stats = countTimetableSlots(newSchedule);
+  let morningFn = session === 'morning' ? '' : (timetable.morningFileName || extractSessionFileNames(timetable.fileName).morning || '');
+  let afternoonFn = session === 'afternoon' ? '' : (timetable.afternoonFileName || extractSessionFileNames(timetable.fileName).afternoon || '');
+
+  if (stats.morning === 0) morningFn = '';
+  if (stats.afternoon === 0) afternoonFn = '';
+
+  const newFileName = stats.total === 0 ? '' : formatCombinedFileName(morningFn, afternoonFn);
+
   return {
     ...timetable,
     updatedAt: new Date().toISOString(),
+    fileName: newFileName,
+    morningFileName: morningFn,
+    afternoonFileName: afternoonFn,
     schedule: newSchedule,
   };
 }
@@ -1129,7 +1227,7 @@ export async function processMultipleTimetableFiles(
   return {
     ...lastResult,
     timetable: currentTimetable,
-    fileName: processedFiles.join(' + '),
+    fileName: currentTimetable.fileName || processedFiles.join(' + '),
     morningSlotsCount: finalStats.morning,
     afternoonSlotsCount: finalStats.afternoon,
     totalSlotsCount: finalStats.total,
@@ -1177,8 +1275,26 @@ export function loadTimetableFromStorage(): Timetable | null {
     }
     if (data && data.schedule && data.schedule['7']) {
       delete data.schedule['7'];
+    }
+
+    // Tự động chuẩn hóa và làm sạch fileName nếu chứa chuỗi lặp từ các lần nạp trước
+    if (data && data.schedule) {
+      const stats = countTimetableSlots(data.schedule);
+      if (stats.total === 0) {
+        data.fileName = '';
+        data.morningFileName = '';
+        data.afternoonFileName = '';
+      } else if (data.fileName) {
+        const extracted = extractSessionFileNames(data.fileName);
+        const morningFn = data.morningFileName || extracted.morning || '';
+        const afternoonFn = data.afternoonFileName || extracted.afternoon || '';
+        data.morningFileName = stats.morning > 0 ? cleanRawFileName(morningFn) : '';
+        data.afternoonFileName = stats.afternoon > 0 ? cleanRawFileName(afternoonFn) : '';
+        data.fileName = formatCombinedFileName(data.morningFileName, data.afternoonFileName, cleanRawFileName(data.fileName));
+      }
       localStorage.setItem('11a10_timetable_data', JSON.stringify(data));
     }
+
     return data;
   } catch {
     return null;

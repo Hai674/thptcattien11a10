@@ -105,6 +105,8 @@ export interface Timetable {
   updatedAt: string | number | Date;
   updatedBy: string;
   fileName: string;
+  morningFileName?: string;
+  afternoonFileName?: string;
   schedule: {
     // day: "2" | "3" | "4" | "5" | "6" | "7" (Thứ 2 đến Thứ 7)
     [day: string]: {

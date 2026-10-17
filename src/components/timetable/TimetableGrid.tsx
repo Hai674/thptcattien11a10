@@ -10,46 +10,45 @@ interface TimetableGridProps {
   isEditable?: boolean;
 }
 
-const SUBJECT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  'Chào cờ': { bg: 'bg-red-500/15', text: 'text-red-300', border: 'border-red-500/30' },
-  'Toán': { bg: 'bg-blue-500/15', text: 'text-blue-300', border: 'border-blue-500/30' },
-  'Ngữ Văn': { bg: 'bg-pink-500/15', text: 'text-pink-300', border: 'border-pink-500/30' },
-  'Tiếng Anh': { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
-  'Vật Lý': { bg: 'bg-violet-500/15', text: 'text-violet-300', border: 'border-violet-500/30' },
-  'Lý': { bg: 'bg-violet-500/15', text: 'text-violet-300', border: 'border-violet-500/30' },
-  'Hóa Học': { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/30' },
-  'Hóa': { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/30' },
-  'Sinh Học': { bg: 'bg-teal-500/15', text: 'text-teal-300', border: 'border-teal-500/30' },
-  'Sinh': { bg: 'bg-teal-500/15', text: 'text-teal-300', border: 'border-teal-500/30' },
-  'Lịch Sử': { bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/30' },
-  'Sử': { bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/30' },
-  'Địa Lý': { bg: 'bg-cyan-500/15', text: 'text-cyan-300', border: 'border-cyan-500/30' },
-  'Địa': { bg: 'bg-cyan-500/15', text: 'text-cyan-300', border: 'border-cyan-500/30' },
-  'KTPL': { bg: 'bg-indigo-500/15', text: 'text-indigo-300', border: 'border-indigo-500/30' },
-  'GDCD': { bg: 'bg-lime-500/15', text: 'text-lime-300', border: 'border-lime-500/30' },
-  'Tin Học': { bg: 'bg-sky-500/15', text: 'text-sky-300', border: 'border-sky-500/30' },
-  'Tin': { bg: 'bg-sky-500/15', text: 'text-sky-300', border: 'border-sky-500/30' },
-  'Thể Dục': { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
-  'GDTC': { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
-  'GDQP-AN': { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30' },
-  'GDQPAN': { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30' },
-  'GDQP': { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30' },
-  'HDTNHN': { bg: 'bg-rose-500/15', text: 'text-rose-300', border: 'border-rose-500/30' },
-  'GDĐP': { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/30' },
-  'Sinh hoạt lớp': { bg: 'bg-purple-500/15', text: 'text-purple-300', border: 'border-purple-500/30' },
-  'Công Nghệ': { bg: 'bg-cyan-500/15', text: 'text-cyan-300', border: 'border-cyan-500/30' },
+const SUBJECT_ACCENTS: Record<string, { dot: string; borderLeft: string }> = {
+  'Chào cờ': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80' },
+  'Toán': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80' },
+  'Ngữ Văn': { dot: 'bg-pink-400', borderLeft: 'border-l-2 border-l-pink-400/80' },
+  'Tiếng Anh': { dot: 'bg-emerald-400', borderLeft: 'border-l-2 border-l-emerald-400/80' },
+  'Vật Lý': { dot: 'bg-violet-400', borderLeft: 'border-l-2 border-l-violet-400/80' },
+  'Lý': { dot: 'bg-violet-400', borderLeft: 'border-l-2 border-l-violet-400/80' },
+  'Hóa Học': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'Hóa': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'Sinh Học': { dot: 'bg-teal-400', borderLeft: 'border-l-2 border-l-teal-400/80' },
+  'Sinh': { dot: 'bg-teal-400', borderLeft: 'border-l-2 border-l-teal-400/80' },
+  'Lịch Sử': { dot: 'bg-orange-400', borderLeft: 'border-l-2 border-l-orange-400/80' },
+  'Sử': { dot: 'bg-orange-400', borderLeft: 'border-l-2 border-l-orange-400/80' },
+  'Địa Lý': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
+  'Địa': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
+  'KTPL': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+  'GDCD': { dot: 'bg-lime-400', borderLeft: 'border-l-2 border-l-lime-400/80' },
+  'Tin Học': { dot: 'bg-blue-400', borderLeft: 'border-l-2 border-l-blue-400/80' },
+  'Tin': { dot: 'bg-blue-400', borderLeft: 'border-l-2 border-l-blue-400/80' },
+  'Thể Dục': { dot: 'bg-emerald-400', borderLeft: 'border-l-2 border-l-emerald-400/80' },
+  'GDTC': { dot: 'bg-emerald-400', borderLeft: 'border-l-2 border-l-emerald-400/80' },
+  'GDQP-AN': { dot: 'bg-yellow-400', borderLeft: 'border-l-2 border-l-yellow-400/80' },
+  'GDQPAN': { dot: 'bg-yellow-400', borderLeft: 'border-l-2 border-l-yellow-400/80' },
+  'GDQP': { dot: 'bg-yellow-400', borderLeft: 'border-l-2 border-l-yellow-400/80' },
+  'HDTNHN': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80' },
+  'GDĐP': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'Sinh hoạt lớp': { dot: 'bg-purple-400', borderLeft: 'border-l-2 border-l-purple-400/80' },
+  'Công Nghệ': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
 };
 
-function getSubjectColor(subject: string) {
+function getSubjectAccent(subject: string) {
   if (!subject) return null;
   const s = subject.toLowerCase();
-  for (const [key, val] of Object.entries(SUBJECT_COLORS)) {
+  for (const [key, val] of Object.entries(SUBJECT_ACCENTS)) {
     if (s.includes(key.toLowerCase())) return val;
   }
   return {
-    bg: 'bg-blue-500/10',
-    text: 'text-blue-300',
-    border: 'border-blue-500/20',
+    dot: 'bg-slate-400',
+    borderLeft: 'border-l-2 border-l-slate-400/50',
   };
 }
 
@@ -151,7 +150,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
             {/* Các ngày từ Thứ 2 đến Thứ 7 */}
             {days.map((d) => {
               const slot = timetable.schedule[d.key]?.[p.key];
-              const colors = slot ? getSubjectColor(slot.subject) : null;
+              const accent = slot ? getSubjectAccent(slot.subject) : null;
               const isCurrentDay = currentDayOfWeek === d.key;
               const isEditing = editingKey === `${d.key}_${p.key}`;
 
@@ -203,23 +202,26 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                     </div>
                   ) : slot && slot.subject ? (
                     <div
-                      className={`h-full min-h-[58px] p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
-                        colors
-                          ? `${colors.bg} ${colors.border}`
-                          : 'bg-white/5 border-white/10'
+                      className={`h-full min-h-[58px] p-2.5 rounded-xl border flex flex-col justify-between transition-all bg-slate-900/60 hover:bg-slate-900/90 border-white/10 hover:border-white/20 group/cell ${
+                        accent ? accent.borderLeft : ''
                       }`}
                     >
                       <div className="flex items-start justify-between gap-1">
-                        <p className={`font-semibold text-xs leading-tight ${colors ? colors.text : 'text-white'}`}>
-                          {slot.subject}
-                        </p>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          {accent?.dot && (
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${accent.dot}`} />
+                          )}
+                          <p className="font-semibold text-xs text-white leading-tight truncate">
+                            {slot.subject}
+                          </p>
+                        </div>
                         {isEditable && (
-                          <Edit2 className="w-2.5 h-2.5 text-slate-500 opacity-0 group-hover:opacity-100" />
+                          <Edit2 className="w-2.5 h-2.5 text-slate-500 opacity-0 group-hover/cell:opacity-100 shrink-0" />
                         )}
                       </div>
 
                       {slot.teacher && (
-                        <p className="text-[10px] text-slate-400 truncate mt-1">
+                        <p className="text-[10px] text-slate-400 truncate mt-1 pl-3">
                           {slot.teacher}
                         </p>
                       )}

@@ -16,6 +16,7 @@ import {
   Sunset,
   Trash2,
   Layers,
+  X,
 } from 'lucide-react';
 import {
   parseTimetableFromExcel,
@@ -25,6 +26,7 @@ import {
   loadTimetableFromStorage,
   countTimetableSlots,
   clearSessionFromTimetable,
+  clearTimetableSourceFiles,
   EMPTY_TIMETABLE,
 } from '@/services/timetableExcelService';
 import { INITIAL_TIMETABLE } from '@/data/mockData';
@@ -107,6 +109,12 @@ export const TimetablePage: React.FC = () => {
       setTimetable(EMPTY_TIMETABLE);
       toast.success('Đã làm trống toàn bộ thời khóa biểu');
     }
+  };
+
+  const handleClearSourceFile = () => {
+    const updated = clearTimetableSourceFiles(timetable);
+    setTimetable(updated);
+    toast.success('Đã gỡ bỏ nguồn tệp tin');
   };
 
   const handleClearSession = (session: 'morning' | 'afternoon') => {
@@ -283,16 +291,16 @@ export const TimetablePage: React.FC = () => {
           <button
             type="button"
             onClick={() => morningFileInputRef.current?.click()}
-            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 text-amber-200 transition-all text-left flex items-center gap-3 group"
+            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 active:scale-[0.99] transition-all text-left flex items-center gap-3 group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:text-amber-300 transition-colors">
               <Sun className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-amber-200">
+              <p className="text-xs font-semibold text-white group-hover:text-slate-100 transition-colors">
                 1. Nạp file TKB Sáng
               </p>
-              <p className="text-[11px] text-amber-300/80">
+              <p className="text-[11px] text-slate-400">
                 Chỉ cập nhật lịch Sáng (Tiết 1 - 5)
               </p>
             </div>
@@ -302,16 +310,16 @@ export const TimetablePage: React.FC = () => {
           <button
             type="button"
             onClick={() => afternoonFileInputRef.current?.click()}
-            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 hover:border-indigo-400 hover:bg-indigo-500/20 text-indigo-200 transition-all text-left flex items-center gap-3 group"
+            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 active:scale-[0.99] transition-all text-left flex items-center gap-3 group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:text-indigo-300 transition-colors">
               <Sunset className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-indigo-200">
+              <p className="text-xs font-semibold text-white group-hover:text-slate-100 transition-colors">
                 2. Nạp file TKB Chiều
               </p>
-              <p className="text-[11px] text-indigo-300/80">
+              <p className="text-[11px] text-slate-400">
                 Chỉ cập nhật lịch Chiều (Tiết 1 - 4)
               </p>
             </div>
@@ -321,65 +329,82 @@ export const TimetablePage: React.FC = () => {
           <button
             type="button"
             onClick={() => autoFileInputRef.current?.click()}
-            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/20 text-cyan-200 transition-all text-left flex items-center gap-3 group"
+            className="flex-1 min-w-[180px] p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 active:scale-[0.99] transition-all text-left flex items-center gap-3 group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 group-hover:text-cyan-300 transition-colors">
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-cyan-200">
+              <p className="text-xs font-semibold text-white group-hover:text-slate-100 transition-colors">
                 3. Gộp cả 2 file cùng lúc
               </p>
-              <p className="text-[11px] text-cyan-300/80">
+              <p className="text-[11px] text-slate-400">
                 Chọn cả 2 file hoặc kéo thả vào
               </p>
             </div>
           </button>
         </div>
 
-        {/* Trạng thái hiện tại của TKB */}
-        <div className="mt-2 flex flex-wrap items-center justify-center gap-3 pt-3 border-t border-white/10 w-full max-w-xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-mono">
-            <Sun className="w-3.5 h-3.5 text-amber-400" />
-            <span>Buổi Sáng: <strong>{stats.morning}</strong> tiết</span>
+        {/* Trạng thái hiện tại của TKB - Tinh gọn, thanh lịch, không nền màu đằng sau chữ */}
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:gap-6 px-4 py-2 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-300 font-mono w-full max-w-xl">
+          <div className="flex items-center gap-2">
+            <Sun className="w-3.5 h-3.5 text-slate-400" />
+            <span>Sáng: <strong className="text-white font-semibold">{stats.morning}</strong> tiết</span>
             {stats.morning > 0 && (
               <button
                 type="button"
                 onClick={() => handleClearSession('morning')}
-                className="hover:text-red-400 transition-colors ml-1 p-0.5 rounded"
-                title="Làm trống buổi sáng"
+                className="text-slate-500 hover:text-red-400 transition-colors p-0.5 rounded cursor-pointer"
+                title="Xóa lịch học buổi sáng"
               >
                 <Trash2 className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono">
-            <Sunset className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Buổi Chiều: <strong>{stats.afternoon}</strong> tiết</span>
+          <span className="text-white/20 hidden sm:inline">|</span>
+
+          <div className="flex items-center gap-2">
+            <Sunset className="w-3.5 h-3.5 text-slate-400" />
+            <span>Chiều: <strong className="text-white font-semibold">{stats.afternoon}</strong> tiết</span>
             {stats.afternoon > 0 && (
               <button
                 type="button"
                 onClick={() => handleClearSession('afternoon')}
-                className="hover:text-red-400 transition-colors ml-1 p-0.5 rounded"
-                title="Làm trống buổi chiều"
+                className="text-slate-500 hover:text-red-400 transition-colors p-0.5 rounded cursor-pointer"
+                title="Xóa lịch học buổi chiều"
               >
                 <Trash2 className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Tổng số: <strong>{stats.total}</strong> tiết học</span>
+          <span className="text-white/20 hidden sm:inline">|</span>
+
+          <div className="flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
+            <span>Tổng: <strong className="text-white font-semibold">{stats.total}</strong> tiết</span>
           </div>
         </div>
 
-        {timetable.fileName && (
-          <p className="text-[11px] text-slate-400 font-mono">
-            Nguồn tệp hiện tại: <span className="text-cyan-300 font-medium">{timetable.fileName}</span>
-          </p>
-        )}
+        {/* Nguồn tệp hiện tại - chỉ hiển thị khi có file và cho phép xóa/bỏ tệp bất kỳ lúc nào */}
+        {timetable.fileName ? (
+          <div className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] text-slate-400 font-mono max-w-xl w-full">
+            <FileSpreadsheet className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="truncate">
+              Nguồn tệp: <span className="text-slate-200 font-medium">{timetable.fileName}</span>
+            </span>
+            <button
+              type="button"
+              onClick={handleClearSourceFile}
+              className="text-slate-400 hover:text-red-400 transition-colors p-1 rounded hover:bg-white/10 shrink-0 ml-1 inline-flex items-center gap-1 text-[10px] cursor-pointer"
+              title="Xóa thông tin nguồn tệp tin"
+            >
+              <X className="w-3 h-3" />
+              <span>Bỏ tệp</span>
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {/* Bảng Thời khóa biểu chính */}
