@@ -37,16 +37,33 @@ export function loadMembersFromStorage(): Member[] {
     }
 
     // Tự động nâng cấp năm sinh từ 2009 sang 2010 cho học sinh
-    let updatedYear = false;
+    let updatedStorage = false;
     const migrated = list.map((m: Member) => {
-      if (m.birthDate === '2009' || m.birthDate?.includes('2009')) {
-        updatedYear = true;
-        return { ...m, birthDate: m.birthDate.replace('2009', '2010') };
+      let item = { ...m };
+      if (item.birthDate === '2009' || item.birthDate?.includes('2009')) {
+        item.birthDate = item.birthDate.replace('2009', '2010');
+        updatedStorage = true;
       }
-      return m;
+      // Dọn dẹp châm ngôn mặc định rập khuôn "Thành viên tập thể lớp 11A10 - THPT Cát Tiên"
+      if (item.quote === 'Thành viên tập thể lớp 11A10 - THPT Cát Tiên') {
+        item.quote = undefined;
+        updatedStorage = true;
+      }
+      // Dọn dẹp sở thích mẫu mặc định ['Học tập', 'Hoạt động trường', 'Đoàn kết']
+      if (
+        Array.isArray(item.hobbies) &&
+        item.hobbies.length === 3 &&
+        item.hobbies[0] === 'Học tập' &&
+        item.hobbies[1] === 'Hoạt động trường' &&
+        item.hobbies[2] === 'Đoàn kết'
+      ) {
+        item.hobbies = [];
+        updatedStorage = true;
+      }
+      return item;
     });
 
-    if (updatedYear) {
+    if (updatedStorage) {
       saveMembersToStorage(migrated);
       return migrated;
     }
@@ -82,7 +99,7 @@ export function downloadSampleMembersExcel() {
       m.role || 'Thành viên',
       m.birthDate || '2010',
       m.phone || '',
-      m.quote || 'Tập thể 11A10',
+      m.quote || '',
       (m.hobbies || []).join(', '),
     ]),
   ];

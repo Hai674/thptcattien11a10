@@ -21,6 +21,7 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getGivenName } from '@/utils/nameUtils';
 
 interface PostComment {
   id: string;
@@ -395,7 +396,7 @@ export const LibraryPage: React.FC = () => {
             {user?.photoURL ? (
               <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              user?.displayName?.charAt(0) || 'U'
+              <span className="truncate max-w-full px-0.5">{getGivenName(user?.displayName) || 'U'}</span>
             )}
           </div>
 
@@ -494,7 +495,7 @@ export const LibraryPage: React.FC = () => {
                     {post.authorAvatar ? (
                       <img src={post.authorAvatar} alt={post.authorName} className="w-full h-full object-cover" />
                     ) : (
-                      post.authorName.charAt(0)
+                      <span className="truncate max-w-full px-0.5">{getGivenName(post.authorName)}</span>
                     )}
                   </div>
                   <div>
@@ -592,7 +593,7 @@ export const LibraryPage: React.FC = () => {
                             {comment.avatar ? (
                               <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover rounded-full" />
                             ) : (
-                              comment.author.charAt(0)
+                              <span className="truncate max-w-full px-0.5">{getGivenName(comment.author)}</span>
                             )}
                           </div>
                           <div className="flex-1 bg-white/[0.04] border border-white/5 rounded-2xl px-3.5 py-2">

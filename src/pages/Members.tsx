@@ -12,7 +12,6 @@ import {
   Plus,
   Upload,
   Download,
-  Trash2,
   GraduationCap,
   Sparkles,
   Award,
@@ -22,10 +21,11 @@ import {
 import {
   loadMembersFromStorage,
   saveMembersToStorage,
-  clearDemoMembers,
   downloadSampleMembersExcel,
   parseMembersFromExcel,
 } from '@/services/memberService';
+import { getGivenName, getAvatarGradient } from '@/utils/nameUtils';
+import { cn } from '@/utils/cn';
 import { toast } from 'sonner';
 
 export const MembersPage: React.FC = () => {
@@ -92,22 +92,6 @@ export const MembersPage: React.FC = () => {
     setNewQuote('');
     setNewHobbies('');
     toast.success(`Đã thêm bạn ${newMember.fullName} vào danh sách lớp`);
-  };
-
-  const handleDeleteMember = (id: string, name: string) => {
-    if (window.confirm(`Bạn có chắc muốn xóa học sinh ${name}?`)) {
-      setMembers((prev) => prev.filter((m) => m.id !== id));
-      if (selectedMember?.id === id) setSelectedMember(null);
-      toast.success(`Đã xóa học sinh ${name}`);
-    }
-  };
-
-  const handleClearAll = () => {
-    if (window.confirm('Bạn có chắc muốn xóa toàn bộ danh sách để tự nhập danh sách thật từ đầu?')) {
-      const empty = clearDemoMembers();
-      setMembers(empty);
-      toast.success('Đã làm trống danh sách lớp');
-    }
   };
 
   const filteredMembers = members.filter((m) => {
@@ -181,17 +165,6 @@ export const MembersPage: React.FC = () => {
               <Plus className="w-3.5 h-3.5 text-blue-400" />
               <span>Thêm bạn</span>
             </GlassButton>
-
-            {members.length > 0 && (
-              <GlassButton
-                size="sm"
-                variant="destructive"
-                onClick={handleClearAll}
-                title="Xóa toàn bộ danh sách để bắt đầu mới"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </GlassButton>
-            )}
           </div>
       </Card>
 
@@ -276,12 +249,17 @@ export const MembersPage: React.FC = () => {
               className="group p-5 rounded-3xl cursor-pointer hover:scale-[1.015] hover:border-blue-400/40 transition-all duration-300 flex flex-col justify-between space-y-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center shadow-md">
-                    {member.fullName.charAt(0)}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={cn(
+                      'w-11 h-11 rounded-2xl bg-gradient-to-tr text-white font-black text-xs sm:text-sm flex items-center justify-center shadow-md px-1 select-none flex-shrink-0 tracking-tight',
+                      getAvatarGradient(member.fullName)
+                    )}
+                  >
+                    <span className="truncate max-w-full">{getGivenName(member.fullName)}</span>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-sm text-white group-hover:text-blue-300 transition-colors">
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-sm text-white group-hover:text-blue-300 transition-colors truncate">
                       {member.fullName}
                     </h3>
                     <span className="inline-block mt-0.5 text-[11px] font-mono text-blue-300">
@@ -289,21 +267,9 @@ export const MembersPage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteMember(member.id, member.fullName);
-                  }}
-                  className="p-1 rounded-lg text-slate-500 hover:text-red-400 hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Xóa học sinh"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
               </div>
 
-              {member.quote && (
+              {member.quote && member.quote.trim() && (
                 <p className="text-xs text-slate-300/80 italic font-serif line-clamp-2 px-1">
                   "{member.quote}"
                 </p>
@@ -339,8 +305,13 @@ export const MembersPage: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-2xl flex items-center justify-center shadow-lg">
-                {selectedMember.fullName.charAt(0)}
+              <div
+                className={cn(
+                  'w-16 h-16 rounded-2xl bg-gradient-to-tr text-white font-black text-lg flex items-center justify-center shadow-lg px-1.5 select-none flex-shrink-0 tracking-tight',
+                  getAvatarGradient(selectedMember.fullName)
+                )}
+              >
+                <span className="truncate max-w-full">{getGivenName(selectedMember.fullName)}</span>
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">{selectedMember.fullName}</h3>
@@ -353,7 +324,7 @@ export const MembersPage: React.FC = () => {
               </div>
             </div>
 
-            {selectedMember.quote && (
+            {selectedMember.quote && selectedMember.quote.trim() && (
               <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/5 text-xs text-slate-200 italic font-serif">
                 "{selectedMember.quote}"
               </div>

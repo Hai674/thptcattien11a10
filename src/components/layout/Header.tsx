@@ -20,6 +20,7 @@ import {
 import { toast } from 'sonner';
 import { loadAnnouncementsFromStorage } from '@/services/announcementService';
 import { cn } from '@/utils/cn';
+import { getGivenName } from '@/utils/nameUtils';
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -216,15 +217,15 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               contentClassName="flex items-center gap-2 text-xs font-medium text-slate-200"
             >
-              <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-6 h-6 rounded-full overflow-hidden bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-[11px] flex items-center justify-center flex-shrink-0 shadow-sm">
                 {user.photoURL ? (
                   <img src={user.photoURL} alt={user.displayName || 'Avatar'} className="w-full h-full object-cover" />
                 ) : (
-                  <span>{user.displayName?.charAt(0) || 'U'}</span>
+                  <span>{getGivenName(user.displayName) || 'U'}</span>
                 )}
               </div>
               <span className="hidden md:inline max-w-[90px] truncate">
-                {user.displayName?.split(' ').pop() || 'Tài khoản'}
+                {getGivenName(user.displayName) || 'Tài khoản'}
               </span>
             </GlassButton>
           ) : (
@@ -243,11 +244,11 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative z-10 space-y-2">
                 {/* Header User Profile Card */}
                 <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3 backdrop-blur-md">
-                  <div className="w-11 h-11 rounded-2xl overflow-hidden border border-blue-400/40 flex-shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-11 h-11 rounded-2xl overflow-hidden border border-blue-400/40 flex-shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.3)] bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xs px-1 select-none">
                     {user.photoURL ? (
                       <img src={user.photoURL} alt={user.displayName || 'Avatar'} className="w-full h-full object-cover" />
                     ) : (
-                      <span>{user.displayName?.charAt(0) || 'U'}</span>
+                      <span className="truncate max-w-full">{getGivenName(user.displayName) || 'U'}</span>
                     )}
                   </div>
                   <div className="overflow-hidden min-w-0 flex-1">

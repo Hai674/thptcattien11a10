@@ -17,6 +17,7 @@ import {
   toggleUserBlockInStorage,
   deleteUserFromStorage,
 } from '@/services/userService';
+import { getGivenName } from '@/utils/nameUtils';
 
 export const AdminUsersPage: React.FC = () => {
   const [usersList, setUsersList] = useState<User[]>(() => loadUsersFromStorage());
@@ -128,8 +129,8 @@ export const AdminUsersPage: React.FC = () => {
                 <tr key={u.uid} className="hover:bg-white/[0.04] transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white shadow">
-                        {u.displayName ? u.displayName.charAt(0) : 'U'}
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white shadow text-xs px-1 select-none">
+                        <span className="truncate max-w-full">{getGivenName(u.displayName) || 'U'}</span>
                       </div>
                       <div>
                         <p className="font-bold text-white">{u.displayName}</p>

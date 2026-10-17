@@ -9,6 +9,8 @@ import {
   ArrowRight,
   Dices,
 } from 'lucide-react';
+import { getGivenName, getAvatarGradient } from '@/utils/nameUtils';
+import { cn } from '@/utils/cn';
 
 interface LayoutContextType {
   openLottery: () => void;
@@ -111,8 +113,13 @@ export const Home: React.FC = () => {
               className="p-5 text-center space-y-4"
             >
               <div className="relative inline-block mx-auto">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xl flex items-center justify-center shadow-md">
-                  {member.fullName.charAt(0)}
+                <div
+                  className={cn(
+                    'w-16 h-16 rounded-2xl bg-gradient-to-tr text-white font-black text-lg flex items-center justify-center shadow-md select-none px-1 tracking-tight',
+                    getAvatarGradient(member.fullName)
+                  )}
+                >
+                  <span className="truncate max-w-full">{getGivenName(member.fullName)}</span>
                 </div>
               </div>
 
@@ -125,7 +132,7 @@ export const Home: React.FC = () => {
                 </span>
               </div>
 
-              {member.quote && (
+              {member.quote && member.quote.trim() && (
                 <p className="text-xs text-slate-400 italic line-clamp-2 px-2">
                   "{member.quote}"
                 </p>

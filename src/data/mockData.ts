@@ -7,8 +7,6 @@ export const INITIAL_MEMBERS: Member[] = DEFAULT_11A10_STUDENTS.map((s, idx) => 
   fullName: s.fullName,
   role: 'Thành viên',
   birthDate: '2010',
-  quote: 'Thành viên tập thể lớp 11A10 - THPT Cát Tiên',
-  hobbies: ['Học tập', 'Hoạt động trường', 'Đoàn kết'],
 }));
 
 export const INITIAL_ANNOUNCEMENTS: Announcement[] = [OFFICIAL_WELCOME_ANNOUNCEMENT];

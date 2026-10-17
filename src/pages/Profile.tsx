@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { cyberAudio } from '@/utils/cyberAudio';
 import { compressAvatar, compressBanner } from '@/utils/imageCompressor';
+import { getGivenName } from '@/utils/nameUtils';
 
 // Danh sách các mẫu avatar học sinh tuyển chọn
 const PRESET_AVATARS = [
@@ -295,8 +296,8 @@ export const ProfilePage: React.FC = () => {
                 {photoURL ? (
                   <img src={photoURL} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 font-black text-2xl sm:text-3xl text-white">
-                    {displayName.charAt(0)}
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 font-black text-xl sm:text-2xl text-white select-none px-1 tracking-tight">
+                    <span className="truncate max-w-full">{getGivenName(displayName) || 'U'}</span>
                   </div>
                 )}
               </div>
