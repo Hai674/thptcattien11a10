@@ -10,34 +10,51 @@ interface TimetableGridProps {
   isEditable?: boolean;
 }
 
-const SUBJECT_ACCENTS: Record<string, { dot: string; borderLeft: string }> = {
-  'Chào cờ': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80' },
+// Phân nhóm màu sắc theo chuyên môn học tập:
+// 1. Tự nhiên & Công nghệ (Sky / Cyan)
+// 2. Xã hội & Ngôn ngữ (Indigo / Violet / Purple)
+// 3. Thể chất & Kỹ năng (Amber / Vàng cam)
+// 4. Hoạt động tập thể (Rose / Đỏ hồng)
+const SUBJECT_ACCENTS: Record<string, { dot: string; borderLeft: string; tag?: string }> = {
+  // Khoa học Tự nhiên & Công nghệ
   'Toán': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80' },
-  'Ngữ Văn': { dot: 'bg-pink-400', borderLeft: 'border-l-2 border-l-pink-400/80' },
-  'Tiếng Anh': { dot: 'bg-emerald-400', borderLeft: 'border-l-2 border-l-emerald-400/80' },
-  'Vật Lý': { dot: 'bg-violet-400', borderLeft: 'border-l-2 border-l-violet-400/80' },
-  'Lý': { dot: 'bg-violet-400', borderLeft: 'border-l-2 border-l-violet-400/80' },
-  'Hóa Học': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
-  'Hóa': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'CĐ Toán': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80', tag: 'CĐ' },
+  'Vật Lý': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80' },
+  'Lý': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80' },
+  'CĐ Lý': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80', tag: 'CĐ' },
+  'Hóa Học': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80' },
+  'Hóa': { dot: 'bg-sky-400', borderLeft: 'border-l-2 border-l-sky-400/80' },
   'Sinh Học': { dot: 'bg-teal-400', borderLeft: 'border-l-2 border-l-teal-400/80' },
   'Sinh': { dot: 'bg-teal-400', borderLeft: 'border-l-2 border-l-teal-400/80' },
-  'Lịch Sử': { dot: 'bg-orange-400', borderLeft: 'border-l-2 border-l-orange-400/80' },
-  'Sử': { dot: 'bg-orange-400', borderLeft: 'border-l-2 border-l-orange-400/80' },
-  'Địa Lý': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
-  'Địa': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
-  'KTPL': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
-  'GDCD': { dot: 'bg-lime-400', borderLeft: 'border-l-2 border-l-lime-400/80' },
-  'Tin Học': { dot: 'bg-blue-400', borderLeft: 'border-l-2 border-l-blue-400/80' },
-  'Tin': { dot: 'bg-blue-400', borderLeft: 'border-l-2 border-l-blue-400/80' },
-  'Thể Dục': { dot: 'bg-emerald-400', borderLeft: 'border-l-2 border-l-emerald-400/80' },
-  'GDTC': { dot: 'bg-emerald-400', borderLeft: 'border-l-2 border-l-emerald-400/80' },
-  'GDQP-AN': { dot: 'bg-yellow-400', borderLeft: 'border-l-2 border-l-yellow-400/80' },
-  'GDQPAN': { dot: 'bg-yellow-400', borderLeft: 'border-l-2 border-l-yellow-400/80' },
-  'GDQP': { dot: 'bg-yellow-400', borderLeft: 'border-l-2 border-l-yellow-400/80' },
-  'HDTNHN': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80' },
-  'GDĐP': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
-  'Sinh hoạt lớp': { dot: 'bg-purple-400', borderLeft: 'border-l-2 border-l-purple-400/80' },
+  'Tin Học': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
+  'Tin': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
   'Công Nghệ': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
+  'CĐ Công nghệ': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80', tag: 'CĐ' },
+  'Công nghệ Nông nghiệp': { dot: 'bg-cyan-400', borderLeft: 'border-l-2 border-l-cyan-400/80' },
+
+  // Xã hội & Ngôn ngữ
+  'Ngữ Văn': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+  'Tiếng Anh': { dot: 'bg-violet-400', borderLeft: 'border-l-2 border-l-violet-400/80' },
+  'Lịch Sử': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+  'Sử': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+  'Địa Lý': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+  'Địa': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+  'KTPL': { dot: 'bg-purple-400', borderLeft: 'border-l-2 border-l-purple-400/80' },
+  'CĐ KTPL': { dot: 'bg-purple-400', borderLeft: 'border-l-2 border-l-purple-400/80', tag: 'CĐ' },
+  'GDCD': { dot: 'bg-purple-400', borderLeft: 'border-l-2 border-l-purple-400/80' },
+  'GDĐP': { dot: 'bg-indigo-400', borderLeft: 'border-l-2 border-l-indigo-400/80' },
+
+  // Thể chất & Kỹ năng
+  'Thể Dục': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'GDTC': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'GDQP-AN': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'GDQPAN': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+  'GDQP': { dot: 'bg-amber-400', borderLeft: 'border-l-2 border-l-amber-400/80' },
+
+  // Hoạt động & Sinh hoạt
+  'Chào cờ': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80' },
+  'Sinh hoạt lớp': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80', tag: 'GVCN' },
+  'HDTNHN': { dot: 'bg-rose-400', borderLeft: 'border-l-2 border-l-rose-400/80' },
 };
 
 function getSubjectAccent(subject: string) {
@@ -87,11 +104,11 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
   ];
 
   const afternoonPeriods = [
-    { key: 'c1', name: 'Tiết 1 (Chiều)' },
-    { key: 'c2', name: 'Tiết 2 (Chiều)' },
-    { key: 'c3', name: 'Tiết 3 (Chiều)' },
-    { key: 'c4', name: 'Tiết 4 (Chiều)' },
-    ...(hasAfternoonPeriod5 || isEditable ? [{ key: 'c5', name: 'Tiết 5 (Chiều)' }] : []),
+    { key: 'c1', name: 'Tiết 1' },
+    { key: 'c2', name: 'Tiết 2' },
+    { key: 'c3', name: 'Tiết 3' },
+    { key: 'c4', name: 'Tiết 4' },
+    ...(hasAfternoonPeriod5 || isEditable ? [{ key: 'c5', name: 'Tiết 5' }] : []),
   ];
 
   const now = new Date();
@@ -140,14 +157,14 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
             key={p.key}
             className="border-b border-white/[0.05] hover:bg-white/[0.02] transition-colors"
           >
-            {/* Cột số tiết (đã loại bỏ khung giờ) */}
+            {/* Cột số tiết */}
             <td className="p-3 text-center bg-white/[0.04] border-r border-white/10 w-24 sm:w-28 backdrop-blur-md">
               <span className="inline-block px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-white font-bold text-xs">
                 {p.name}
               </span>
             </td>
 
-            {/* Các ngày từ Thứ 2 đến Thứ 7 */}
+            {/* Các ngày từ Thứ 2 đến Thứ 6 */}
             {days.map((d) => {
               const slot = timetable.schedule[d.key]?.[p.key];
               const accent = slot ? getSubjectAccent(slot.subject) : null;
@@ -159,7 +176,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                   key={d.key}
                   onClick={() => !isEditing && isEditable && startEdit(d.key, p.key, slot)}
                   className={`p-2.5 border-l border-white/5 align-top transition-all ${
-                    isCurrentDay ? 'bg-blue-500/[0.05]' : ''
+                    isCurrentDay ? 'bg-cyan-500/[0.04]' : ''
                   } ${isEditable ? 'cursor-pointer hover:bg-white/[0.04]' : ''}`}
                 >
                   {isEditing ? (
@@ -202,7 +219,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                     </div>
                   ) : slot && slot.subject ? (
                     <div
-                      className={`h-full min-h-[58px] p-2.5 rounded-xl border flex flex-col justify-between transition-all bg-slate-900/60 hover:bg-slate-900/90 border-white/10 hover:border-white/20 group/cell ${
+                      className={`h-full min-h-[58px] p-2.5 rounded-xl border flex flex-col justify-between transition-all bg-slate-900/60 hover:bg-slate-900/95 hover:border-white/25 hover:shadow-lg hover:shadow-black/20 group/cell ${
                         accent ? accent.borderLeft : ''
                       }`}
                     >
@@ -214,6 +231,11 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                           <p className="font-semibold text-xs text-white leading-tight truncate">
                             {slot.subject}
                           </p>
+                          {accent?.tag && (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/10 text-slate-300 border border-white/15 shrink-0">
+                              {accent.tag}
+                            </span>
+                          )}
                         </div>
                         {isEditable && (
                           <Edit2 className="w-2.5 h-2.5 text-slate-500 opacity-0 group-hover/cell:opacity-100 shrink-0" />
@@ -227,8 +249,16 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                       )}
                     </div>
                   ) : (
-                    <div className="h-full min-h-[58px] rounded-xl border border-dashed border-white/5 flex items-center justify-center text-slate-600 text-[11px] italic">
-                      {isEditable ? '+ Thêm' : '—'}
+                    <div className="h-full min-h-[58px] rounded-xl border border-white/[0.04] bg-white/[0.01] flex items-center justify-center transition-colors">
+                      {isEditable ? (
+                        <span className="text-slate-500 text-[11px] hover:text-cyan-300">+ Thêm</span>
+                      ) : p.key.startsWith('c') ? (
+                        <span className="text-[10px] text-slate-500/80 font-mono tracking-wider">
+                          Nghỉ chiều
+                        </span>
+                      ) : (
+                        <span className="text-slate-600 text-xs font-mono">—</span>
+                      )}
                     </div>
                   )}
                 </td>
@@ -323,23 +353,28 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                 <th className="p-3.5 text-xs font-bold uppercase text-slate-300 w-24 sm:w-28 text-center font-mono">
                   Tiết
                 </th>
-                {days.map((d) => (
-                  <th
-                    key={d.key}
-                    className={`p-3.5 text-xs font-bold text-center border-l border-white/10 ${
-                      currentDayOfWeek === d.key
-                        ? 'text-blue-300 bg-blue-500/20 font-extrabold'
-                        : 'text-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-1.5">
-                      <span>{d.label}</span>
-                      {currentDayOfWeek === d.key && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_#60a5fa]" />
-                      )}
-                    </div>
-                  </th>
-                ))}
+                {days.map((d) => {
+                  const isCurrentDay = currentDayOfWeek === d.key;
+                  return (
+                    <th
+                      key={d.key}
+                      className={`p-3 text-xs font-bold text-center border-l border-white/10 transition-all ${
+                        isCurrentDay
+                          ? 'bg-cyan-500/[0.12] text-cyan-200 font-extrabold shadow-[inset_0_2px_0_#22d3ee]'
+                          : 'text-slate-300'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center justify-center gap-1">
+                        {isCurrentDay && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 shadow-[0_0_10px_rgba(34,211,238,0.3)] tracking-wide">
+                            Hôm nay
+                          </span>
+                        )}
+                        <span className={isCurrentDay ? 'text-white font-extrabold' : ''}>{d.label}</span>
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
