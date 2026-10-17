@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { loadMembersFromStorage } from '@/services/memberService';
 import { Member } from '@/types';
-import { DEFAULT_11A10_STUDENTS, PURPOSE_PRESETS, StudentCandidate } from '@/data/classDefaultStudents';
+import { DEFAULT_11A10_STUDENTS, StudentCandidate } from '@/data/classDefaultStudents';
 import { LuckyWheelCanvas } from '@/components/games/LuckyWheelCanvas';
 import { CyberSlotRoller } from '@/components/games/CyberSlotRoller';
 import { MysteryCardDeck } from '@/components/games/MysteryCardDeck';
@@ -20,7 +20,6 @@ import {
   Sparkles,
   Zap,
   Layers,
-  ArrowRight,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { cyberAudio } from '@/utils/cyberAudio';
@@ -35,9 +34,7 @@ type GameMode = 'wheel' | 'slot' | 'card';
 
 export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, onClose }) => {
   const [allStudents, setAllStudents] = useState<StudentCandidate[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<string>('all');
-  const [purposeId, setPurposeId] = useState<string>('blackboard');
-  const [gameMode, setGameMode] = useState<GameMode>('wheel');
+  const [gameMode, setGameMode] = useState<GameMode>('card');
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<StudentCandidate | null>(null);
   const [calledIds, setCalledIds] = useState<string[]>(() => {
@@ -59,7 +56,6 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
           id: m.id || String(idx + 1),
           fullName: m.fullName,
           role: m.role || 'Học sinh',
-          group: (m as any).group || `Tổ ${((idx % 4) + 1)}`,
         }));
         setAllStudents(mapped);
       } else {
@@ -77,17 +73,12 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
 
   const activeCandidates = useMemo(() => {
     return allStudents.filter((student) => {
-      if (selectedGroup !== 'all' && student.group !== selectedGroup) {
-        return false;
-      }
       if (excludeCalled && calledIds.includes(student.id)) {
         return false;
       }
       return true;
     });
-  }, [allStudents, selectedGroup, excludeCalled, calledIds]);
-
-  const currentPurpose = PURPOSE_PRESETS.find((p) => p.id === purposeId) || PURPOSE_PRESETS[0];
+  }, [allStudents, excludeCalled, calledIds]);
 
   const handleToggleSound = () => {
     const next = !soundEnabled;
@@ -121,7 +112,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
   const handleMarkCalled = (studentId: string) => {
     if (!calledIds.includes(studentId)) {
       setCalledIds((prev) => [...prev, studentId]);
-      toast.success('Đã ghi nhận bạn lên bảng!');
+      toast.success('Đã ghi nhận bạn được gọi!');
     }
     setWinner(null);
   };
@@ -136,7 +127,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-slate-900 border border-white/10 p-5 sm:p-7 text-center space-y-5 shadow-2xl my-auto">
+      <div className="relative w-full max-w-3xl rounded-3xl bg-slate-900 border border-white/10 p-5 sm:p-6 text-center space-y-4 shadow-2xl my-auto">
         {/* Nút đóng modal */}
         <button
           onClick={onClose}
@@ -150,7 +141,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
           <div className="flex items-center justify-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-mono">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Mini-Game Bốc Thăm & Gọi Tên 11A10</span>
+              <span>Bốc Thăm & Gọi Tên 11A10</span>
             </span>
             <Link
               to="/vong-quay"
@@ -165,46 +156,33 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
             Chọn Ngẫu Nhiên Học Sinh Lên Bảng
           </h2>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Hỗ trợ giáo viên & ban cán sự gọi ngẫu nhiên kiểm tra miệng, giải bài tập hoặc trả lời câu hỏi
+            Bốc thăm cả lớp 46 học sinh: 46 lá bài bí mật, Vòng quay may mắn hoặc Máy xèng tốc độ
           </p>
         </div>
 
-        {/* Chọn Mục đích & Chế độ chơi */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-          {/* 4 Mục đích */}
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            {PURPOSE_PRESETS.map((p) => {
-              const active = purposeId === p.id;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => {
-                    setPurposeId(p.id);
-                    cyberAudio.playClick();
-                  }}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-medium transition-all flex items-center gap-1 border ${
-                    active
-                      ? 'bg-blue-600 border-blue-400 text-white shadow-sm'
-                      : 'bg-slate-950/60 border-white/5 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <span>{p.icon}</span>
-                  <span>{p.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3 Chế độ game */}
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/5">
+        {/* Chọn Chế độ chơi */}
+        <div className="flex items-center justify-center gap-2 pt-1">
+          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-white/5">
+            <button
+              type="button"
+              onClick={() => {
+                setGameMode('card');
+                cyberAudio.playClick();
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                gameMode === 'card' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Lật 46 thẻ bài ma thuật"
+            >
+              🃏 46 Thẻ bài
+            </button>
             <button
               type="button"
               onClick={() => {
                 setGameMode('wheel');
                 cyberAudio.playClick();
               }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 gameMode === 'wheel' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
               }`}
               title="Vòng quay kỳ diệu"
@@ -217,50 +195,23 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                 setGameMode('slot');
                 cyberAudio.playClick();
               }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 gameMode === 'slot' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
               }`}
               title="Quay số xèng tốc độ"
             >
               🎰 Xèng số
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setGameMode('card');
-                cyberAudio.playClick();
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                gameMode === 'card' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Lật thẻ bài ma thuật"
-            >
-              🃏 Thẻ bài
-            </button>
           </div>
         </div>
 
-        {/* Thanh lọc tổ & trạng thái */}
-        <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 rounded-xl bg-slate-950/60 border border-white/5 text-xs">
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400 text-[11px]">Tổ:</span>
-            {['all', 'Tổ 1', 'Tổ 2', 'Tổ 3', 'Tổ 4'].map((grp) => (
-              <button
-                key={grp}
-                type="button"
-                onClick={() => {
-                  setSelectedGroup(grp);
-                  cyberAudio.playClick();
-                }}
-                className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
-                  selectedGroup === grp
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {grp === 'all' ? 'Tất cả' : grp}
-              </button>
-            ))}
+        {/* Thanh trạng thái sĩ số & Tránh gọi trùng */}
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-950/60 border border-white/5 text-xs">
+          <div className="flex items-center gap-2 text-slate-300">
+            <Users className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="text-[11px]">
+              Sĩ số: <strong className="text-white">{allStudents.length} học sinh</strong> • Sẵn sàng: <strong className="text-amber-400">{activeCandidates.length}</strong>
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -278,7 +229,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
               <button
                 type="button"
                 onClick={handleResetCalled}
-                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5"
+                className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-0.5 font-mono"
               >
                 <RotateCcw className="w-2.5 h-2.5" /> Đặt lại
               </button>
@@ -314,7 +265,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                   isSpinning={isSpinning}
                   onSpinStart={handleSpinStart}
                   onSpinEnd={handleSpinEnd}
-                  selectedPurpose={currentPurpose.label}
+                  selectedPurpose="Bốc thăm ngẫu nhiên"
                 />
               )}
 
@@ -342,14 +293,14 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
               <div className="w-full max-w-xs rounded-2xl bg-slate-900 border-2 border-amber-400 p-5 text-center space-y-4 shadow-2xl">
                 <Trophy className="w-8 h-8 text-amber-400 mx-auto" />
                 <div>
-                  <span className="inline-block px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[11px] font-mono">
-                    {currentPurpose.icon} {currentPurpose.label}
+                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[11px] font-mono font-bold">
+                    🎲 BỐC THĂM 11A10
                   </span>
                   <h3 className="text-xl sm:text-2xl font-black text-white font-display pt-1">
                     {winner.fullName}
                   </h3>
                   <p className="text-xs text-slate-400 font-mono">
-                    {winner.group || '11A10'} • {winner.role || 'Học sinh'}
+                    {winner.role || 'Học sinh'} • Tập thể 11A10
                   </p>
                 </div>
 

@@ -6,10 +6,18 @@ const STORAGE_KEY = '11a10_members_list';
 
 export function loadMembersFromStorage(): Member[] {
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
+  if (!raw) {
+    saveMembersToStorage(INITIAL_MEMBERS);
+    return INITIAL_MEMBERS;
+  }
   try {
     const list = JSON.parse(raw);
-    // Tự động dọn sạch nếu dữ liệu cũ còn chứa các thành viên demo
+    if (!Array.isArray(list) || list.length === 0) {
+      saveMembersToStorage(INITIAL_MEMBERS);
+      return INITIAL_MEMBERS;
+    }
+
+    // Tự động thay thế nếu dữ liệu cũ còn chứa các thành viên demo cũ
     const DEMO_NAMES = [
       'Trần Nguyễn Hoàng Anh',
       'Lê Thị Mai Phương',
@@ -22,19 +30,15 @@ export function loadMembersFromStorage(): Member[] {
     ];
 
     if (
-      Array.isArray(list) &&
-      list.length > 0 &&
       list.some((m: Member) => /^m[1-8]$/.test(m.id) || DEMO_NAMES.includes(m.fullName))
     ) {
-      const cleaned = list.filter(
-        (m: Member) => !/^m[1-8]$/.test(m.id) && !DEMO_NAMES.includes(m.fullName)
-      );
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cleaned));
-      return cleaned;
+      saveMembersToStorage(INITIAL_MEMBERS);
+      return INITIAL_MEMBERS;
     }
     return list;
   } catch {
-    return [];
+    saveMembersToStorage(INITIAL_MEMBERS);
+    return INITIAL_MEMBERS;
   }
 }
 
@@ -48,34 +52,39 @@ export function clearDemoMembers(): Member[] {
 }
 
 /**
- * Tải file Excel mẫu danh sách học sinh
+ * Tải file Excel danh sách 46 học sinh lớp 11A10 chuẩn
  */
 export function downloadSampleMembersExcel() {
   const wsData = [
     ['DANH SÁCH HỌC SINH LỚP 11A10 - THPT CÁT TIÊN (NĂM HỌC 2026 - 2027)'],
-    ['(Điền thông tin các thành viên của lớp vào bên dưới)'],
+    ['(Cập nhật thông tin chi tiết từng học sinh vào bảng bên dưới)'],
     [],
     ['STT', 'Họ và tên', 'Chức vụ', 'Ngày sinh', 'Số điện thoại', 'Châm ngôn / Lời nhắn', 'Sở thích'],
-    [1, 'Trần Nguyễn Hoàng Anh', 'Lớp trưởng', '15/03/2009', '0912 345 678', 'Quyết tâm dẫn đầu phong trào', 'Đọc sách, Guitar'],
-    [2, 'Lê Thị Mai Phương', 'Lớp phó học tập', '22/07/2009', '0987 654 321', 'Chăm chỉ là chìa khóa tri thức', 'Vẽ tranh, Tiếng Anh'],
-    [3, 'Nguyễn Văn Minh Khang', 'Bí thư Chi đoàn', '10/11/2009', '0934 567 890', 'Nhiệt huyết tuổi trẻ', 'Cầu lông, Tình nguyện'],
-    [4, 'Phạm Bảo Ngọc', 'Lớp phó phong trào', '05/01/2009', '0978 123 456', 'Cuộc sống không thể thiếu âm nhạc', 'Ca hát, Múa'],
+    ...INITIAL_MEMBERS.map((m, idx) => [
+      idx + 1,
+      m.fullName,
+      m.role || 'Thành viên',
+      m.birthDate || '2009',
+      m.phone || '',
+      m.quote || 'Tập thể 11A10',
+      (m.hobbies || []).join(', '),
+    ]),
   ];
 
   const ws = XLSX.utils.aoa_to_sheet(wsData);
   ws['!cols'] = [
     { wch: 6 },
-    { wch: 26 },
+    { wch: 28 },
     { wch: 18 },
     { wch: 14 },
     { wch: 16 },
-    { wch: 36 },
-    { wch: 22 },
+    { wch: 40 },
+    { wch: 24 },
   ];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Danh_Sach_11A10');
-  XLSX.writeFile(wb, 'Mau_Danh_Sach_Hoc_Sinh_11A10.xlsx');
+  XLSX.writeFile(wb, 'Danh_Sach_Hoc_Sinh_11A10.xlsx');
 }
 
 /**
@@ -133,7 +142,7 @@ export async function parseMembersFromExcel(file: File): Promise<Member[]> {
     if (!fullName || fullName.length < 2) continue;
 
     const role = roleCol !== -1 && row[roleCol] ? String(row[roleCol]).trim() : 'Thành viên';
-    const birthDate = birthCol !== -1 && row[birthCol] ? String(row[birthCol]).trim() : '01/01/2009';
+    const birthDate = birthCol !== -1 && row[birthCol] ? String(row[birthCol]).trim() : '2009';
     const phone = phoneCol !== -1 && row[phoneCol] ? String(row[phoneCol]).trim() : undefined;
     const quote = quoteCol !== -1 && row[quoteCol] ? String(row[quoteCol]).trim() : undefined;
     const hobbiesStr = hobbyCol !== -1 && row[hobbyCol] ? String(row[hobbyCol]).trim() : '';
