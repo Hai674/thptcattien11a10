@@ -12,7 +12,7 @@ export const MainLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLotteryOpen, setIsLotteryOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(() => {
-    return localStorage.getItem('11a10_sidebar_collapsed') === 'true';
+    return localStorage.getItem('11a10_sidebar_collapsed') !== 'false';
   });
 
   const location = useLocation();
@@ -20,7 +20,21 @@ export const MainLayout: React.FC = () => {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  // Tự động ẩn thanh Header khi lướt xuống, hiện lại khi lướt lên hoặc ở sát đỉnh trang
+  const handleCollapse = useCallback(() => {
+    setIsCollapsed(true);
+    setIsSidebarOpen(false);
+    localStorage.setItem('11a10_sidebar_collapsed', 'true');
+  }, []);
+
+  const handleToggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('11a10_sidebar_collapsed', String(next));
+      return next;
+    });
+  }, []);
+
+  // Tự động thu hồi Sidebar về chỗ cũ và ẩn/hiện Header khi lướt trang
   useEffect(() => {
     let ticking = false;
 
@@ -28,12 +42,17 @@ export const MainLayout: React.FC = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
+          const delta = currentScrollY - lastScrollY.current;
+
+          // Lướt trang (lướt lên hoặc lướt xuống với delta khác 0) -> tự động thu hồi Sidebar về chỗ cũ
+          if (Math.abs(delta) > 5) {
+            handleCollapse();
+          }
 
           // Nếu ở gần đỉnh (<= 25px), luôn hiển thị Header
           if (currentScrollY <= 25) {
             setIsHeaderVisible(true);
           } else {
-            const delta = currentScrollY - lastScrollY.current;
             // Lướt xuống (delta > 6 và đã cuộn qua 50px) -> ẩn thanh Header
             if (delta > 6 && currentScrollY > 50) {
               setIsHeaderVisible(false);
@@ -51,23 +70,44 @@ export const MainLayout: React.FC = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    // Bắt sự kiện lăn chuột (wheel) để thu hồi ngay khi vừa lăn chuột
+    const handleWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > 6) {
+        handleCollapse();
+      }
+    };
 
-  // Khi chuyển trang (route change), đưa header về trạng thái hiển thị
+    // Bắt sự kiện vuốt trên màn hình cảm ứng điện thoại / tablet
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      const touchY = e.touches[0].clientY;
+      if (Math.abs(touchY - touchStartY) > 10) {
+        handleCollapse();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [handleCollapse]);
+
+  // Khi chuyển trang (route change), tự động thu hồi sidebar và đưa header về hiển thị
   useEffect(() => {
     setIsHeaderVisible(true);
+    handleCollapse();
     lastScrollY.current = window.scrollY;
-  }, [location.pathname]);
-
-  const handleToggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => {
-      const next = !prev;
-      localStorage.setItem('11a10_sidebar_collapsed', String(next));
-      return next;
-    });
-  }, []);
+  }, [location.pathname, handleCollapse]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 relative font-sans selection:bg-blue-600/30 selection:text-blue-200">
@@ -87,6 +127,7 @@ export const MainLayout: React.FC = () => {
           onClose={() => setIsSidebarOpen(false)}
           isCollapsed={isCollapsed}
           onToggleCollapse={handleToggleCollapse}
+          onCollapse={handleCollapse}
         />
 
         {/* Khối nội dung chính: tự động chừa lề cho Sidebar cố định */}

@@ -22,6 +22,7 @@ interface SidebarProps {
   onClose?: () => void;
   isCollapsed?: boolean; // desktop collapse
   onToggleCollapse?: () => void;
+  onCollapse?: () => void; // thu hồi sidebar về chỗ cũ
   isHeaderVisible?: boolean;
 }
 
@@ -30,15 +31,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClose,
   isCollapsed = false,
   onToggleCollapse,
+  onCollapse,
 }) => {
   const { isAdmin } = useAuth();
   const location = useLocation();
   const asideRef = useRef<HTMLElement>(null);
 
-  // Xử lý đóng Sidebar trên Mobile khi chọn mục điều hướng
+  // Xử lý thu hồi Sidebar về chỗ cũ khi click chọn bất kỳ mục điều hướng nào
   const handleNavSelect = () => {
     onClose?.();
+    onCollapse?.();
   };
+
+  // Tự động thu hồi Sidebar về chỗ cũ khi click ra ngoài thanh menu
+  useEffect(() => {
+    if (isCollapsed && !isOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Nếu click bên trong aside thì không tính là click outside
+      if (asideRef.current && asideRef.current.contains(target)) {
+        return;
+      }
+      onClose?.();
+      onCollapse?.();
+    };
+
+    // Đợi 50ms để không bị bắt ngay sự kiện click vừa mở thanh menu
+    const timer = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isCollapsed, isOpen, onCollapse, onClose]);
 
   const navItems = [
     { name: 'Trang chủ', path: '/', icon: Home },
@@ -177,7 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.path}
                     to={item.path}
                     end={item.path === '/'}
-                    onClick={onClose}
+                    onClick={handleNavSelect}
                     title={item.name}
                     className={({ isActive }) =>
                       `group relative flex items-center justify-center w-11 h-11 rounded-xl text-xs transition-all duration-200 active:scale-95 cursor-pointer ${
@@ -196,7 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="pt-2 mt-1 border-t border-white/10 w-full flex justify-center">
                   <NavLink
                     to="/admin"
-                    onClick={onClose}
+                    onClick={handleNavSelect}
                     title="Bảng điều khiển Admin"
                     className={({ isActive }) =>
                       `group relative flex items-center justify-center w-11 h-11 rounded-xl text-xs transition-all duration-200 active:scale-95 cursor-pointer ${
