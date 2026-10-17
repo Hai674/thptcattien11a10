@@ -28,7 +28,7 @@ import { AdminMembersPage } from '@/pages/admin/AdminMembers';
 import { AdminLibraryPage } from '@/pages/admin/AdminLibrary';
 import { AdminTimetablePage } from '@/pages/admin/AdminTimetable';
 import { AdminSettingsPage } from '@/pages/admin/AdminSettings';
-import { PrismCometPreloader } from '@/components/ui/prism-comet-preloader';
+import { ConveyorLoop } from '@/components/ui/conveyor-loop';
 import { NotFound } from '@/components/ui/not-found-2';
 import { initAntiF12 } from '@/utils/antiDevtools';
 import { useAuth } from '@/hooks/useAuth';
@@ -46,6 +46,17 @@ export const App: React.FC = () => {
     const cleanup = initAntiF12();
     return cleanup;
   }, []);
+
+  React.useEffect(() => {
+    if (!showIntro) return;
+
+    const timeoutId = window.setTimeout(() => {
+      sessionStorage.setItem('11a10_intro_viewed', 'true');
+      setShowIntro(false);
+    }, 1200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showIntro]);
 
   const appRouter = (
     <BrowserRouter>
@@ -105,17 +116,15 @@ export const App: React.FC = () => {
   }
 
   return (
-    <PrismCometPreloader
-      word="11A10"
-      caption="TẬP THỂ 11A10 · THPT CÁT TIÊN"
-      durationMs={1200}
-      onComplete={() => {
-        sessionStorage.setItem('11a10_intro_viewed', 'true');
-        setShowIntro(false);
-      }}
-    >
-      {appRouter}
-    </PrismCometPreloader>
+    <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+      <span className="inline-flex items-center font-mono text-xl text-foreground">
+        <ConveyorLoop
+          className="mr-2"
+          style={{ '--mask-color': 'hsl(var(--background))' } as React.CSSProperties}
+        />
+        Đang tải
+      </span>
+    </div>
   );
 };
 
