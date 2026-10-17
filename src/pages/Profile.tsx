@@ -16,7 +16,9 @@ import {
   Trash2,
   Phone,
   BookOpen,
+  Sparkles,
 } from 'lucide-react';
+
 import { toast } from 'sonner';
 import { cyberAudio } from '@/utils/cyberAudio';
 import { compressAvatar, compressBanner } from '@/utils/imageCompressor';
@@ -235,20 +237,20 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* ================= THẺ ĐỊNH DANH HỌC SINH / BAN CÁN SỰ ================= */}
-      <Card className="text-white shadow-xl overflow-hidden rounded-3xl relative">
-        {/* Banner Cover */}
+      <Card className="text-white shadow-2xl overflow-hidden rounded-3xl relative border border-white/15 bg-slate-950/70 backdrop-blur-2xl">
+        {/* 1. KHU VỰC ẢNH BÌA (BANNER COVER) - RỘNG RÃI & KHÔNG BỊ CẮT XÉN */}
         <div
-          className="h-36 sm:h-44 relative flex items-end p-6 bg-cover bg-center transition-all duration-300"
+          className="h-56 sm:h-72 md:h-80 w-full relative bg-cover bg-center transition-all duration-300"
           style={{
             backgroundImage: bannerCustomUrl
               ? `url('${bannerCustomUrl}')`
-              : 'linear-gradient(to right, #2563eb, #4f46e5, #9333ea)',
+              : 'linear-gradient(135deg, #1e3a8a 0%, #312e81 40%, #581c87 100%)',
           }}
         >
-          {/* Lớp phủ tối mờ để đảm bảo chữ và avatar nổi bật */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none" />
+          {/* Lớp phủ chuyển sắc tinh tế để nổi bật nút bấm và chân banner */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80 pointer-events-none" />
 
-          {/* Nút đổi ảnh bìa */}
+          {/* Nút đổi / gỡ ảnh bìa */}
           <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
             <input
               ref={bannerFileInputRef}
@@ -260,65 +262,95 @@ export const ProfilePage: React.FC = () => {
             <button
               type="button"
               onClick={() => bannerFileInputRef.current?.click()}
-              className="px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/20 text-xs text-slate-200 hover:text-white flex items-center gap-1.5 transition-all shadow-lg"
+              className="px-3.5 py-2 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/25 text-xs font-semibold text-slate-100 hover:text-white flex items-center gap-1.5 transition-all shadow-xl hover:scale-105 active:scale-95"
             >
-              <Camera className="w-3.5 h-3.5 text-blue-400" />
+              <Camera className="w-4 h-4 text-cyan-400" />
               <span>Đổi ảnh bìa</span>
             </button>
             {bannerCustomUrl && (
               <button
                 type="button"
                 onClick={handleRemoveBanner}
-                className="px-2.5 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 backdrop-blur-md border border-red-500/30 text-xs text-red-300 hover:text-red-100 flex items-center gap-1 transition-all"
+                className="px-2.5 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/90 backdrop-blur-md border border-red-500/40 text-xs text-red-200 hover:text-white flex items-center gap-1 transition-all shadow-xl hover:scale-105 active:scale-95"
                 title="Gỡ ảnh bìa tùy chỉnh"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             )}
           </div>
-
-          {/* Avatar & Thông tin cơ bản */}
-          <div className="flex items-center gap-4 translate-y-10 sm:translate-y-8 relative z-10">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-4 border-slate-900 bg-slate-800 overflow-hidden shadow-2xl relative group shrink-0">
-              {photoURL ? (
-                <img src={photoURL} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-blue-600 font-bold text-2xl sm:text-3xl text-white">
-                  {displayName.charAt(0)}
-                </div>
-              )}
-            </div>
-            <div className="pt-8 sm:pt-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                <span>{displayName}</span>
-                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
-              </h2>
-              <p className="text-xs sm:text-sm text-blue-300 font-medium">{user?.role || 'Học sinh 11A10'}</p>
-            </div>
-          </div>
         </div>
 
-        {/* Footer của Thẻ định danh */}
-        <div className="pt-14 pb-4 px-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 border-t border-white/5">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <GraduationCap className="w-4 h-4 text-blue-400" />
-              <span>Lớp 11A10 • THPT Cát Tiên</span>
-            </span>
-            <span className="hidden sm:inline text-slate-600">•</span>
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <Mail className="w-4 h-4 text-purple-400" />
-              <span>{user?.email}</span>
-            </span>
+        {/* 2. KHU VỰC THÔNG TIN HỒ SƠ & NỘI DUNG GHI CHÚ */}
+        <div className="px-6 pb-6 pt-0 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-14 sm:-mt-16 mb-4">
+            {/* Avatar & Tên & Vai trò */}
+            <div className="flex items-end gap-4">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-[#060913] bg-slate-900 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative group shrink-0 ring-2 ring-white/10">
+                {photoURL ? (
+                  <img src={photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 font-black text-2xl sm:text-3xl text-white">
+                    {displayName.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <div className="pb-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2 tracking-tight">
+                    <span>{displayName}</span>
+                    <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase tracking-wider">
+                    {user?.role === 'admin' ? 'Ban Cán Sự (Admin)' : 'Thành viên 11A10'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 font-medium mt-1 flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Học sinh lớp 11A10 • THPT Cát Tiên</span>
+                </p>
+              </div>
+            </div>
           </div>
-          {phoneNumber && (
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <Phone className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{phoneNumber}</span>
-            </span>
-          )}
+
+          {/* 3. NỘI DUNG GHI CHÚ / CHÂM NGÔN / TIỂU SỬ (BIO) - HIỂN THỊ NỔI BẬT */}
+          <div className="mt-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md shadow-inner">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider mb-1.5">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
+            </div>
+            {bio ? (
+              <p className="text-sm sm:text-base text-slate-100 font-medium italic leading-relaxed pl-2 border-l-2 border-amber-400/60 ml-0.5">
+                “{bio}”
+              </p>
+            ) : (
+              <p className="text-xs text-slate-400 italic">
+                Chưa có nội dung ghi chú. Bạn có thể nhập ghi chú / châm ngôn ở form bên dưới và bấm "Lưu thông tin".
+              </p>
+            )}
+          </div>
+
+          {/* 4. FOOTER CHI TIẾT: EMAIL & SỐ ĐIỆN THOẠI */}
+          <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <Mail className="w-4 h-4 text-purple-400" />
+                <span>{user?.email || 'Chưa liên kết email'}</span>
+              </span>
+            </div>
+            {phoneNumber ? (
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{phoneNumber}</span>
+              </span>
+            ) : (
+              <span className="text-[11px] text-slate-500 italic">
+                Chưa cập nhật số điện thoại
+              </span>
+            )}
+          </div>
         </div>
       </Card>
+
 
       {/* ================= 2 CỘT THÔNG TIN HỒ SƠ & BẢO MẬT ================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -425,16 +457,21 @@ export const ProfilePage: React.FC = () => {
                 />
               </div>
 
-              {/* Tiểu sử (Bio) */}
+              {/* Nội dung ghi chú / Châm ngôn cá nhân (Bio) */}
               <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Châm ngôn / Tiểu sử (Bio)</Label>
-                <Input
+                <Label className="text-xs text-slate-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Nội dung ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
+                </Label>
+                <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="bg-slate-950/80 border-slate-800 text-white text-xs rounded-xl focus:border-blue-500"
-                  placeholder="Nhập châm ngôn tuổi học trò..."
+                  rows={3}
+                  className="w-full bg-slate-950/80 border border-slate-800 text-white text-xs rounded-xl p-3 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors leading-relaxed resize-none placeholder:text-slate-600"
+                  placeholder="Nhập nội dung ghi chú, châm ngôn tuổi học trò hoặc thông điệp cá nhân..."
                 />
               </div>
+
 
               {/* Nút lưu */}
               <GlassButton

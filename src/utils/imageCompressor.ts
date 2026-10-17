@@ -91,14 +91,16 @@ export async function compressAvatar(file: File | Blob): Promise<string> {
 }
 
 /**
- * Nén ảnh bìa (cover/banner) tối ưu tỉ lệ 800x320px, chất lượng 0.72 (~35KB - 45KB)
+ * Nén ảnh bìa (cover/banner) tỉ lệ rộng tự nhiên: tối đa 1200x600px, chất lượng 0.76 (~50KB - 65KB)
+ * Giữ nguyên khung cảnh rộng, không bị cắt xén chiều dọc
  */
 export async function compressBanner(file: File | Blob): Promise<string> {
   return compressImage(file, {
-    maxWidth: 800,
-    maxHeight: 320,
-    quality: 0.72,
+    maxWidth: 1200,
+    maxHeight: 600,
+    quality: 0.76,
     format: 'image/jpeg',
   });
 }
+
 
