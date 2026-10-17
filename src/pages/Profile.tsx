@@ -236,56 +236,62 @@ export const ProfilePage: React.FC = () => {
         </p>
       </div>
 
-      {/* ================= THẺ ĐỊNH DANH HỌC SINH / BAN CÁN SỰ ================= */}
-      <Card className="text-white shadow-2xl overflow-hidden rounded-3xl relative border border-white/15 bg-slate-950/70 backdrop-blur-2xl">
-        {/* 1. KHU VỰC ẢNH BÌA (BANNER COVER) - RỘNG RÃI & KHÔNG BỊ CẮT XÉN */}
-        <div
-          className="h-56 sm:h-72 md:h-80 w-full relative bg-cover bg-center transition-all duration-300"
-          style={{
-            backgroundImage: bannerCustomUrl
-              ? `url('${bannerCustomUrl}')`
-              : 'linear-gradient(135deg, #1e3a8a 0%, #312e81 40%, #581c87 100%)',
-          }}
-        >
-          {/* Lớp phủ chuyển sắc tinh tế để nổi bật nút bấm và chân banner */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80 pointer-events-none" />
+      {/* ================= THẺ ĐỊNH DANH HỌC SINH / BAN CÁN SỰ (FULL BÌA TOÀN BỘ CARD) ================= */}
+      <Card
+        className="text-white shadow-2xl overflow-hidden rounded-3xl relative border border-white/20 bg-cover bg-center transition-all duration-300"
+        style={{
+          backgroundImage: bannerCustomUrl
+            ? `url('${bannerCustomUrl}')`
+            : 'linear-gradient(135deg, #1e3a8a 0%, #312e81 40%, #581c87 100%)',
+        }}
+      >
+        {/* Lớp phủ chuyển sắc tối nhẹ dạng kính mờ (Liquid Glass Dark Overlay) để giữ trọn vẹn màu sắc của ảnh bìa nhưng chữ và thông tin vẫn siêu rõ nét */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80 backdrop-blur-[2px] pointer-events-none" />
 
-          {/* Nút đổi / gỡ ảnh bìa */}
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-            <input
-              ref={bannerFileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleBannerUpload}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => bannerFileInputRef.current?.click()}
-              className="px-3.5 py-2 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/25 text-xs font-semibold text-slate-100 hover:text-white flex items-center gap-1.5 transition-all shadow-xl hover:scale-105 active:scale-95"
-            >
-              <Camera className="w-4 h-4 text-cyan-400" />
-              <span>Đổi ảnh bìa</span>
-            </button>
-            {bannerCustomUrl && (
+        <div className="relative z-10 p-6 sm:p-8 flex flex-col justify-between min-h-[380px] sm:min-h-[420px]">
+          {/* Header trên cùng: Trường lớp & Nút đổi ảnh bìa */}
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-2">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-black/40 backdrop-blur-md border border-white/20 text-white flex items-center gap-1.5 shadow-lg">
+                <GraduationCap className="w-4 h-4 text-cyan-400" />
+                <span>THPT CÁT TIÊN • LỚP 11A10</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                ref={bannerFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleBannerUpload}
+                className="hidden"
+              />
               <button
                 type="button"
-                onClick={handleRemoveBanner}
-                className="px-2.5 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/90 backdrop-blur-md border border-red-500/40 text-xs text-red-200 hover:text-white flex items-center gap-1 transition-all shadow-xl hover:scale-105 active:scale-95"
-                title="Gỡ ảnh bìa tùy chỉnh"
+                onClick={() => bannerFileInputRef.current?.click()}
+                className="px-3.5 py-2 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/25 text-xs font-semibold text-slate-100 hover:text-white flex items-center gap-1.5 transition-all shadow-xl hover:scale-105 active:scale-95"
               >
-                <Trash2 className="w-4 h-4" />
+                <Camera className="w-4 h-4 text-cyan-400" />
+                <span>Đổi ảnh bìa</span>
               </button>
-            )}
+              {bannerCustomUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemoveBanner}
+                  className="px-2.5 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/90 backdrop-blur-md border border-red-500/40 text-xs text-red-200 hover:text-white flex items-center gap-1 transition-all shadow-xl hover:scale-105 active:scale-95"
+                  title="Gỡ ảnh bìa tùy chỉnh"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* 2. KHU VỰC THÔNG TIN HỒ SƠ & NỘI DUNG GHI CHÚ */}
-        <div className="px-6 pb-6 pt-0 relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-14 sm:-mt-16 mb-4">
-            {/* Avatar & Tên & Vai trò */}
-            <div className="flex items-end gap-4">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-4 border-[#060913] bg-slate-900 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)] relative group shrink-0 ring-2 ring-white/10">
+          {/* Phần giữa: Avatar lớn + Tên + Quyền + Ghi chú / Bio */}
+          <div className="space-y-4 my-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+              {/* Avatar với viền phát sáng */}
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-white/30 bg-slate-900/80 backdrop-blur-md overflow-hidden shadow-[0_10px_35px_rgba(0,0,0,0.8)] relative group shrink-0 ring-4 ring-black/40">
                 {photoURL ? (
                   <img src={photoURL} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -294,62 +300,64 @@ export const ProfilePage: React.FC = () => {
                   </div>
                 )}
               </div>
-              <div className="pb-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2 tracking-tight">
+
+              {/* Thông tin tên & vai trò */}
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2 tracking-tight drop-shadow-md">
                     <span>{displayName}</span>
-                    <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 drop-shadow" />
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase tracking-wider">
+                  <span className="px-3 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/30 text-blue-200 border border-blue-400/40 backdrop-blur-md uppercase tracking-wider shadow-sm">
                     {user?.role === 'admin' ? 'Ban Cán Sự (Admin)' : 'Thành viên 11A10'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 font-medium mt-1 flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Học sinh lớp 11A10 • THPT Cát Tiên</span>
+                <p className="text-xs sm:text-sm text-slate-200/90 font-medium drop-shadow flex items-center gap-2">
+                  <span>Học sinh niên khóa 2024 - 2027</span>
                 </p>
               </div>
             </div>
-          </div>
 
-          {/* 3. NỘI DUNG GHI CHÚ / CHÂM NGÔN / TIỂU SỬ (BIO) - HIỂN THỊ NỔI BẬT */}
-          <div className="mt-4 p-4 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md shadow-inner">
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider mb-1.5">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
+            {/* Khung Ghi chú & Châm ngôn cá nhân (Bio) nằm trọn trong card full bìa */}
+            <div className="p-4 rounded-2xl bg-black/45 backdrop-blur-xl border border-white/15 shadow-2xl max-w-2xl">
+              <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider mb-1.5">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
+              </div>
+              {bio ? (
+                <p className="text-sm sm:text-base text-white font-medium italic leading-relaxed pl-2 border-l-2 border-amber-400/80 ml-0.5">
+                  “{bio}”
+                </p>
+              ) : (
+                <p className="text-xs text-slate-300/80 italic">
+                  Chưa có nội dung ghi chú. Bạn có thể nhập ghi chú / châm ngôn ở form bên dưới và bấm "Lưu thông tin".
+                </p>
+              )}
             </div>
-            {bio ? (
-              <p className="text-sm sm:text-base text-slate-100 font-medium italic leading-relaxed pl-2 border-l-2 border-amber-400/60 ml-0.5">
-                “{bio}”
-              </p>
-            ) : (
-              <p className="text-xs text-slate-400 italic">
-                Chưa có nội dung ghi chú. Bạn có thể nhập ghi chú / châm ngôn ở form bên dưới và bấm "Lưu thông tin".
-              </p>
-            )}
           </div>
 
-          {/* 4. FOOTER CHI TIẾT: EMAIL & SỐ ĐIỆN THOẠI */}
-          <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+          {/* Footer dưới cùng: Email & Số điện thoại với kính mờ */}
+          <div className="pt-4 mt-6 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-200">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Mail className="w-4 h-4 text-purple-400" />
+              <span className="flex items-center gap-1.5 text-white/90 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                <Mail className="w-4 h-4 text-purple-300" />
                 <span>{user?.email || 'Chưa liên kết email'}</span>
               </span>
             </div>
             {phoneNumber ? (
-              <span className="flex items-center gap-1.5 text-slate-300">
+              <span className="flex items-center gap-1.5 text-emerald-300 font-medium bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
                 <Phone className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{phoneNumber}</span>
               </span>
             ) : (
-              <span className="text-[11px] text-slate-500 italic">
+              <span className="text-[11px] text-white/60 italic bg-black/30 px-2.5 py-1 rounded-lg">
                 Chưa cập nhật số điện thoại
               </span>
             )}
           </div>
         </div>
       </Card>
+
 
 
       {/* ================= 2 CỘT THÔNG TIN HỒ SƠ & BẢO MẬT ================= */}
