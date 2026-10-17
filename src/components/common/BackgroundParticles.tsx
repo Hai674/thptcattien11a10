@@ -93,8 +93,8 @@ export const BackgroundParticles: React.FC = () => {
     }
 
     // ================= HỆ THỐNG MƯA SAO BĂNG ĐA TẦNG (METEOR SHOWER) =================
-    // Cho phép nhiều sao băng bay đồng thời, chu kỳ sinh sao liên tục và dày dặn
-    const MAX_ACTIVE_METEORS = 5;
+    // Tần xuất vừa phải, chuyển động thanh thoát và êm ái
+    const MAX_ACTIVE_METEORS = 2;
     const meteors: ShootingStar[] = [];
 
     const METEOR_PALETTES = [
@@ -115,8 +115,8 @@ export const BackgroundParticles: React.FC = () => {
         : Math.random() * (height * 0.45);
 
       const color = METEOR_PALETTES[Math.floor(Math.random() * METEOR_PALETTES.length)];
-      const speed = Math.random() * 8 + 11; // 11px - 19px / frame lướt nhanh
-      const length = Math.random() * 90 + 70; // 70px - 160px vệt đuôi
+      const speed = Math.random() * 3.5 + 6.5; // 6.5px - 10px / frame lướt êm ái, chậm rãi hơn
+      const length = Math.random() * 80 + 90; // 90px - 170px vệt đuôi mềm mại
 
       return {
         x,
@@ -125,17 +125,15 @@ export const BackgroundParticles: React.FC = () => {
         speed,
         angle: (Math.PI / 5) + Math.random() * (Math.PI / 7), // Góc chéo 36° - 60°
         alpha: 1,
-        decay: Math.random() * 0.012 + 0.014, // Tốc độ tan biến
-        width: Math.random() * 1.2 + 1.2,
+        decay: Math.random() * 0.007 + 0.007, // Tốc độ tan biến nhẹ nhàng theo nhịp bay chậm
+        width: Math.random() * 1.0 + 1.1,
         color,
         active: true,
       };
     };
 
-    // Khởi tạo một số sao băng sẵn sàng bay
-    for (let i = 0; i < 3; i++) {
-      meteors.push(spawnMeteor());
-    }
+    // Khởi tạo 1 sao băng nhẹ lúc ban đầu
+    meteors.push(spawnMeteor());
 
     let lastSpawnTime = Date.now();
 
@@ -174,11 +172,11 @@ export const BackgroundParticles: React.FC = () => {
         ctx.restore();
       }
 
-      // 2. Sinh sao băng mới thường xuyên (Cứ mỗi 0.8s - 1.6s lại có thêm 1 sao băng)
+      // 2. Sinh sao băng mới với tần xuất thưa hơn (Cứ mỗi 2.2s - 4.5s xuất hiện 1 sao băng)
       const now = Date.now();
       const currentActiveCount = meteors.filter((m) => m.active).length;
 
-      if (currentActiveCount < MAX_ACTIVE_METEORS && now - lastSpawnTime > (Math.random() * 800 + 700)) {
+      if (currentActiveCount < MAX_ACTIVE_METEORS && now - lastSpawnTime > (Math.random() * 2300 + 2200)) {
         meteors.push(spawnMeteor());
         lastSpawnTime = now;
       }
