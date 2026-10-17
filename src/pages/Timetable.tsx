@@ -129,8 +129,8 @@ export const TimetablePage: React.FC = () => {
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 flex items-center gap-2 font-mono">
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
-              <span>Quy chuẩn 4 tiết Sáng + 4 tiết Chiều • THPT Cát Tiên</span>
+              <Calendar className="w-3.5 h-3.5 text-blue-400" />
+              <span>Quy chuẩn 4 tiết Sáng + 4 tiết Chiều (Thứ 2 - Thứ 6) • THPT Cát Tiên</span>
             </p>
           </div>
 
@@ -157,7 +157,7 @@ export const TimetablePage: React.FC = () => {
 
             <GlassButton
               size="sm"
-              variant="default"
+              variant="secondary"
               onClick={() => setIsEditable(!isEditable)}
             >
               <span>{isEditable ? '✓ Xong sửa' : '✎ Sửa trực tiếp'}</span>
@@ -205,7 +205,7 @@ export const TimetablePage: React.FC = () => {
           Kéo thả tệp Excel vào đây hoặc nhấp để chọn tệp (.xlsx, .xls)
         </p>
         <p className="text-xs text-slate-400 max-w-md">
-          Hệ thống sẽ tự động phân tích các cột Thứ 2 đến Thứ 7 (Sáng 4 tiết, Chiều 4 tiết) và cập nhật thời khóa biểu lên website ngay lập tức
+          Hệ thống sẽ tự động phân tích các cột Thứ 2 đến Thứ 6 (Sáng 4 tiết, Chiều 4 tiết) và cập nhật thời khóa biểu lên website ngay lập tức
         </p>
         {totalSlots > 0 && (
           <span className="mt-2 inline-flex items-center gap-1.5 text-emerald-300 text-[11px] font-mono">
@@ -226,7 +226,7 @@ export const TimetablePage: React.FC = () => {
       <Card className="p-4 sm:p-5 rounded-2xl flex items-start sm:items-center gap-3.5 text-xs text-slate-300">
         <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5 sm:mt-0" />
         <p className="leading-relaxed">
-          <strong className="text-white">Quy chuẩn thời gian:</strong> Buổi sáng bắt đầu lúc <strong>07:00</strong> (4 tiết), buổi chiều bắt đầu lúc <strong>14:00</strong> (4 tiết, Tiết 1: 14:00 - 14:45), mọi thay đổi khi nạp file Excel hoặc chỉnh sửa trực tiếp sẽ được lưu lại tự động trên trình duyệt
+          <strong className="text-white">Quy chuẩn học tập:</strong> Lịch học từ <strong>Thứ Hai đến Thứ Sáu</strong> gồm 4 tiết Sáng và 4 tiết Chiều. Mọi thay đổi khi nạp file Excel hoặc chỉnh sửa trực tiếp sẽ được lưu lại tự động trên trình duyệt.
         </p>
       </Card>
     </div>

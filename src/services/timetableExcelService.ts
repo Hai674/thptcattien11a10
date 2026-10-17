@@ -26,28 +26,27 @@ export const EMPTY_TIMETABLE: Timetable = {
     '4': {},
     '5': {},
     '6': {},
-    '7': {},
   },
 };
 
 /**
- * Tạo và tải xuống file Excel mẫu chuẩn 4 tiết sáng + 4 tiết chiều
+ * Tạo và tải xuống file Excel mẫu chuẩn 4 tiết sáng + 4 tiết chiều (Thứ 2 đến Thứ 6)
  */
 export function downloadSampleTimetableExcel() {
   const wsData = [
     ['THỜI KHÓA BIỂU LỚP 11A10 - TRƯỜNG THPT CÁT TIÊN (NĂM HỌC 2026 - 2027)'],
-    ['(Quy chuẩn: Sáng 4 tiết từ 07:00, Chiều 4 tiết từ 14:00 - Nhập tên môn học vào từng ô)'],
+    ['(Quy chuẩn: 4 tiết Sáng, 4 tiết Chiều từ Thứ Hai đến Thứ Sáu - Nhập tên môn học vào từng ô)'],
     [],
-    ['Buổi', 'Tiết', 'Khung giờ', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
-    ['Sáng', 1, '07:00 - 07:45', 'Chào cờ', 'Toán', 'Ngữ Văn', 'Hóa Học', 'Tiếng Anh', 'Toán'],
-    ['Sáng', 2, '07:50 - 08:35', 'Toán', 'Vật Lý', 'Ngữ Văn', 'Lịch Sử', 'Tiếng Anh', 'Toán'],
-    ['Sáng', 3, '08:50 - 09:35', 'Hóa Học', 'Vật Lý', 'Tin Học', 'Địa Lý', 'Sinh Học', 'Ngữ Văn'],
-    ['Sáng', 4, '09:40 - 10:25', 'Sinh Học', 'Tiếng Anh', 'Tin Học', 'GDCD', 'Công Nghệ', 'Sinh hoạt lớp'],
+    ['Buổi', 'Tiết', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu'],
+    ['Sáng', 1, 'Chào cờ', 'Toán', 'Ngữ Văn', 'Hóa Học', 'Tiếng Anh'],
+    ['Sáng', 2, 'Toán', 'Vật Lý', 'Ngữ Văn', 'Lịch Sử', 'Tiếng Anh'],
+    ['Sáng', 3, 'Hóa Học', 'Vật Lý', 'Tin Học', 'Địa Lý', 'Sinh Học'],
+    ['Sáng', 4, 'Sinh Học', 'Tiếng Anh', 'Tin Học', 'GDCD', 'Sinh hoạt lớp'],
     [],
-    ['Chiều', 1, '14:00 - 14:45', 'Thể Dục', '', 'Bồi dưỡng Toán', 'Bồi dưỡng Văn', 'GDQP-AN', ''],
-    ['Chiều', 2, '14:50 - 15:35', 'Thể Dục', '', 'Bồi dưỡng Toán', 'Bồi dưỡng Anh', 'GDQP-AN', ''],
-    ['Chiều', 3, '15:50 - 16:35', '', '', 'Tự học', 'Tự học', '', ''],
-    ['Chiều', 4, '16:40 - 17:25', '', '', '', '', '', ''],
+    ['Chiều', 1, 'Thể Dục', '', 'Bồi dưỡng Toán', 'Bồi dưỡng Văn', 'GDQP-AN'],
+    ['Chiều', 2, 'Thể Dục', '', 'Bồi dưỡng Toán', 'Bồi dưỡng Anh', 'GDQP-AN'],
+    ['Chiều', 3, '', '', 'Tự học', 'Tự học', ''],
+    ['Chiều', 4, '', '', '', '', ''],
   ];
 
   const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -55,14 +54,12 @@ export function downloadSampleTimetableExcel() {
   // Đặt độ rộng các cột cho đẹp mắt
   ws['!cols'] = [
     { wch: 10 }, // Buổi
-    { wch: 6 },  // Tiết
-    { wch: 16 }, // Khung giờ
-    { wch: 18 }, // Thứ 2
-    { wch: 18 }, // Thứ 3
-    { wch: 18 }, // Thứ 4
-    { wch: 18 }, // Thứ 5
-    { wch: 18 }, // Thứ 6
-    { wch: 18 }, // Thứ 7
+    { wch: 8 },  // Tiết
+    { wch: 20 }, // Thứ 2
+    { wch: 20 }, // Thứ 3
+    { wch: 20 }, // Thứ 4
+    { wch: 20 }, // Thứ 5
+    { wch: 20 }, // Thứ 6
   ];
 
   const wb = XLSX.utils.book_new();
@@ -92,7 +89,6 @@ export async function parseTimetableFromExcel(file: File): Promise<Timetable> {
     '4': {},
     '5': {},
     '6': {},
-    '7': {},
   };
 
   // Tìm dòng tiêu đề chứa các thứ
@@ -114,8 +110,6 @@ export async function parseTimetableFromExcel(file: File): Promise<Timetable> {
         dayColMap['5'] = c;
       } else if (val.includes('thứ sáu') || val.includes('thứ 6') || val === 't6' || val === 'fri') {
         dayColMap['6'] = c;
-      } else if (val.includes('thứ bảy') || val.includes('thứ 7') || val === 't7' || val === 'sat') {
-        dayColMap['7'] = c;
       }
     }
     if (headerRowIndex !== -1) break;
@@ -218,6 +212,10 @@ export function loadTimetableFromStorage(): Timetable | null {
     ) {
       localStorage.removeItem('11a10_timetable_data');
       return null;
+    }
+    if (data && data.schedule && data.schedule['7']) {
+      delete data.schedule['7'];
+      localStorage.setItem('11a10_timetable_data', JSON.stringify(data));
     }
     return data;
   } catch {

@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
 import { Timetable, ScheduleSlot } from '@/types';
-import {
-  PERIOD_TIMES_MORNING,
-  PERIOD_TIMES_AFTERNOON,
-} from '@/services/timetableExcelService';
 import { Sun, Sunset, Edit2, Check, X } from 'lucide-react';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Card } from '@/components/ui/card';
@@ -60,21 +56,20 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
     { key: '4', label: 'Thứ Tư' },
     { key: '5', label: 'Thứ Năm' },
     { key: '6', label: 'Thứ Sáu' },
-    { key: '7', label: 'Thứ Bảy' },
   ];
 
   const morningPeriods = [
-    { key: '1', name: 'Tiết 1', time: PERIOD_TIMES_MORNING['1'] },
-    { key: '2', name: 'Tiết 2', time: PERIOD_TIMES_MORNING['2'] },
-    { key: '3', name: 'Tiết 3', time: PERIOD_TIMES_MORNING['3'] },
-    { key: '4', name: 'Tiết 4', time: PERIOD_TIMES_MORNING['4'] },
+    { key: '1', name: 'Tiết 1' },
+    { key: '2', name: 'Tiết 2' },
+    { key: '3', name: 'Tiết 3' },
+    { key: '4', name: 'Tiết 4' },
   ];
 
   const afternoonPeriods = [
-    { key: 'c1', name: 'Tiết 1 (Chiều)', time: PERIOD_TIMES_AFTERNOON['c1'] },
-    { key: 'c2', name: 'Tiết 2 (Chiều)', time: PERIOD_TIMES_AFTERNOON['c2'] },
-    { key: 'c3', name: 'Tiết 3 (Chiều)', time: PERIOD_TIMES_AFTERNOON['c3'] },
-    { key: 'c4', name: 'Tiết 4 (Chiều)', time: PERIOD_TIMES_AFTERNOON['c4'] },
+    { key: 'c1', name: 'Tiết 1 (Chiều)' },
+    { key: 'c2', name: 'Tiết 2 (Chiều)' },
+    { key: 'c3', name: 'Tiết 3 (Chiều)' },
+    { key: 'c4', name: 'Tiết 4 (Chiều)' },
   ];
 
   const now = new Date();
@@ -107,7 +102,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
       <>
         {/* Tiêu đề phân đoạn buổi học */}
         <tr className="bg-white/[0.03] border-y border-white/10">
-          <td colSpan={7} className="px-4 py-2 text-xs font-semibold text-slate-300">
+          <td colSpan={6} className="px-4 py-2 text-xs font-semibold text-slate-300">
             <div className="flex items-center gap-2">
               {sessionIcon}
               <span>{sessionTitle}</span>
@@ -123,12 +118,11 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
             key={p.key}
             className="border-b border-white/[0.05] hover:bg-white/[0.02] transition-colors"
           >
-            {/* Cột số tiết & giờ */}
-            <td className="p-3 text-center bg-white/[0.04] border-r border-white/10 w-28 backdrop-blur-md">
-              <span className="inline-block px-2.5 py-0.5 rounded-lg bg-white/10 border border-white/15 text-white font-bold text-xs mb-1">
+            {/* Cột số tiết (đã loại bỏ khung giờ) */}
+            <td className="p-3 text-center bg-white/[0.04] border-r border-white/10 w-24 sm:w-28 backdrop-blur-md">
+              <span className="inline-block px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-white font-bold text-xs">
                 {p.name}
               </span>
-              <p className="text-[10px] text-slate-300 font-mono">{p.time}</p>
             </td>
 
             {/* Các ngày từ Thứ 2 đến Thứ 7 */}
@@ -229,6 +223,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
           {activeSession === 'all' ? (
             <GlassButton
               size="sm"
+              variant="primary"
               onClick={() => setActiveSession('all')}
               contentClassName="px-3.5 py-1.5 text-xs text-white font-semibold"
             >
@@ -247,8 +242,9 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
           {activeSession === 'morning' ? (
             <GlassButton
               size="sm"
+              variant="primary"
               onClick={() => setActiveSession('morning')}
-              contentClassName="flex items-center gap-1.5 px-3.5 py-1.5 text-xs text-amber-200 font-semibold"
+              contentClassName="flex items-center gap-1.5 px-3.5 py-1.5 text-xs text-white font-semibold"
             >
               <Sun className="w-3.5 h-3.5 text-amber-400" />
               <span>Sáng (4 tiết)</span>
@@ -267,8 +263,9 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
           {activeSession === 'afternoon' ? (
             <GlassButton
               size="sm"
+              variant="primary"
               onClick={() => setActiveSession('afternoon')}
-              contentClassName="flex items-center gap-1.5 px-3.5 py-1.5 text-xs text-orange-200 font-semibold"
+              contentClassName="flex items-center gap-1.5 px-3.5 py-1.5 text-xs text-white font-semibold"
             >
               <Sunset className="w-3.5 h-3.5 text-orange-400" />
               <span>Chiều (4 tiết)</span>
@@ -298,8 +295,8 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
           <table className="w-full text-left border-collapse min-w-[760px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.06] backdrop-blur-md">
-                <th className="p-3.5 text-xs font-bold uppercase text-slate-300 w-28 text-center font-mono">
-                  Tiết / Giờ
+                <th className="p-3.5 text-xs font-bold uppercase text-slate-300 w-24 sm:w-28 text-center font-mono">
+                  Tiết
                 </th>
                 {days.map((d) => (
                   <th

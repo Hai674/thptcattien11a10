@@ -147,14 +147,15 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
   const hasMorning = morningSlots.length > 0;
   const hasAfternoon = afternoonSlots.length > 0;
   const totalClassesCount = morningSlots.length + afternoonSlots.length;
-  const isOffDay = todayKey === 'CN' || totalClassesCount === 0;
+  const isWeekend = todayKey === 'CN' || todayKey === '7';
+  const isOffDay = isWeekend || totalClassesCount === 0;
 
   // Xác định trạng thái tiết học trực tiếp theo giờ
   let liveStatusText = 'Ngoài giờ học';
   let livePeriodKey: string | null = null;
   let isRecess = false;
 
-  if (todayKey === 'CN') {
+  if (isWeekend) {
     liveStatusText = 'Nghỉ cuối tuần (Nạp năng lượng)';
   } else if (totalClassesCount === 0) {
     liveStatusText = 'Chưa có lịch học hôm nay';
@@ -288,7 +289,7 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
                   LỊCH HỌC HÔM NAY
                 </span>
                 <span className="text-[11px] font-mono text-slate-500">
-                  {totalClassesCount > 0 ? `${totalClassesCount} tiết trong ngày` : todayKey === 'CN' ? 'Cuối tuần' : 'Chưa xếp lịch'}
+                  {totalClassesCount > 0 ? `${totalClassesCount} tiết trong ngày` : isWeekend ? 'Cuối tuần' : 'Chưa xếp lịch'}
                 </span>
               </div>
 
@@ -389,11 +390,11 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-white">
-                      {todayKey === 'CN' ? 'Hôm nay được nghỉ học (Cuối tuần)' : 'Chưa có lịch học hôm nay'}
+                      {isWeekend ? 'Hôm nay được nghỉ học (Cuối tuần)' : 'Chưa có lịch học hôm nay'}
                     </h4>
                     <p className="text-xs text-slate-200 mt-1.5 max-w-xs mx-auto leading-relaxed">
-                      {todayKey === 'CN'
-                        ? 'Chủ Nhật là thời gian nghỉ ngơi thư giãn, chúc các bạn 11A10 nạp đầy năng lượng để bắt đầu tuần mới'
+                      {isWeekend
+                        ? 'Cuối tuần là thời gian nghỉ ngơi thư giãn, chúc các bạn 11A10 nạp đầy năng lượng để bắt đầu tuần mới'
                         : 'Thời khóa biểu lớp chưa có tiết học nào được xếp, ban cán sự có thể nạp tệp Excel mới trong trang Thời khóa biểu'}
                     </p>
                   </div>

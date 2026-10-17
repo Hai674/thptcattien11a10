@@ -22,7 +22,6 @@ export const INITIAL_TIMETABLE: Timetable = {
     '4': {},
     '5': {},
     '6': {},
-    '7': {},
   },
 };
 
