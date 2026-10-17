@@ -247,9 +247,15 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
         </div>
 
         {/* Khung tương tác trò chơi */}
-        <div className="relative py-4 px-2 rounded-2xl bg-slate-950/80 border border-white/5 flex flex-col items-center justify-center min-h-[320px]">
+        <div className="relative py-6 px-4 rounded-3xl bg-gradient-to-b from-slate-900/90 via-indigo-950/40 to-slate-900/90 border border-white/10 backdrop-blur-2xl flex flex-col items-center justify-center min-h-[360px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.1)]">
+          {/* Ambient Lighting */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] bg-gradient-to-tr from-indigo-600/25 via-purple-600/20 to-cyan-500/20 rounded-full blur-3xl opacity-80" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15)_0%,transparent_70%)]" />
+          </div>
+
           {activeCandidates.length === 0 ? (
-            <div className="text-center py-8 space-y-3">
+            <div className="text-center py-8 space-y-3 relative z-10">
               <Trophy className="w-10 h-10 text-amber-400 mx-auto" />
               <h4 className="text-base font-bold text-white">Đã gọi hết học sinh trong danh sách!</h4>
               <p className="text-xs text-slate-400">Bấm đặt lại để bắt đầu vòng gọi mới.</p>
@@ -258,7 +264,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
               </GlassButton>
             </div>
           ) : (
-            <>
+            <div className="relative z-10 w-full flex items-center justify-center">
               {gameMode === 'wheel' && (
                 <LuckyWheelCanvas
                   candidates={activeCandidates}
@@ -284,34 +290,67 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                   onSelectWinner={handleSpinEnd}
                 />
               )}
-            </>
+            </div>
           )}
 
           {/* Popup trúng giải */}
           {winner && (
-            <div className="absolute inset-0 z-30 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md rounded-2xl animate-in zoom-in-95 duration-200">
-              <div className="w-full max-w-xs rounded-2xl bg-slate-900 border-2 border-amber-400 p-5 text-center space-y-4 shadow-2xl">
-                <Trophy className="w-8 h-8 text-amber-400 mx-auto" />
-                <div>
-                  <span className="inline-block text-amber-400 text-[11px] font-mono font-bold tracking-wider uppercase">
-                    🎲 BỐC THĂM 11A10
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-white font-display pt-1">
-                    {winner.fullName}
-                  </h3>
-                  <p className="text-xs text-slate-400 font-mono">
-                    {winner.role || 'Học sinh'} • Tập thể 11A10
-                  </p>
+            <div className="absolute inset-0 z-30 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+              {/* Outer Golden Glow Halo */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-gradient-to-tr from-amber-500/25 via-purple-600/20 to-indigo-500/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
+
+              <div className="w-full max-w-xs rounded-3xl bg-gradient-to-b from-slate-900/95 via-indigo-950/90 to-slate-900/95 border border-white/15 p-6 text-center space-y-4 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(245,158,11,0.2)] relative overflow-hidden">
+                {/* Top Radiant Bar */}
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-400" />
+
+                {/* Close Button X */}
+                <button
+                  type="button"
+                  onClick={() => setWinner(null)}
+                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+
+                {/* Celebration Trophy Icon */}
+                <div className="relative mx-auto w-16 h-16 pt-1">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 blur-md opacity-50 animate-pulse" />
+                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 via-amber-500 to-rose-500 flex items-center justify-center text-white shadow-lg ring-4 ring-white/20">
+                    <Trophy className="w-8 h-8 text-amber-100 drop-shadow" />
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                {/* Text Content */}
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold font-mono tracking-wider uppercase">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>CHÚC MỪNG BẠN</span>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black tracking-tight font-display bg-gradient-to-r from-amber-100 via-white to-amber-200 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(251,191,36,0.35)] pt-0.5">
+                    {winner.fullName}
+                  </h3>
+
+                  <div className="flex items-center justify-center gap-1.5 pt-0.5">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
+                      {winner.role || 'Học sinh'}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      11A10 • Cát Tiên
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 pt-1">
                   <GlassButton
                     size="sm"
                     variant="primary"
                     onClick={() => handleMarkCalled(winner.id)}
                     className="w-full"
+                    contentClassName="flex items-center justify-center gap-2 text-xs font-semibold text-white py-0.5"
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
                     <span>Đánh dấu đã hoàn thành</span>
                   </GlassButton>
 
@@ -320,7 +359,9 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                     variant="secondary"
                     onClick={() => setWinner(null)}
                     className="w-full"
+                    contentClassName="flex items-center justify-center gap-2 text-xs font-semibold text-slate-200 py-0.5"
                   >
+                    <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Quay bạn tiếp theo</span>
                   </GlassButton>
                 </div>

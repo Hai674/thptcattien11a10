@@ -10,16 +10,20 @@ interface LuckyWheelCanvasProps {
   className?: string;
 }
 
-// Bảng màu vòng quay Midnight Cosmic cao cấp: Dịu mắt, sang trọng, độ tương phản tuyệt đối giúp chữ trắng nổi bật 100%
+// Bảng 12 màu Cyber Modern hài hòa, tươi sáng, có chiều sâu 3D gradient cao cấp
 const PALETTE = [
-  // 1. Deep Royal Sapphire (Xanh Sapphire thẫm)
-  { base: '#1e3a8a', dark: '#0c1a3b' },
-  // 2. Cosmic Dark Slate (Đá phiến than chì huyền bí)
-  { base: '#1e293b', dark: '#050a14' },
-  // 3. Midnight Galaxy Indigo (Tím than vũ trụ sâu lắng)
-  { base: '#312e81', dark: '#0e0c26' },
-  // 4. Deep Oceanic Teal (Xanh ngọc biển đêm dịu mát)
-  { base: '#0f4c5c', dark: '#06232b' },
+  { base: '#3b82f6', dark: '#1d4ed8' }, // Sapphire Blue
+  { base: '#06b6d4', dark: '#0891b2' }, // Neon Cyan
+  { base: '#10b981', dark: '#047857' }, // Emerald Glow
+  { base: '#8b5cf6', dark: '#6d28d9' }, // Cyber Violet
+  { base: '#f59e0b', dark: '#d97706' }, // Amber Gold
+  { base: '#ec4899', dark: '#be185d' }, // Neon Pink
+  { base: '#6366f1', dark: '#4338ca' }, // Electric Indigo
+  { base: '#14b8a6', dark: '#0f766e' }, // Teal Wave
+  { base: '#f97316', dark: '#c2410c' }, // Bright Orange
+  { base: '#a855f7', dark: '#7e22ce' }, // Bright Purple
+  { base: '#0284c7', dark: '#0369a1' }, // Deep Sky
+  { base: '#f43f5e', dark: '#be123c' }, // Crimson Rose
 ];
 
 export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
@@ -57,17 +61,18 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
       ctx.beginPath();
       ctx.arc(center, center, radius + 14, 0, 2 * Math.PI);
       ctx.fillStyle = '#090d16';
-      ctx.shadowColor = 'rgba(59, 130, 246, 0.45)';
+      ctx.shadowColor = 'rgba(99, 102, 241, 0.6)';
       ctx.shadowBlur = 24;
       ctx.fill();
 
-      // Viền gradient Sapphire - Cyan thanh lịch đồng bộ với website
+      // Viền gradient đa sắc hiện đại
       const rimGradient = ctx.createLinearGradient(0, 0, size, size);
       rimGradient.addColorStop(0, '#38bdf8');
-      rimGradient.addColorStop(0.5, '#6366f1');
-      rimGradient.addColorStop(1, '#06b6d4');
+      rimGradient.addColorStop(0.3, '#818cf8');
+      rimGradient.addColorStop(0.6, '#ec4899');
+      rimGradient.addColorStop(1, '#f59e0b');
       ctx.strokeStyle = rimGradient;
-      ctx.lineWidth = 8;
+      ctx.lineWidth = 10;
       ctx.stroke();
       ctx.restore();
 
@@ -148,32 +153,24 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
       ctx.beginPath();
       ctx.arc(center, center, hubRadius, 0, 2 * Math.PI);
       const hubGradient = ctx.createRadialGradient(center, center, 8, center, center, hubRadius);
-      hubGradient.addColorStop(0, '#0f172a');
-      hubGradient.addColorStop(1, '#020617');
+      hubGradient.addColorStop(0, '#1e1b4b');
+      hubGradient.addColorStop(1, '#090d16');
       ctx.fillStyle = hubGradient;
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-      ctx.shadowBlur = 20;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 15;
       ctx.fill();
 
-      // Viền trục trung tâm phát sáng
-      ctx.strokeStyle = '#38bdf8';
+      ctx.strokeStyle = '#f59e0b';
       ctx.lineWidth = 3.5;
       ctx.stroke();
 
-      // Vòng tròn phụ bên trong
-      ctx.beginPath();
-      ctx.arc(center, center, hubRadius - 8, 0, 2 * Math.PI);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
       // Logo chữ 11A10 ở trục giữa
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = '#fef08a';
       ctx.font = '900 19px "Montserrat", "Inter", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(56, 189, 248, 0.9)';
-      ctx.shadowBlur = 12;
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 10;
       ctx.fillText('11A10', center, center);
       ctx.restore();
     },
@@ -282,31 +279,31 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
 
   return (
     <div className={`relative inline-flex items-center justify-center select-none ${className}`}>
-      {/* Kim chỉ thị phong cách Cyber Ruby ở đỉnh 12h */}
+      {/* Kim chỉ thị phong cách ở đỉnh 12h */}
       <div
         ref={needleRef}
-        className="absolute -top-3.5 z-20 pointer-events-none transition-transform duration-75 origin-top filter drop-shadow-[0_4px_12px_rgba(244,63,94,0.6)]"
+        className="absolute -top-4 z-20 pointer-events-none transition-transform duration-75 origin-top filter drop-shadow-[0_6px_14px_rgba(245,158,11,0.7)]"
         style={{ transform: 'rotate(0deg)' }}
       >
         <div className="relative flex flex-col items-center">
-          {/* Mũi tên tam giác định vị sắc nét */}
-          <svg width="26" height="38" viewBox="0 0 26 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Mũi tên nhọn vàng amber rực rỡ */}
+          <svg width="34" height="46" viewBox="0 0 34 46" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M13 38L1 6C-0.5 3 1.5 0 5 0H21C24.5 0 26.5 3 25 6L13 38Z"
+              d="M17 46L2 12C0 8 3 0 8 0H26C31 0 34 8 32 12L17 46Z"
               fill="url(#needleGrad)"
               stroke="#ffffff"
-              strokeWidth="1.5"
+              strokeWidth="2"
             />
             <defs>
-              <linearGradient id="needleGrad" x1="13" y1="0" x2="13" y2="38" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#fb7185" />
-                <stop offset="0.6" stopColor="#e11d48" />
-                <stop offset="1" stopColor="#9f1239" />
+              <linearGradient id="needleGrad" x1="17" y1="0" x2="17" y2="46" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#fbbf24" />
+                <stop offset="0.6" stopColor="#f59e0b" />
+                <stop offset="1" stopColor="#ea580c" />
               </linearGradient>
             </defs>
           </svg>
-          {/* Điểm ngọc định vị phát sáng trắng */}
-          <div className="absolute top-2 w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
+          {/* Tâm kim ngọc phát sáng */}
+          <div className="absolute top-2.5 w-3.5 h-3.5 rounded-full bg-white border-2 border-amber-500 shadow-[0_0_8px_#ffffff]" />
         </div>
       </div>
 
@@ -318,23 +315,21 @@ export const LuckyWheelCanvas: React.FC<LuckyWheelCanvasProps> = ({
         className="w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[480px] md:h-[480px] max-w-full aspect-square drop-shadow-[0_20px_50px_rgba(0,0,0,0.85)]"
       />
 
-      {/* Nút bấm tròn trung tâm Holographic Core */}
+      {/* Nút bấm tròn trung tâm */}
       <button
         type="button"
         disabled={isSpinning || candidates.length === 0}
         onClick={onSpinStart}
-        className={`absolute z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center font-display font-black tracking-wider uppercase transition-all duration-300 shadow-2xl active:scale-95 group ${
+        className={`absolute z-10 w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center font-display font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-2xl active:scale-95 ${
           isSpinning
-            ? 'bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 border-2 border-indigo-500/60 text-indigo-300 cursor-not-allowed opacity-90 animate-pulse shadow-[0_0_25px_rgba(99,102,241,0.5)]'
+            ? 'bg-gradient-to-tr from-purple-800 to-indigo-800 text-purple-200 cursor-not-allowed opacity-90 animate-pulse'
             : candidates.length === 0
-            ? 'bg-slate-900 text-slate-500 border border-white/10 cursor-not-allowed'
-            : 'bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-950 hover:from-indigo-950 hover:to-blue-950 text-white border-2 border-cyan-400/70 hover:border-cyan-300 hover:scale-105 shadow-[0_0_25px_rgba(6,182,212,0.4)] ring-4 ring-white/10'
+            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+            : 'bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white hover:scale-105 ring-4 ring-white/20 shadow-amber-500/40'
         }`}
       >
-        <span className="text-xs sm:text-sm font-black text-white group-hover:text-cyan-200 transition-colors">
-          {isSpinning ? 'ĐANG QUAY' : 'BẤM QUAY'}
-        </span>
-        <span className="text-[9px] font-sans font-medium text-cyan-300/80 mt-0.5">
+        <span>{isSpinning ? 'ĐANG QUAY' : 'BẤM QUAY'}</span>
+        <span className="text-[9px] font-sans font-normal opacity-85 mt-0.5">
           {candidates.length} bạn
         </span>
       </button>
