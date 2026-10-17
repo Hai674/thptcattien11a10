@@ -117,21 +117,23 @@ const glassButtonStyles = `
 
 /* ================= VARIANTS STYLING ================= */
 
-/* 1. Primary Variant (Xanh Sapphire Gradient rực rỡ, độ sâu cao) */
+/* 1. Primary Variant (Xanh Sapphire Frosted Glass có chiều sâu, viền phát sáng) */
 .glass-button.btn-primary {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
-  border: 1px solid rgba(147, 197, 253, 0.35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-              0 4px 14px -2px rgba(37, 99, 235, 0.45);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.85) 0%, rgba(59, 130, 246, 0.75) 50%, rgba(96, 165, 250, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+              0 4px 18px -2px rgba(37, 99, 235, 0.4);
   color: #ffffff;
 }
 
 .glass-button.btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
-  border-color: rgba(191, 219, 254, 0.55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55),
-              0 6px 20px -2px rgba(37, 99, 235, 0.65);
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.95) 0%, rgba(37, 99, 235, 0.9) 50%, rgba(59, 130, 246, 0.95) 100%);
+  border-color: rgba(191, 219, 254, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+              0 6px 22px -2px rgba(59, 130, 246, 0.55);
 }
 
 /* 2. Secondary / Default / Glass Variant (Kính mờ Frosted Glass sang trọng) */
@@ -158,21 +160,23 @@ const glassButtonStyles = `
   color: #ffffff;
 }
 
-/* 3. Destructive Variant (Đỏ Ruby Cảnh báo) */
+/* 3. Destructive Variant (Kính Ruby mờ tinh tế, không chói mắt) */
 .glass-button.btn-destructive {
-  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
-  border: 1px solid rgba(252, 165, 165, 0.35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-              0 4px 14px -2px rgba(220, 38, 38, 0.45);
-  color: #ffffff;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.22) 0%, rgba(239, 68, 68, 0.28) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(251, 113, 133, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),
+              0 4px 16px -2px rgba(225, 29, 72, 0.3);
+  color: #fecdd3;
 }
 
 .glass-button.btn-destructive:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
-  border-color: rgba(254, 202, 202, 0.55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55),
-              0 6px 20px -2px rgba(220, 38, 38, 0.65);
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.38) 0%, rgba(239, 68, 68, 0.45) 100%);
+  border-color: rgba(251, 113, 133, 0.55);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3),
+              0 6px 20px -2px rgba(225, 29, 72, 0.45);
 }
 
 /* 4. Success Variant (Xanh Emerald Hoàn thành) */

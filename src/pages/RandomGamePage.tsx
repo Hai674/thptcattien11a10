@@ -389,14 +389,14 @@ export const RandomGamePage: React.FC = () => {
         {/* Cột phụ: Lịch sử & Danh sách đã gọi (Col 4) */}
         <div className="lg:col-span-4 space-y-4">
           {/* Card Lịch sử vừa gọi */}
-          <Card className="text-white shadow-xl rounded-3xl">
+          <Card className="text-white shadow-2xl rounded-3xl bg-slate-950/70 border border-white/10 backdrop-blur-2xl">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                  <History className="w-4 h-4 text-blue-400" />
+                  <History className="w-4 h-4 text-cyan-400" />
                   <h3 className="font-bold text-sm text-white">Lịch sử lượt gọi</h3>
                 </div>
-                <span className="text-xs font-mono text-slate-400">{history.length} lượt</span>
+                <span className="text-xs font-mono text-cyan-400">{history.length} lượt</span>
               </div>
 
               {history.length === 0 ? (
@@ -408,13 +408,13 @@ export const RandomGamePage: React.FC = () => {
                   {history.map((h, i) => (
                     <div
                       key={i}
-                      className="p-2.5 rounded-xl bg-slate-950/60 border border-white/5 flex items-center justify-between text-xs"
+                      className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-xs hover:border-white/15 transition-colors"
                     >
                       <div>
                         <div className="font-bold text-slate-200">{h.student.fullName}</div>
                         <div className="text-[10px] text-slate-400">11A10</div>
                       </div>
-                      <span className="text-[10px] font-mono text-amber-300/80">{h.time}</span>
+                      <span className="text-[10px] font-mono text-cyan-300/80">{h.time}</span>
                     </div>
                   ))}
                 </div>
@@ -423,7 +423,7 @@ export const RandomGamePage: React.FC = () => {
           </Card>
 
           {/* Card Danh sách học sinh đã kiểm tra */}
-          <Card className="text-white shadow-xl rounded-3xl">
+          <Card className="text-white shadow-2xl rounded-3xl bg-slate-950/70 border border-white/10 backdrop-blur-2xl">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-white/10">
                 <div className="flex items-center gap-2">

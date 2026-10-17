@@ -330,18 +330,25 @@ export const Header: React.FC<HeaderProps> = ({
                     </button>
                   )}
 
-                  {/* Nút Đăng xuất đồng bộ hoàn toàn với GlassButton */}
+                  {/* Nút Đăng xuất thiết kế đồng bộ với các mục menu */}
                   <div className="pt-2 mt-1 border-t border-white/10">
-                    <GlassButton
-                      size="sm"
-                      variant="destructive"
+                    <button
+                      type="button"
                       onClick={handleLogout}
-                      className="w-full"
-                      contentClassName="flex items-center justify-center gap-2 text-xs font-semibold text-rose-200 hover:text-white"
+                      className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-rose-500/[0.06] hover:bg-rose-500/[0.14] active:bg-rose-500/[0.2] border border-rose-500/15 hover:border-rose-500/30 transition-all duration-200 group/logout cursor-pointer text-left"
                     >
-                      <LogOut className="w-3.5 h-3.5 text-rose-300" />
-                      <span>Đăng xuất</span>
-                    </GlassButton>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-rose-500/15 border border-rose-400/25 flex items-center justify-center text-rose-300 group-hover/logout:scale-105 group-hover/logout:text-white transition-all shadow-[0_0_12px_rgba(244,63,94,0.2)]">
+                          <LogOut className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-rose-200 group-hover/logout:text-white transition-colors">
+                            Đăng xuất
+                          </p>
+                          <p className="text-[10px] text-rose-300/60">Thoát khỏi phiên đăng nhập</p>
+                        </div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               </div>

@@ -368,10 +368,10 @@ export const ProfilePage: React.FC = () => {
       {/* ================= 2 CỘT THÔNG TIN HỒ SƠ & BẢO MẬT ================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Cột trái: Cập nhật thông tin học sinh */}
-        <Card className="text-white shadow-xl rounded-3xl">
+        <Card className="text-white shadow-2xl rounded-3xl bg-slate-950/70 border border-white/10 backdrop-blur-2xl">
           <CardContent className="p-6 space-y-5">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
-              <UserIcon className="w-4 h-4 text-blue-400" />
+            <div className="flex items-center gap-2 pb-3 border-b border-white/10">
+              <UserIcon className="w-4 h-4 text-cyan-400" />
               <h3 className="font-bold text-white text-sm uppercase tracking-wide">
                 Thông tin học sinh & Avatar
               </h3>
@@ -379,10 +379,10 @@ export const ProfilePage: React.FC = () => {
 
             <form onSubmit={handleSaveProfile} className="space-y-4">
               {/* Chọn & Tải Avatar */}
-              <div className="space-y-2 p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
+              <div className="space-y-2 p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
-                    <Camera className="w-3.5 h-3.5 text-blue-400" />
+                    <Camera className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Ảnh đại diện</span>
                   </span>
                   {photoURL && (
@@ -439,48 +439,51 @@ export const ProfilePage: React.FC = () => {
 
 
               {/* Họ và tên */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Họ và tên</Label>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-200">Họ và tên</Label>
                 <Input
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="bg-slate-950/80 border-slate-800 text-white text-xs rounded-xl focus:border-blue-500"
+                  className="bg-white/[0.04] hover:bg-white/[0.07] border-white/10 hover:border-white/20 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 text-white text-xs rounded-2xl h-11 px-4 transition-all duration-200"
                   required
                 />
               </div>
 
               {/* Email */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Địa chỉ Email</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold text-slate-200">Địa chỉ Email</Label>
+                  <span className="text-[10px] text-slate-400 font-mono">Định danh Google cố định</span>
+                </div>
                 <Input
                   value={user?.email || ''}
                   disabled
-                  className="bg-slate-950/40 border-slate-800/50 text-slate-500 text-xs rounded-xl cursor-not-allowed"
+                  className="bg-white/[0.02] border-white/5 text-slate-400 text-xs rounded-2xl h-11 px-4 cursor-not-allowed select-none"
                 />
               </div>
 
               {/* Số điện thoại */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Số điện thoại</Label>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-200">Số điện thoại</Label>
                 <Input
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="bg-slate-950/80 border-slate-800 text-white text-xs rounded-xl focus:border-blue-500"
+                  className="bg-white/[0.04] hover:bg-white/[0.07] border-white/10 hover:border-white/20 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 text-white text-xs rounded-2xl h-11 px-4 transition-all duration-200"
                   placeholder="Ví dụ: 0912 345 678"
                 />
               </div>
 
               {/* Nội dung ghi chú / Châm ngôn cá nhân (Bio) */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                   <span>Nội dung ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
                 </Label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={3}
-                  className="w-full bg-slate-950/80 border border-slate-800 text-white text-xs rounded-xl p-3 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors leading-relaxed resize-none placeholder:text-slate-600"
+                  className="w-full bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 hover:border-white/20 text-white text-xs rounded-2xl p-3.5 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all duration-200 leading-relaxed resize-none placeholder:text-slate-500"
                   placeholder="Nhập nội dung ghi chú, châm ngôn tuổi học trò hoặc thông điệp cá nhân..."
                 />
               </div>
@@ -492,9 +495,9 @@ export const ProfilePage: React.FC = () => {
                 type="submit"
                 variant="primary"
                 disabled={isSaving}
-                className="w-full pt-1"
+                className="w-full mt-2"
               >
-                <Save className="w-4 h-4 text-white" />
+                <Save className="w-4 h-4 text-white mr-1.5" />
                 <span>{isSaving ? 'Đang lưu...' : 'Lưu thông tin'}</span>
               </GlassButton>
             </form>
@@ -502,58 +505,59 @@ export const ProfilePage: React.FC = () => {
         </Card>
 
         {/* Cột phải: Bảo mật & Đổi mật khẩu */}
-        <Card className="text-white shadow-xl rounded-3xl">
+        <Card className="text-white shadow-2xl rounded-3xl bg-slate-950/70 border border-white/10 backdrop-blur-2xl">
           <CardContent className="p-6 space-y-5">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
-              <Lock className="w-4 h-4 text-blue-400" />
+            <div className="flex items-center gap-2 pb-3 border-b border-white/10">
+              <Lock className="w-4 h-4 text-cyan-400" />
               <h3 className="font-bold text-white text-sm uppercase tracking-wide">
                 Bảo mật & Đổi mật khẩu
               </h3>
             </div>
 
             <form onSubmit={handleChangePassword} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Mật khẩu hiện tại</Label>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-200">Mật khẩu hiện tại</Label>
                 <Input
                   type="password"
                   placeholder="••••••••"
                   value={currentPass}
                   onChange={(e) => setCurrentPass(e.target.value)}
-                  className="bg-slate-950/80 border-slate-800 text-white text-xs rounded-xl focus:border-blue-500"
+                  className="bg-white/[0.04] hover:bg-white/[0.07] border-white/10 hover:border-white/20 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 text-white text-xs rounded-2xl h-11 px-4 transition-all duration-200"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Mật khẩu mới</Label>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-200">Mật khẩu mới</Label>
                 <Input
                   type="password"
                   placeholder="Tối thiểu 6 ký tự"
                   value={newPass}
                   onChange={(e) => setNewPass(e.target.value)}
-                  className="bg-slate-950/80 border-slate-800 text-white text-xs rounded-xl focus:border-blue-500"
+                  className="bg-white/[0.04] hover:bg-white/[0.07] border-white/10 hover:border-white/20 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 text-white text-xs rounded-2xl h-11 px-4 transition-all duration-200"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300">Xác nhận mật khẩu mới</Label>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-200">Xác nhận mật khẩu mới</Label>
                 <Input
                   type="password"
                   placeholder="Nhập lại mật khẩu mới"
                   value={confirmPass}
                   onChange={(e) => setConfirmPass(e.target.value)}
-                  className="bg-slate-950/80 border-slate-800 text-white text-xs rounded-xl focus:border-blue-500"
+                  className="bg-white/[0.04] hover:bg-white/[0.07] border-white/10 hover:border-white/20 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20 text-white text-xs rounded-2xl h-11 px-4 transition-all duration-200"
                 />
               </div>
 
-              <div className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800 text-[11px] text-slate-400 leading-relaxed">
-                Mẹo: Mật khẩu mới bảo vệ tài khoản quản trị và hoạt động của bạn tại lớp 11A10, hãy lưu giữ cẩn thận để tránh gián đoạn truy cập.
+              <div className="p-3.5 bg-cyan-500/[0.06] rounded-2xl border border-cyan-400/20 text-[11px] text-cyan-200/80 leading-relaxed flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+                <span>Mẹo: Mật khẩu mới bảo vệ tài khoản quản trị và hoạt động của bạn tại lớp 11A10, hãy lưu giữ cẩn thận để tránh gián đoạn truy cập.</span>
               </div>
 
               <GlassButton
                 size="default"
                 type="submit"
                 variant="primary"
-                className="w-full"
+                className="w-full mt-2"
               >
                 <span>Cập nhật mật khẩu</span>
               </GlassButton>
