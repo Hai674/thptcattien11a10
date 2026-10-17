@@ -85,12 +85,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={cn(
-        'w-full h-16 border-b border-white/[0.02] bg-transparent backdrop-blur-none px-3 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
-        isVisible
-          ? 'translate-y-0 opacity-100'
-          : '-translate-y-full opacity-0 pointer-events-none'
-      )}
+      className="w-full h-16 border-b border-white/[0.06] bg-[#080312]/80 backdrop-blur-xl px-3 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-all duration-300"
     >
       {/* Trái: Menu mobile, Nút Toggle Desktop & Brand Logo */}
       <div className="flex items-center gap-3">

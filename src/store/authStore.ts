@@ -30,20 +30,42 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: false,
   setUser: (user) => {
     if (user) {
-      localStorage.setItem('auth_user_11a10', JSON.stringify(user));
+      try {
+        localStorage.setItem('auth_user_11a10', JSON.stringify(user));
+      } catch (err) {
+        console.warn('Lỗi lưu auth_user_11a10 vào localStorage:', err);
+      }
     }
     set({ user, loading: false });
   },
   updateUser: (partial) => {
     set((state) => {
-      if (!state.user) return state;
-      const updated = { ...state.user, ...partial };
-      localStorage.setItem('auth_user_11a10', JSON.stringify(updated));
+      const baseUser = state.user || getStoredUser() || {
+        uid: 'user-' + Date.now(),
+        email: 'hocsinh@11a10.edu.vn',
+        displayName: 'Học sinh 11A10',
+        photoURL: null,
+        role: 'member',
+        classId: '11A10',
+        status: 'active',
+      };
+      const updated: User = {
+        ...baseUser,
+        ...partial,
+        updatedAt: new Date().toISOString(),
+      };
+      try {
+        localStorage.setItem('auth_user_11a10', JSON.stringify(updated));
+      } catch (err) {
+        console.warn('Lỗi cập nhật auth_user_11a10 vào localStorage:', err);
+      }
       return { user: updated };
     });
   },
   clearUser: () => {
-    localStorage.removeItem('auth_user_11a10');
+    try {
+      localStorage.removeItem('auth_user_11a10');
+    } catch {}
     set({ user: null, loading: false });
   },
   setLoading: (loading) => set({ loading }),

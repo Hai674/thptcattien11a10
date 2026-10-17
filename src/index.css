@@ -36,46 +36,31 @@
   }
 }
 
+@keyframes aurora {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translate3d(8%, 6%, 0) rotate(12deg) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-6%, 10%, 0) rotate(-8deg) scale(0.96);
+  }
+}
+
+.animate-aurora {
+  animation: aurora 20s ease-in-out infinite;
+}
+
 .hero-background {
   position: relative;
   isolation: isolate;
-  background-color: #0c0414;
-}
-
-.hero-background::before,
-.hero-background::after {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  width: min(75vw, 75rem);
-  height: 75rem;
-  pointer-events: none;
-  transform: rotate(-20deg) skewX(-40deg);
-  filter: blur(4rem);
-  opacity: 0.5;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(147, 197, 253, 0.8));
-  mask-image: repeating-linear-gradient(
-    90deg,
-    transparent 0 9rem,
-    #000 10rem 12rem,
-    transparent 13rem 20rem
-  );
-}
-
-.hero-background::before {
-  top: -40rem;
-  right: -30rem;
-}
-
-.hero-background::after {
-  top: -50rem;
-  right: -50rem;
-  opacity: 0.35;
+  background-color: #070310;
 }
 
 body {
   min-height: 100vh;
-  background-color: #0c0414;
+  background-color: #070310;
 }
 
 @layer utilities {

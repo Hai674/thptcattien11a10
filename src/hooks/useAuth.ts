@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '@/supabase/config';
-import { getCurrentUser } from '@/services/auth.service';
+import { getCurrentUser, updateUserProfile } from '@/services/auth.service';
 import { useAuthStore } from '@/store/authStore';
 import { User } from '@/types';
 
@@ -9,7 +9,7 @@ import { User } from '@/types';
  * Đồng bộ trực tiếp vào Zustand store và trả về quyền hạn người dùng
  */
 export function useAuth() {
-  const { user, loading, setUser, updateUser, clearUser, setLoading } = useAuthStore();
+  const { user, loading, setUser, updateUser: storeUpdateUser, clearUser, setLoading } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;
@@ -65,14 +65,34 @@ export function useAuth() {
         try {
           if (session?.user) {
             const profile = await getCurrentUser(session.user.id);
+            // Giữ lại các tùy biến (tên, avatar, ảnh bìa) nếu người dùng đã đổi ở máy
+            const localRaw = localStorage.getItem('auth_user_11a10');
+            let localData: Partial<User> = {};
+            if (localRaw) {
+              try {
+                localData = JSON.parse(localRaw);
+              } catch {}
+            }
+
             if (profile && isMounted) {
-              setUser(profile);
+              const mergedUser: User = {
+                ...profile,
+                displayName: localData.displayName || profile.displayName,
+                photoURL: localData.photoURL !== undefined ? localData.photoURL : profile.photoURL,
+                bannerCustomUrl: localData.bannerCustomUrl || profile.bannerCustomUrl,
+                bannerTheme: localData.bannerTheme || profile.bannerTheme,
+                phoneNumber: localData.phoneNumber || profile.phoneNumber,
+                bio: localData.bio || profile.bio,
+              };
+              setUser(mergedUser);
             } else if (isMounted) {
               const fallbackUser: User = {
                 uid: session.user.id,
                 email: session.user.email || null,
-                displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
-                photoURL: session.user.user_metadata?.avatar_url || null,
+                displayName: localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
+                photoURL: localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null),
+                bannerCustomUrl: localData.bannerCustomUrl,
+                bannerTheme: localData.bannerTheme,
                 role: 'member',
                 classId: '11A10',
                 status: 'active',
@@ -111,14 +131,33 @@ export function useAuth() {
         try {
           if (session?.user) {
             const profile = await getCurrentUser(session.user.id);
+            const localRaw = localStorage.getItem('auth_user_11a10');
+            let localData: Partial<User> = {};
+            if (localRaw) {
+              try {
+                localData = JSON.parse(localRaw);
+              } catch {}
+            }
+
             if (profile && isMounted) {
-              setUser(profile);
+              const mergedUser: User = {
+                ...profile,
+                displayName: localData.displayName || profile.displayName,
+                photoURL: localData.photoURL !== undefined ? localData.photoURL : profile.photoURL,
+                bannerCustomUrl: localData.bannerCustomUrl || profile.bannerCustomUrl,
+                bannerTheme: localData.bannerTheme || profile.bannerTheme,
+                phoneNumber: localData.phoneNumber || profile.phoneNumber,
+                bio: localData.bio || profile.bio,
+              };
+              setUser(mergedUser);
             } else if (isMounted) {
               const fallbackUser: User = {
                 uid: session.user.id,
                 email: session.user.email || null,
-                displayName: session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
-                photoURL: session.user.user_metadata?.avatar_url || null,
+                displayName: localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
+                photoURL: localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null),
+                bannerCustomUrl: localData.bannerCustomUrl,
+                bannerTheme: localData.bannerTheme,
                 role: 'member',
                 classId: '11A10',
                 status: 'active',
@@ -126,7 +165,10 @@ export function useAuth() {
               setUser(fallbackUser);
             }
           } else if (isMounted) {
-            clearUser();
+            const currentSaved = localStorage.getItem('auth_user_11a10');
+            if (!currentSaved) {
+              clearUser();
+            }
           }
         } catch (error) {
           console.error('Lỗi onAuthStateChange Supabase:', error);
@@ -143,6 +185,10 @@ export function useAuth() {
     };
   }, [setUser, clearUser, setLoading]);
 
+  const handleUpdateUser = useCallback(async (partial: Partial<User>) => {
+    return await updateUserProfile(partial);
+  }, []);
+
   const isAdmin = user?.role === 'admin';
   const isMember = user?.role === 'member' || user?.role === 'admin';
   const isActive = user?.status === 'active';
@@ -154,7 +200,7 @@ export function useAuth() {
     isMember,
     isActive,
     setUser,
-    updateUser,
+    updateUser: handleUpdateUser,
     clearUser,
   };
 }

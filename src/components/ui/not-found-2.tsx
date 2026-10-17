@@ -7,10 +7,12 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty";
 import { HomeIcon } from "lucide-react";
+import { AuroraBackground } from "@/components/ui/aurora";
 
 export function NotFound() {
 	return (
-		<div className="hero-background relative flex min-h-screen w-full items-center justify-center p-4 sm:p-6 text-slate-100 overflow-hidden">
+		<div className="relative flex min-h-screen w-full items-center justify-center p-4 sm:p-6 text-slate-100 overflow-hidden">
+			<AuroraBackground />
 			<Empty className="relative z-10 max-w-md w-full">
 				<EmptyHeader className="space-y-4">
 					<EmptyTitle className="font-black text-7xl sm:text-8xl md:text-9xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-500 select-none">

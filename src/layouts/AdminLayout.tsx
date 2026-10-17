@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   Sparkles,
 } from 'lucide-react';
+import { AuroraBackground } from '@/components/ui/aurora';
 import { toast } from 'sonner';
 
 export const AdminLayout: React.FC = () => {
@@ -45,7 +46,8 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="hero-background min-h-screen flex flex-col text-slate-100 font-sans">
+    <div className="relative min-h-screen flex flex-col text-slate-100 font-sans">
+      <AuroraBackground />
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Admin Header Neo-Glass */}
         <header className="h-16 border-b border-indigo-500/20 glass-panel px-6 flex items-center justify-between sticky top-0 z-40">

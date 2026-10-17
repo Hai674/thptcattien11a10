@@ -65,8 +65,14 @@ export default {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
         'shimmer': 'shimmer 2.5s infinite linear',
+        'aurora': 'aurora 20s ease-in-out infinite',
       },
       keyframes: {
+        aurora: {
+          '0%, 100%': { transform: 'translate3d(0, 0, 0) rotate(0deg) scale(1)' },
+          '33%': { transform: 'translate3d(8%, 6%, 0) rotate(12deg) scale(1.08)' },
+          '66%': { transform: 'translate3d(-6%, 10%, 0) rotate(-8deg) scale(0.96)' },
+        },
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-8px)' },

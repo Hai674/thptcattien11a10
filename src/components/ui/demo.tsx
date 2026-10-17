@@ -1,5 +1,10 @@
-import { NotFound } from "@/components/ui/not-found-2";
+// This is a demo of a preview
+// That's what users will see in the preview
 
-export default function DemoOne() {
-  return <NotFound />;
+import { Hero1 } from "@/components/ui/hero-1";
+
+export function DemoOne() {
+  return <Hero1 />;
 }
+
+export default DemoOne;

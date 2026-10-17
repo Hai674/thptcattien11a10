@@ -28,6 +28,7 @@ import {
   Loader2,
   Sparkles,
 } from 'lucide-react';
+import { AuroraBackground } from '@/components/ui/aurora';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -120,7 +121,8 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="hero-background min-h-screen w-full flex items-center justify-center p-4 sm:p-6 overflow-x-hidden overflow-y-auto">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 overflow-x-hidden overflow-y-auto">
+      <AuroraBackground />
       <div className="w-full max-w-md relative z-10 py-6 sm:py-10 my-auto">
         {/* Banner trường lớp */}
         <div className="text-center mb-6">

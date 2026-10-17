@@ -38,6 +38,8 @@ export async function getCurrentUser(uid?: string): Promise<User | null> {
         status: data.status || 'active',
         phoneNumber: data.phone_number,
         bio: data.bio,
+        bannerCustomUrl: data.banner_url || data.banner_custom_url || undefined,
+        bannerTheme: data.banner_theme || undefined,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
       };
@@ -74,15 +76,30 @@ export async function signInWithGoogle(): Promise<User | void> {
   }
 
   // Fallback trải nghiệm nếu Google Provider chưa được bật trên Supabase
+  let existingGoogle: Partial<User> = {};
+  try {
+    const saved = localStorage.getItem('auth_user_11a10');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.email === 'hocsinh.google@11a10.edu.vn' || parsed.uid === 'google-member-11a10') {
+        existingGoogle = parsed;
+      }
+    }
+  } catch {}
+
   const googleUser: User = {
     uid: 'google-member-11a10',
     email: 'hocsinh.google@11a10.edu.vn',
-    displayName: 'Học sinh 11A10',
-    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+    displayName: existingGoogle.displayName || 'Học sinh 11A10',
+    photoURL: existingGoogle.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+    phoneNumber: existingGoogle.phoneNumber || '',
+    bio: existingGoogle.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+    bannerCustomUrl: existingGoogle.bannerCustomUrl,
+    bannerTheme: existingGoogle.bannerTheme,
     role: 'member',
     classId: '11A10',
     status: 'active',
-    createdAt: new Date().toISOString(),
+    createdAt: existingGoogle.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
   localStorage.setItem('auth_user_11a10', JSON.stringify(googleUser));
@@ -137,17 +154,33 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
   const cleanEmail = email.trim().toLowerCase();
   const cleanPass = pass.trim();
 
+  // Kiểm tra xem máy đã lưu thông tin tùy chỉnh nào của email này chưa
+  let existingProfile: Partial<User> = {};
+  try {
+    const savedRaw = localStorage.getItem('auth_user_11a10');
+    if (savedRaw) {
+      const parsed = JSON.parse(savedRaw);
+      if (parsed.email === cleanEmail || (cleanEmail.includes('admin') && parsed.role === 'admin')) {
+        existingProfile = parsed;
+      }
+    }
+  } catch {}
+
   // 1. Hỗ trợ tài khoản Admin mặc định
   if (cleanEmail.includes('admin') || cleanEmail === 'admin@11a10.edu.vn') {
     const adminUser: User = {
       uid: 'admin-11a10-master-uid',
       email: cleanEmail,
-      displayName: 'Ban Cán Sự 11A10 (Admin)',
-      photoURL: null,
+      displayName: existingProfile.displayName || 'Ban Cán Sự 11A10 (Admin)',
+      photoURL: existingProfile.photoURL ?? null,
+      phoneNumber: existingProfile.phoneNumber || '',
+      bio: existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+      bannerCustomUrl: existingProfile.bannerCustomUrl,
+      bannerTheme: existingProfile.bannerTheme,
       role: 'admin',
       classId: '11A10',
       status: 'active',
-      createdAt: new Date().toISOString(),
+      createdAt: existingProfile.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     localStorage.setItem('auth_user_11a10', JSON.stringify(adminUser));
@@ -158,14 +191,18 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
   // 2. Nếu chưa cấu hình Supabase thực tế, hỗ trợ đăng nhập ngay với email học sinh đã nhập
   if (!isSupabaseConfigured) {
     const memberUser: User = {
-      uid: `member-${Date.now()}`,
+      uid: existingProfile.uid || `member-${Date.now()}`,
       email: cleanEmail,
-      displayName: cleanEmail.split('@')[0],
-      photoURL: null,
+      displayName: existingProfile.displayName || cleanEmail.split('@')[0],
+      photoURL: existingProfile.photoURL ?? null,
+      phoneNumber: existingProfile.phoneNumber || '',
+      bio: existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+      bannerCustomUrl: existingProfile.bannerCustomUrl,
+      bannerTheme: existingProfile.bannerTheme,
       role: 'member',
       classId: '11A10',
       status: 'active',
-      createdAt: new Date().toISOString(),
+      createdAt: existingProfile.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     localStorage.setItem('auth_user_11a10', JSON.stringify(memberUser));
@@ -327,4 +364,62 @@ export async function resetPassword(email: string): Promise<void> {
   if (error) {
     console.warn('Lỗi gửi email đặt lại mật khẩu:', error.message);
   }
+}
+
+/**
+ * Cập nhật thông tin hồ sơ người dùng (Tên, Avatar, Số điện thoại, Tiểu sử, Hình nền/Banner)
+ * Đồng bộ cả LocalStorage, Zustand Store và Supabase Auth + Database bảng profiles
+ */
+export async function updateUserProfile(partial: Partial<User>): Promise<User | null> {
+  // 1. Cập nhật ngay tức thì vào Zustand store & LocalStorage
+  useAuthStore.getState().updateUser(partial);
+  const updatedUser = useAuthStore.getState().user;
+
+  // 2. Nếu có phiên Supabase thực tế, đồng bộ lên máy chủ Supabase
+  if (isSupabaseConfigured) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        // Cập nhật User Metadata của Supabase Auth
+        const metaUpdates: Record<string, any> = {};
+        if (partial.displayName !== undefined) metaUpdates.display_name = partial.displayName;
+        if (partial.photoURL !== undefined) metaUpdates.avatar_url = partial.photoURL;
+        if (partial.bannerCustomUrl !== undefined) metaUpdates.banner_url = partial.bannerCustomUrl;
+        if (partial.bannerTheme !== undefined) metaUpdates.banner_theme = partial.bannerTheme;
+
+        if (Object.keys(metaUpdates).length > 0) {
+          try {
+            await supabase.auth.updateUser({ data: metaUpdates });
+          } catch (e) {
+            console.warn('Lỗi cập nhật metadata Supabase auth:', e);
+          }
+        }
+
+        // Cập nhật bảng profiles (nếu có bảng này trong CSDL Supabase)
+        const profileUpdates: Record<string, any> = {
+          id: session.user.id,
+          updated_at: new Date().toISOString(),
+        };
+        if (partial.displayName !== undefined) profileUpdates.display_name = partial.displayName;
+        if (partial.photoURL !== undefined) profileUpdates.photo_url = partial.photoURL;
+        if (partial.phoneNumber !== undefined) profileUpdates.phone_number = partial.phoneNumber;
+        if (partial.bio !== undefined) profileUpdates.bio = partial.bio;
+        if (partial.bannerCustomUrl !== undefined) profileUpdates.banner_url = partial.bannerCustomUrl;
+        if (partial.bannerTheme !== undefined) profileUpdates.banner_theme = partial.bannerTheme;
+
+        try {
+          const { error: upsertErr } = await supabase.from('profiles').upsert(profileUpdates);
+          if (upsertErr) {
+            console.warn('Lưu vào bảng profiles Supabase chú ý:', upsertErr.message);
+          }
+        } catch (err) {
+          console.warn('Lỗi gọi bảng profiles:', err);
+        }
+      }
+    } catch (err) {
+      console.warn('Lỗi đồng bộ hồ sơ lên Supabase:', err);
+    }
+  }
+
+  return updatedUser;
 }
