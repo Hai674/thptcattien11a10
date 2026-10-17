@@ -401,10 +401,11 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
                     <Link to="/thoi-khoa-bieu" className="inline-block">
                       <GlassButton
                         size="sm"
-                        contentClassName="flex items-center gap-1.5 text-xs text-purple-200 font-semibold"
+                        variant="primary"
+                        contentClassName="flex items-center gap-2 text-xs font-semibold text-white"
                       >
-                        <span>Xem & Cập nhật thời khóa biểu</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-purple-300" />
+                        <span>Xem &amp; Cập nhật thời khóa biểu</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-white" />
                       </GlassButton>
                     </Link>
                   </div>

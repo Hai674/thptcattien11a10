@@ -211,6 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
           {user ? (
             <GlassButton
               size="sm"
+              variant="secondary"
               onClick={() => {
                 setDropdownOpen((prev) => !prev);
                 setNotiOpen(false);
@@ -234,6 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Link to="/login">
               <GlassButton
                 size="sm"
+                variant="primary"
                 contentClassName="flex items-center gap-1.5 text-xs text-white font-semibold"
               >
                 <span>Đăng nhập</span>
@@ -246,7 +248,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative z-10 space-y-2">
                 {/* Header User Profile Card */}
                 <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3 backdrop-blur-md">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-cyan-400/40 flex-shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.25)] bg-slate-900 select-none">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/25 flex-shrink-0 shadow-md bg-slate-900 select-none">
                     {user.photoURL ? (
                       <img src={user.photoURL} alt={user.displayName || 'Avatar'} className="w-full h-full object-cover" />
                     ) : (

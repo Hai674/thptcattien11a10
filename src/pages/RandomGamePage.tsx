@@ -191,7 +191,7 @@ export const RandomGamePage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2.5">
           <GlassButton
             size="sm"
-            variant="default"
+            variant="secondary"
             onClick={handleManualSync}
             title="Đồng bộ danh sách học sinh mới nhất từ trang Danh sách lớp"
           >
@@ -201,6 +201,7 @@ export const RandomGamePage: React.FC = () => {
 
           <GlassButton
             size="sm"
+            variant="secondary"
             onClick={handleToggleSound}
             contentClassName="flex items-center gap-1.5 text-xs text-slate-300"
             title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
@@ -211,7 +212,7 @@ export const RandomGamePage: React.FC = () => {
 
           <GlassButton
             size="sm"
-            variant="default"
+            variant="secondary"
             onClick={handleToggleFullscreen}
             contentClassName="flex items-center gap-1.5 text-xs text-slate-200"
             title="Mở toàn màn hình trình chiếu máy chiếu/Tivi"
@@ -235,6 +236,7 @@ export const RandomGamePage: React.FC = () => {
               <GlassButton
                 key={mode.id}
                 size="sm"
+                variant="primary"
                 onClick={() => {
                   setGameMode(mode.id as GameMode);
                   cyberAudio.playClick();
@@ -306,7 +308,7 @@ export const RandomGamePage: React.FC = () => {
             <div className="text-center p-8 space-y-3">
               <Trophy className="w-12 h-12 text-amber-400 mx-auto opacity-50" />
               <p className="text-sm text-slate-300">Tất cả các bạn đã được gọi trong tiết học này!</p>
-              <GlassButton size="sm" onClick={handleResetCalled}>
+              <GlassButton size="sm" variant="primary" onClick={handleResetCalled}>
                 Bắt đầu vòng bốc thăm mới
               </GlassButton>
             </div>
