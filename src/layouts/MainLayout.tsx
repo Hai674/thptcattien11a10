@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Footer } from '@/components/layout/Footer';
-import { BackgroundParticles } from '@/components/common/BackgroundParticles';
 import { ClassLotteryModal } from '@/components/common/ClassLotteryModal';
 import { cn } from '@/utils/cn';
 
@@ -70,10 +69,7 @@ export const MainLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 relative font-sans selection:bg-blue-600/30 selection:text-blue-200">
-      {/* Nền hiệu ứng hạt sao và hào quang */}
-      <BackgroundParticles />
-
+    <div className="hero-background min-h-screen flex flex-col text-slate-100 font-sans selection:bg-blue-600/30 selection:text-blue-200">
       {/* Hộp thoại bốc thăm ngẫu nhiên học sinh 11A10 */}
       <ClassLotteryModal
         isOpen={isLotteryOpen}

@@ -79,9 +79,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           // Trong suốt hoàn toàn khi thu gọn để nhìn thấu 100% hạt sao và cực quang
           isCollapsed
             ? 'bg-transparent md:bg-transparent backdrop-blur-none border-r border-white/[0.02] w-[72px] p-2.5'
-            : 'bg-slate-950/30 md:bg-[#060913]/40 backdrop-blur-xl border-r border-white/[0.04] w-64 p-4 shadow-2xl shadow-black/40',
+            : 'bg-[#0c0414]/60 md:bg-[#0c0414]/40 backdrop-blur-xl border-r border-white/[0.04] w-64 p-4 shadow-2xl shadow-black/40',
           isOpen
-            ? 'translate-x-0 w-64 p-4 bg-[#060913]/95 backdrop-blur-2xl shadow-2xl shadow-black/50 z-50'
+            ? 'translate-x-0 w-64 p-4 bg-[#0c0414]/95 backdrop-blur-2xl shadow-2xl shadow-black/50 z-50'
             : '-translate-x-full md:translate-x-0'
         )}
       >

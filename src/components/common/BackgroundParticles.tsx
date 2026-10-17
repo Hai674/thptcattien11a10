@@ -243,7 +243,7 @@ export const BackgroundParticles: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#070a16]">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#0c0414]">
       {/* 1. Nền Cực Quang Xanh Ngọc (Emerald - Cyan Aurora Flare - Top Left) */}
       <div
         className="absolute -top-[10%] -left-[10%] w-[65vw] h-[65vw] max-w-[900px] max-h-[900px] rounded-full opacity-65 blur-[85px] pointer-events-none"

@@ -28,7 +28,6 @@ import {
   Loader2,
   Sparkles,
 } from 'lucide-react';
-import HalftoneNebula from '@/components/ui/halftone-nebula';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -121,20 +120,7 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 relative overflow-x-hidden overflow-y-auto bg-[#050309]">
-      {/* Nền Halftone Nebula (Pixel-art WebGL2 interactive background) */}
-      <div className="fixed inset-0 z-0 pointer-events-none sm:pointer-events-auto">
-        <HalftoneNebula
-          height="100%"
-          preset="ultraviolet"
-          interactive={true}
-          touch="scroll"
-          className="w-full h-full"
-        />
-        {/* Lớp phủ gradient nhẹ giúp nội dung form tương phản rõ ràng */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050309]/60 via-transparent to-[#050309]/85 pointer-events-none" />
-      </div>
-
+    <div className="hero-background min-h-screen w-full flex items-center justify-center p-4 sm:p-6 overflow-x-hidden overflow-y-auto">
       <div className="w-full max-w-md relative z-10 py-6 sm:py-10 my-auto">
         {/* Banner trường lớp */}
         <div className="text-center mb-6">

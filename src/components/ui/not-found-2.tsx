@@ -10,11 +10,7 @@ import { HomeIcon } from "lucide-react";
 
 export function NotFound() {
 	return (
-		<div className="relative flex min-h-screen w-full items-center justify-center p-4 sm:p-6 bg-[#060913] text-slate-100 overflow-hidden">
-			{/* Ambient Glow */}
-			<div className="absolute top-1/3 -left-20 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-			<div className="absolute bottom-1/3 -right-20 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-
+		<div className="hero-background relative flex min-h-screen w-full items-center justify-center p-4 sm:p-6 text-slate-100 overflow-hidden">
 			<Empty className="relative z-10 max-w-md w-full">
 				<EmptyHeader className="space-y-4">
 					<EmptyTitle className="font-black text-7xl sm:text-8xl md:text-9xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-500 select-none">

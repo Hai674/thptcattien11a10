@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 270 66.7% 4.7%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 4.9%;
+    --card: 270 30% 9%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 4.9%;
+    --popover: 270 30% 9%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 217.2 91.2% 59.8%;
@@ -36,14 +36,56 @@
   }
 }
 
+.hero-background {
+  position: relative;
+  isolation: isolate;
+  background-color: #0c0414;
+}
+
+.hero-background::before,
+.hero-background::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  width: min(75vw, 75rem);
+  height: 75rem;
+  pointer-events: none;
+  transform: rotate(-20deg) skewX(-40deg);
+  filter: blur(4rem);
+  opacity: 0.5;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(147, 197, 253, 0.8));
+  mask-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 9rem,
+    #000 10rem 12rem,
+    transparent 13rem 20rem
+  );
+}
+
+.hero-background::before {
+  top: -40rem;
+  right: -30rem;
+}
+
+.hero-background::after {
+  top: -50rem;
+  right: -50rem;
+  opacity: 0.35;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #0c0414;
+}
+
 @layer utilities {
   /* Optical 3D Glass Architecture (identical to glass-button.tsx) */
   .glass-panel {
-    background: linear-gradient(-75deg, oklch(from #090d1a l c h / 20%), oklch(from #090d1a l c h / 36%), oklch(from #090d1a l c h / 20%));
+    background: linear-gradient(-75deg, oklch(from #160d20 l c h / 20%), oklch(from #160d20 l c h / 36%), oklch(from #160d20 l c h / 20%));
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 .15em .15em oklch(from #f8fafc l c h / 14%), inset 0 -.15em .15em oklch(from #090d1a l c h / 50%), 0 16px 40px -10px rgba(0, 0, 0, 0.65), 0 0 20px 0 rgba(99, 102, 241, 0.12);
+    box-shadow: inset 0 .15em .15em oklch(from #f8fafc l c h / 14%), inset 0 -.15em .15em oklch(from #160d20 l c h / 50%), 0 16px 40px -10px rgba(0, 0, 0, 0.65), 0 0 20px 0 rgba(99, 102, 241, 0.12);
   }
 
   .glass-card-hover {
@@ -51,7 +93,7 @@
   }
   .glass-card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: inset 0 .2em .2em oklch(from #f8fafc l c h / 22%), inset 0 -.2em .2em oklch(from #090d1a l c h / 60%), 0 24px 50px -10px rgba(0, 0, 0, 0.75), 0 0 30px 0 rgba(99, 102, 241, 0.25);
+    box-shadow: inset 0 .2em .2em oklch(from #f8fafc l c h / 22%), inset 0 -.2em .2em oklch(from #160d20 l c h / 60%), 0 24px 50px -10px rgba(0, 0, 0, 0.75), 0 0 30px 0 rgba(99, 102, 241, 0.25);
   }
 }
 
@@ -65,7 +107,7 @@
   --anim-ease: cubic-bezier(.25, 1, .5, 1);
   --border-width: clamp(1px, .0625em, 2px);
   --card-fg: #f8fafc;
-  --card-bg: #090d1a;
+  --card-bg: #160d20;
   position: relative;
   isolation: isolate;
   border-radius: 1.75rem;
