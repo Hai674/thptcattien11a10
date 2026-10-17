@@ -546,7 +546,7 @@ export const ProfilePage: React.FC = () => {
 
               <div className="p-3.5 bg-cyan-500/[0.06] rounded-2xl border border-cyan-400/20 text-[11px] text-cyan-200/80 leading-relaxed flex items-start gap-2.5">
                 <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span>Mẹo: Mật khẩu mới bảo vệ tài khoản quản trị và hoạt động của bạn tại lớp 11A10, hãy lưu giữ cẩn thận để tránh gián đoạn truy cập.</span>
+                <span>Mẹo: Mật khẩu mới bảo vệ tài khoản quản trị và hoạt động của bạn tại lớp 11A10, hãy lưu giữ cẩn thận để tránh gián đoạn truy cập</span>
               </div>
 
               <GlassButton
