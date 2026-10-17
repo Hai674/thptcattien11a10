@@ -211,12 +211,12 @@ export const RandomGamePage: React.FC = () => {
 
           <GlassButton
             size="sm"
-            variant="primary"
+            variant="default"
             onClick={handleToggleFullscreen}
-            contentClassName="flex items-center gap-1.5 text-xs text-amber-300"
+            contentClassName="flex items-center gap-1.5 text-xs text-slate-200"
             title="Mở toàn màn hình trình chiếu máy chiếu/Tivi"
           >
-            <Maximize2 className="w-4 h-4 text-amber-400" />
+            <Maximize2 className="w-3.5 h-3.5 text-sky-400" />
             <span>Chiếu Tivi / F11</span>
           </GlassButton>
         </div>

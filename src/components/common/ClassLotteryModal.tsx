@@ -146,7 +146,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
             <Link
               to="/vong-quay"
               onClick={onClose}
-              className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1 font-medium"
+              className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium transition-colors"
             >
               <Maximize2 className="w-3 h-3" />
               <span>Chế độ chiếu Tivi</span>
