@@ -118,7 +118,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+    <div className="flex min-h-screen items-center justify-center bg-[#060913] text-foreground">
       <span className="inline-flex items-center font-mono text-xl text-foreground">
         <ConveyorLoop
           className="mr-2"

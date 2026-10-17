@@ -40,7 +40,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Đang kiểm tra phiên đăng nhập và hoàn toàn chưa có user nào
   if (loading && !effectiveUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#060913] text-foreground">
         <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
         <p className="text-sm text-muted-foreground font-medium">Đang kiểm tra quyền truy cập...</p>
       </div>

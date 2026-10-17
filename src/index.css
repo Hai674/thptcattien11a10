@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 226 52% 4.9%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 4.9%;
+    --card: 226 40% 6.5%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 4.9%;
+    --popover: 226 40% 6.5%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 217.2 91.2% 59.8%;
@@ -33,6 +33,13 @@
     --ring: 240 4.9% 83.9%;
 
     --radius: 0.75rem;
+  }
+
+  body {
+    background-color: #060913;
+    color: #f8fafc;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 }
 

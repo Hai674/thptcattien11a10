@@ -46,7 +46,7 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#030712] text-slate-100 relative font-sans">
+    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 relative font-sans">
       <BackgroundParticles />
 
       <div className="relative z-10 flex flex-col min-h-screen">
