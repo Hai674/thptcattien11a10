@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Footer } from '@/components/layout/Footer';
+import { BackgroundParticles } from '@/components/common/BackgroundParticles';
 import { ClassLotteryModal } from '@/components/common/ClassLotteryModal';
-import { AuroraBackground } from '@/components/ui/aurora';
 import { cn } from '@/utils/cn';
 
 export const MainLayout: React.FC = () => {
@@ -17,7 +17,49 @@ export const MainLayout: React.FC = () => {
 
   const location = useLocation();
 
-  const [isHeaderVisible] = useState(true);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  // Tự động ẩn thanh Header khi lướt xuống, hiện lại khi lướt lên hoặc ở sát đỉnh trang
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+
+          // Nếu ở gần đỉnh (<= 25px), luôn hiển thị Header
+          if (currentScrollY <= 25) {
+            setIsHeaderVisible(true);
+          } else {
+            const delta = currentScrollY - lastScrollY.current;
+            // Lướt xuống (delta > 6 và đã cuộn qua 50px) -> ẩn thanh Header
+            if (delta > 6 && currentScrollY > 50) {
+              setIsHeaderVisible(false);
+            }
+            // Lướt ngược lên (delta < -6) -> hiện lại thanh Header
+            else if (delta < -6) {
+              setIsHeaderVisible(true);
+            }
+          }
+
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Khi chuyển trang (route change), đưa header về trạng thái hiển thị
+  useEffect(() => {
+    setIsHeaderVisible(true);
+    lastScrollY.current = window.scrollY;
+  }, [location.pathname]);
 
   const handleToggleCollapse = useCallback(() => {
     setIsCollapsed((prev) => {
@@ -28,9 +70,9 @@ export const MainLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex flex-col text-slate-100 font-sans selection:bg-blue-600/30 selection:text-blue-200">
-      {/* 21st.dev @kevingirelli Aurora Background */}
-      <AuroraBackground />
+    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 relative font-sans selection:bg-blue-600/30 selection:text-blue-200">
+      {/* Nền hiệu ứng hạt sao và hào quang */}
+      <BackgroundParticles />
 
       {/* Hộp thoại bốc thăm ngẫu nhiên học sinh 11A10 */}
       <ClassLotteryModal

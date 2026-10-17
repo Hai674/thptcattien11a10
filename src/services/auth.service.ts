@@ -2,6 +2,43 @@ import { supabase, isSupabaseConfigured } from '@/supabase/config';
 import { User } from '@/types';
 import { useAuthStore } from '@/store/authStore';
 
+const OVERRIDES_STORAGE_KEY = '11a10_user_profile_overrides';
+
+/**
+ * Lấy các thông tin tùy biến (Tên, Avatar, Ảnh bìa, Bio, SĐT) đã được người dùng lưu cục bộ
+ */
+export function getProfileOverrides(identifier?: string | null): Partial<User> {
+  if (!identifier || typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
+    if (!raw) return {};
+    const map = JSON.parse(raw);
+    return map[identifier.toLowerCase()] || {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Lưu các thông tin tùy biến vào bộ nhớ cục bộ theo email hoặc uid của người dùng
+ */
+export function saveProfileOverrides(identifier: string, partial: Partial<User>): void {
+  if (!identifier || typeof window === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
+    const map = raw ? JSON.parse(raw) : {};
+    const cleanId = identifier.toLowerCase();
+    map[cleanId] = {
+      ...(map[cleanId] || {}),
+      ...partial,
+      updatedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(OVERRIDES_STORAGE_KEY, JSON.stringify(map));
+  } catch (err) {
+    console.warn('Lỗi khi lưu profile overrides:', err);
+  }
+}
+
 /**
  * Lấy thông tin chi tiết của người dùng từ Supabase bảng `profiles`
  */
@@ -28,18 +65,20 @@ export async function getCurrentUser(uid?: string): Promise<User | null> {
     }
 
     if (data) {
+      // Ưu tiên nạp đè các tùy biến đã lưu nếu có
+      const overrides = getProfileOverrides(data.email || data.id);
       return {
         uid: data.id,
         email: data.email,
-        displayName: data.display_name || 'Thành viên 11A10',
-        photoURL: data.photo_url || null,
+        displayName: overrides.displayName || data.display_name || 'Thành viên 11A10',
+        photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (data.photo_url || null),
         role: data.role || 'member',
         classId: data.class_id || '11A10',
         status: data.status || 'active',
-        phoneNumber: data.phone_number,
-        bio: data.bio,
-        bannerCustomUrl: data.banner_url || data.banner_custom_url || undefined,
-        bannerTheme: data.banner_theme || undefined,
+        phoneNumber: overrides.phoneNumber !== undefined ? overrides.phoneNumber : (data.phone_number || undefined),
+        bio: overrides.bio !== undefined ? overrides.bio : (data.bio || undefined),
+        bannerCustomUrl: overrides.bannerCustomUrl,
+        bannerTheme: overrides.bannerTheme,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
       };
@@ -168,15 +207,16 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
 
   // 1. Hỗ trợ tài khoản Admin mặc định
   if (cleanEmail.includes('admin') || cleanEmail === 'admin@11a10.edu.vn') {
+    const overrides = getProfileOverrides(cleanEmail);
     const adminUser: User = {
       uid: 'admin-11a10-master-uid',
       email: cleanEmail,
-      displayName: existingProfile.displayName || 'Ban Cán Sự 11A10 (Admin)',
-      photoURL: existingProfile.photoURL ?? null,
-      phoneNumber: existingProfile.phoneNumber || '',
-      bio: existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
-      bannerCustomUrl: existingProfile.bannerCustomUrl,
-      bannerTheme: existingProfile.bannerTheme,
+      displayName: overrides.displayName || existingProfile.displayName || 'Ban Cán Sự 11A10 (Admin)',
+      photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (existingProfile.photoURL ?? null),
+      phoneNumber: overrides.phoneNumber || existingProfile.phoneNumber || '',
+      bio: overrides.bio || existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+      bannerCustomUrl: overrides.bannerCustomUrl || existingProfile.bannerCustomUrl,
+      bannerTheme: overrides.bannerTheme || existingProfile.bannerTheme,
       role: 'admin',
       classId: '11A10',
       status: 'active',
@@ -188,17 +228,45 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
     return adminUser;
   }
 
-  // 2. Nếu chưa cấu hình Supabase thực tế, hỗ trợ đăng nhập ngay với email học sinh đã nhập
+  // 2. Hỗ trợ tài khoản Học sinh Demo (hocsinh@11a10.edu.vn hoặc tương đương)
+  if (
+    cleanEmail === DEMO_ACCOUNTS.member.email ||
+    cleanEmail.startsWith('hocsinh') ||
+    cleanEmail === 'member@11a10.edu.vn'
+  ) {
+    const overrides = getProfileOverrides(cleanEmail);
+    const memberUser: User = {
+      uid: overrides.uid || 'member-11a10-test-uid',
+      email: cleanEmail,
+      displayName: overrides.displayName || existingProfile.displayName || 'Học sinh 11A10',
+      photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (existingProfile.photoURL ?? null),
+      phoneNumber: overrides.phoneNumber || existingProfile.phoneNumber || '',
+      bio: overrides.bio || existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+      bannerCustomUrl: overrides.bannerCustomUrl || existingProfile.bannerCustomUrl,
+      bannerTheme: overrides.bannerTheme || existingProfile.bannerTheme,
+      role: 'member',
+      classId: '11A10',
+      status: 'active',
+      createdAt: existingProfile.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('auth_user_11a10', JSON.stringify(memberUser));
+    useAuthStore.getState().setUser(memberUser);
+    return memberUser;
+  }
+
+  // 3. Nếu chưa cấu hình Supabase thực tế, hỗ trợ đăng nhập ngay với email học sinh đã nhập
   if (!isSupabaseConfigured) {
+    const overrides = getProfileOverrides(cleanEmail);
     const memberUser: User = {
       uid: existingProfile.uid || `member-${Date.now()}`,
       email: cleanEmail,
-      displayName: existingProfile.displayName || cleanEmail.split('@')[0],
-      photoURL: existingProfile.photoURL ?? null,
-      phoneNumber: existingProfile.phoneNumber || '',
-      bio: existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
-      bannerCustomUrl: existingProfile.bannerCustomUrl,
-      bannerTheme: existingProfile.bannerTheme,
+      displayName: overrides.displayName || existingProfile.displayName || cleanEmail.split('@')[0],
+      photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (existingProfile.photoURL ?? null),
+      phoneNumber: overrides.phoneNumber || existingProfile.phoneNumber || '',
+      bio: overrides.bio || existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+      bannerCustomUrl: overrides.bannerCustomUrl || existingProfile.bannerCustomUrl,
+      bannerTheme: overrides.bannerTheme || existingProfile.bannerTheme,
       role: 'member',
       classId: '11A10',
       status: 'active',
@@ -368,49 +436,86 @@ export async function resetPassword(email: string): Promise<void> {
 
 /**
  * Cập nhật thông tin hồ sơ người dùng (Tên, Avatar, Số điện thoại, Tiểu sử, Hình nền/Banner)
- * Đồng bộ cả LocalStorage, Zustand Store và Supabase Auth + Database bảng profiles
+ * Đồng bộ triệt để cả LocalStorage (với overrides riêng biệt), Zustand Store và Supabase Auth + Database
  */
 export async function updateUserProfile(partial: Partial<User>): Promise<User | null> {
-  // 1. Cập nhật ngay tức thì vào Zustand store & LocalStorage
+  const currentUser = useAuthStore.getState().user;
+  const userIdentifier = currentUser?.email || currentUser?.uid || 'default_user';
+
+  // 1. Lưu Profile Overrides vào LocalStorage theo email và uid để không bao giờ bị ghi đè sau reload
+  saveProfileOverrides(userIdentifier, partial);
+  if (currentUser?.email) saveProfileOverrides(currentUser.email, partial);
+  if (currentUser?.uid) saveProfileOverrides(currentUser.uid, partial);
+
+  // 2. Cập nhật ngay tức thì vào Zustand store & LocalStorage (auth_user_11a10)
   useAuthStore.getState().updateUser(partial);
   const updatedUser = useAuthStore.getState().user;
 
-  // 2. Nếu có phiên Supabase thực tế, đồng bộ lên máy chủ Supabase
+  // 3. Đồng bộ với danh sách thành viên đăng ký (11a10_registered_users) nếu có
+  try {
+    const rawUsers = localStorage.getItem('11a10_registered_users');
+    if (rawUsers) {
+      const users: User[] = JSON.parse(rawUsers);
+      const idx = users.findIndex(
+        (u) =>
+          (currentUser?.email && u.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
+          (currentUser?.uid && u.uid === currentUser.uid)
+      );
+      if (idx !== -1) {
+        users[idx] = { ...users[idx], ...partial, updatedAt: new Date().toISOString() };
+        localStorage.setItem('11a10_registered_users', JSON.stringify(users));
+      }
+    }
+  } catch (err) {
+    console.warn('Lỗi đồng bộ vào 11a10_registered_users:', err);
+  }
+
+  // 4. Nếu có phiên Supabase thực tế, đồng bộ an toàn lên máy chủ Supabase
   if (isSupabaseConfigured) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // Cập nhật User Metadata của Supabase Auth
+        // Cập nhật User Metadata của Supabase Auth (CHỈ gửi URL HTTP để tránh lỗi Payload quá lớn làm hỏng JWT)
         const metaUpdates: Record<string, any> = {};
         if (partial.displayName !== undefined) metaUpdates.display_name = partial.displayName;
-        if (partial.photoURL !== undefined) metaUpdates.avatar_url = partial.photoURL;
-        if (partial.bannerCustomUrl !== undefined) metaUpdates.banner_url = partial.bannerCustomUrl;
-        if (partial.bannerTheme !== undefined) metaUpdates.banner_theme = partial.bannerTheme;
+        if (
+          typeof partial.photoURL === 'string' &&
+          (partial.photoURL.startsWith('http://') || partial.photoURL.startsWith('https://'))
+        ) {
+          metaUpdates.avatar_url = partial.photoURL;
+        }
 
         if (Object.keys(metaUpdates).length > 0) {
           try {
             await supabase.auth.updateUser({ data: metaUpdates });
           } catch (e) {
-            console.warn('Lỗi cập nhật metadata Supabase auth:', e);
+            console.warn('Supabase auth updateUser metadata notice:', e);
           }
         }
 
-        // Cập nhật bảng profiles (nếu có bảng này trong CSDL Supabase)
+        // Cập nhật bảng profiles (CHỈ gửi các cột THỰC SỰ TỒN TẠI trong CSDL: id, display_name, photo_url, phone_number, bio, updated_at)
+        // Tuyệt đối không gửi banner_url hay banner_theme vào bảng profiles vì sẽ gây lỗi PGRST204 (Bad Request)
         const profileUpdates: Record<string, any> = {
           id: session.user.id,
           updated_at: new Date().toISOString(),
         };
         if (partial.displayName !== undefined) profileUpdates.display_name = partial.displayName;
-        if (partial.photoURL !== undefined) profileUpdates.photo_url = partial.photoURL;
+        if (partial.photoURL !== undefined) {
+          if (
+            partial.photoURL === null ||
+            (typeof partial.photoURL === 'string' &&
+              (partial.photoURL.startsWith('http') || partial.photoURL === '' || partial.photoURL.length < 500))
+          ) {
+            profileUpdates.photo_url = partial.photoURL;
+          }
+        }
         if (partial.phoneNumber !== undefined) profileUpdates.phone_number = partial.phoneNumber;
         if (partial.bio !== undefined) profileUpdates.bio = partial.bio;
-        if (partial.bannerCustomUrl !== undefined) profileUpdates.banner_url = partial.bannerCustomUrl;
-        if (partial.bannerTheme !== undefined) profileUpdates.banner_theme = partial.bannerTheme;
 
         try {
           const { error: upsertErr } = await supabase.from('profiles').upsert(profileUpdates);
           if (upsertErr) {
-            console.warn('Lưu vào bảng profiles Supabase chú ý:', upsertErr.message);
+            console.warn('Supabase profiles update notice:', upsertErr.message);
           }
         } catch (err) {
           console.warn('Lỗi gọi bảng profiles:', err);
@@ -419,6 +524,11 @@ export async function updateUserProfile(partial: Partial<User>): Promise<User | 
     } catch (err) {
       console.warn('Lỗi đồng bộ hồ sơ lên Supabase:', err);
     }
+  }
+
+  // 5. Phát sự kiện toàn cục để Header, Sidebar và các trang khác cập nhật giao diện lập tức
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('11a10_profile_updated', { detail: updatedUser }));
   }
 
   return updatedUser;

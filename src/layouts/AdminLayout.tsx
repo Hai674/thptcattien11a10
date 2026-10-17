@@ -3,6 +3,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { signOut } from '@/services/auth.service';
 import { GlassButton } from '@/components/ui/glass-button';
+import { BackgroundParticles } from '@/components/common/BackgroundParticles';
 import { TreeNav, TreeNavItem } from '@/components/ui/tree-nav';
 import {
   LayoutDashboard,
@@ -17,7 +18,6 @@ import {
   ShieldAlert,
   Sparkles,
 } from 'lucide-react';
-import { AuroraBackground } from '@/components/ui/aurora';
 import { toast } from 'sonner';
 
 export const AdminLayout: React.FC = () => {
@@ -46,8 +46,9 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="relative min-h-screen flex flex-col text-slate-100 font-sans">
-      <AuroraBackground />
+    <div className="min-h-screen flex flex-col bg-[#030712] text-slate-100 relative font-sans">
+      <BackgroundParticles />
+
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Admin Header Neo-Glass */}
         <header className="h-16 border-b border-indigo-500/20 glass-panel px-6 flex items-center justify-between sticky top-0 z-40">
@@ -92,7 +93,7 @@ export const AdminLayout: React.FC = () => {
         {/* Admin Body with Sidebar */}
         <div className="flex-1 flex">
           <aside className="w-64 glass-panel border-r border-indigo-900/30 p-4 space-y-6 hidden md:block shrink-0">
-            <div className="p-3.5 rounded-2xl bg-[#20102e]/55 border border-indigo-500/20 shadow-inner">
+            <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/20 shadow-inner">
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 <p className="text-xs text-indigo-300 font-bold truncate">{user?.displayName || 'Admin'}</p>

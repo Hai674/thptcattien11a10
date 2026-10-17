@@ -14,7 +14,7 @@ const glassCardStyles = `
   --anim-ease: cubic-bezier(.25, 1, .5, 1);
   --border-width: clamp(1px, .0625em, 2px);
   --foreground: #f8fafc;
-  --background: #160d20;
+  --background: #090d1a;
   position: relative;
   isolation: isolate;
   border-radius: 1.75rem;

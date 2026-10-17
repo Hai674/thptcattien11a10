@@ -30,7 +30,6 @@ import { AdminTimetablePage } from '@/pages/admin/AdminTimetable';
 import { AdminSettingsPage } from '@/pages/admin/AdminSettings';
 import { ConveyorLoop } from '@/components/ui/conveyor-loop';
 import { NotFound } from '@/components/ui/not-found-2';
-import DemoOne from '@/components/ui/demo';
 import { initAntiF12 } from '@/utils/antiDevtools';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -106,7 +105,7 @@ export const App: React.FC = () => {
         </Route>
 
         {/* Route Demo & 404 Not Found */}
-        <Route path="/demo" element={<DemoOne />} />
+        <Route path="/demo" element={<NotFound />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

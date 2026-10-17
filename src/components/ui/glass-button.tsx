@@ -58,6 +58,10 @@ const glassButtonStyles = `
   background: radial-gradient(ellipse at 50% 100%, rgba(16, 185, 129, 0.7), transparent 70%);
 }
 
+.glass-button-wrap.variant-purple .glass-button-shadow {
+  background: radial-gradient(ellipse at 50% 100%, rgba(168, 85, 247, 0.75), transparent 70%);
+}
+
 .glass-button-wrap:has(.glass-button:hover) .glass-button-shadow {
   filter: blur(12px);
   transform: translateY(5px);
@@ -215,6 +219,24 @@ const glassButtonStyles = `
   color: #ffffff;
 }
 
+/* 7. Purple Variant (Tím Hoàng Gia / Indigo Cyber Neon lấp lánh) */
+.glass-button.btn-purple {
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #4f46e5 100%);
+  border: 1px solid rgba(216, 180, 254, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+              0 4px 16px -2px rgba(147, 51, 234, 0.55);
+  color: #ffffff;
+}
+
+.glass-button.btn-purple:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #6366f1 100%);
+  border-color: rgba(233, 213, 255, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65),
+              0 6px 22px -2px rgba(147, 51, 234, 0.75);
+  color: #ffffff;
+}
+
 /* Typography & Content Layer */
 .glass-button-text {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -249,6 +271,7 @@ const variantClassMap: Record<string, { wrap: string; btn: string }> = {
   success: { wrap: "variant-success", btn: "btn-success" },
   outline: { wrap: "variant-outline", btn: "btn-outline" },
   ghost: { wrap: "variant-ghost", btn: "btn-ghost" },
+  purple: { wrap: "variant-purple", btn: "btn-purple" },
 };
 
 export interface GlassButtonProps
@@ -262,8 +285,10 @@ export interface GlassButtonProps
     | "destructive"
     | "success"
     | "outline"
-    | "ghost";
+    | "ghost"
+    | "purple";
   contentClassName?: string;
+  buttonClassName?: string;
 }
 
 const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
@@ -274,6 +299,7 @@ const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
       size = "default",
       variant = "default",
       contentClassName,
+      buttonClassName,
       disabled,
       type = "button",
       ...props
@@ -302,7 +328,8 @@ const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
             className={cn(
               glassButtonVariants({ size }),
               vConfig.btn,
-              isFullWidth && "w-full"
+              isFullWidth && "w-full",
+              buttonClassName
             )}
             {...props}
           >

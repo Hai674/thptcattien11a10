@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '@/supabase/config';
-import { getCurrentUser, updateUserProfile } from '@/services/auth.service';
+import { getCurrentUser, updateUserProfile, getProfileOverrides } from '@/services/auth.service';
 import { useAuthStore } from '@/store/authStore';
 import { User } from '@/types';
 
@@ -13,6 +13,17 @@ export function useAuth() {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Lắng nghe sự kiện cập nhật profile từ trang Profile để đồng bộ tức thì
+    const handleProfileUpdated = (e: Event) => {
+      const customEvent = e as CustomEvent<User>;
+      if (customEvent.detail && isMounted) {
+        setUser(customEvent.detail);
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('11a10_profile_updated', handleProfileUpdated);
+    }
 
     // 1. Nếu vừa đăng xuất thì không khôi phục phiên
     if (typeof window !== 'undefined' && sessionStorage.getItem('just_logged_out') === 'true') {
@@ -65,7 +76,8 @@ export function useAuth() {
         try {
           if (session?.user) {
             const profile = await getCurrentUser(session.user.id);
-            // Giữ lại các tùy biến (tên, avatar, ảnh bìa) nếu người dùng đã đổi ở máy
+            const userIdentifier = session.user.email || session.user.id;
+            const overrides = getProfileOverrides(userIdentifier);
             const localRaw = localStorage.getItem('auth_user_11a10');
             let localData: Partial<User> = {};
             if (localRaw) {
@@ -77,22 +89,22 @@ export function useAuth() {
             if (profile && isMounted) {
               const mergedUser: User = {
                 ...profile,
-                displayName: localData.displayName || profile.displayName,
-                photoURL: localData.photoURL !== undefined ? localData.photoURL : profile.photoURL,
-                bannerCustomUrl: localData.bannerCustomUrl || profile.bannerCustomUrl,
-                bannerTheme: localData.bannerTheme || profile.bannerTheme,
-                phoneNumber: localData.phoneNumber || profile.phoneNumber,
-                bio: localData.bio || profile.bio,
+                displayName: overrides.displayName || localData.displayName || profile.displayName,
+                photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : profile.photoURL),
+                bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : (localData.bannerCustomUrl || profile.bannerCustomUrl),
+                bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : (localData.bannerTheme || profile.bannerTheme),
+                phoneNumber: overrides.phoneNumber !== undefined ? overrides.phoneNumber : (localData.phoneNumber || profile.phoneNumber),
+                bio: overrides.bio !== undefined ? overrides.bio : (localData.bio || profile.bio),
               };
               setUser(mergedUser);
             } else if (isMounted) {
               const fallbackUser: User = {
                 uid: session.user.id,
                 email: session.user.email || null,
-                displayName: localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
-                photoURL: localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null),
-                bannerCustomUrl: localData.bannerCustomUrl,
-                bannerTheme: localData.bannerTheme,
+                displayName: overrides.displayName || localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
+                photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null)),
+                bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : localData.bannerCustomUrl,
+                bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : localData.bannerTheme,
                 role: 'member',
                 classId: '11A10',
                 status: 'active',
@@ -131,6 +143,8 @@ export function useAuth() {
         try {
           if (session?.user) {
             const profile = await getCurrentUser(session.user.id);
+            const userIdentifier = session.user.email || session.user.id;
+            const overrides = getProfileOverrides(userIdentifier);
             const localRaw = localStorage.getItem('auth_user_11a10');
             let localData: Partial<User> = {};
             if (localRaw) {
@@ -142,22 +156,22 @@ export function useAuth() {
             if (profile && isMounted) {
               const mergedUser: User = {
                 ...profile,
-                displayName: localData.displayName || profile.displayName,
-                photoURL: localData.photoURL !== undefined ? localData.photoURL : profile.photoURL,
-                bannerCustomUrl: localData.bannerCustomUrl || profile.bannerCustomUrl,
-                bannerTheme: localData.bannerTheme || profile.bannerTheme,
-                phoneNumber: localData.phoneNumber || profile.phoneNumber,
-                bio: localData.bio || profile.bio,
+                displayName: overrides.displayName || localData.displayName || profile.displayName,
+                photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : profile.photoURL),
+                bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : (localData.bannerCustomUrl || profile.bannerCustomUrl),
+                bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : (localData.bannerTheme || profile.bannerTheme),
+                phoneNumber: overrides.phoneNumber !== undefined ? overrides.phoneNumber : (localData.phoneNumber || profile.phoneNumber),
+                bio: overrides.bio !== undefined ? overrides.bio : (localData.bio || profile.bio),
               };
               setUser(mergedUser);
             } else if (isMounted) {
               const fallbackUser: User = {
                 uid: session.user.id,
                 email: session.user.email || null,
-                displayName: localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
-                photoURL: localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null),
-                bannerCustomUrl: localData.bannerCustomUrl,
-                bannerTheme: localData.bannerTheme,
+                displayName: overrides.displayName || localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
+                photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null)),
+                bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : localData.bannerCustomUrl,
+                bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : localData.bannerTheme,
                 role: 'member',
                 classId: '11A10',
                 status: 'active',
@@ -181,6 +195,9 @@ export function useAuth() {
     return () => {
       isMounted = false;
       clearTimeout(safetyTimer);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('11a10_profile_updated', handleProfileUpdated);
+      }
       subscription.unsubscribe();
     };
   }, [setUser, clearUser, setLoading]);
