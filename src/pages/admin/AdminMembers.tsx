@@ -32,7 +32,7 @@ export const AdminMembersPage: React.FC = () => {
 
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState('Thành viên');
-  const [birthDate, setBirthDate] = useState('15/01/2009');
+  const [birthDate, setBirthDate] = useState('15/01/2010');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [quote, setQuote] = useState('');
@@ -65,7 +65,7 @@ export const AdminMembersPage: React.FC = () => {
     setEditingId(null);
     setFullName('');
     setRole('Thành viên');
-    setBirthDate('15/01/2009');
+    setBirthDate('15/01/2010');
     setPhone('');
     setEmail('');
     setQuote('');
@@ -302,7 +302,7 @@ export const AdminMembersPage: React.FC = () => {
                   <Input
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    placeholder="15/01/2009"
+                    placeholder="15/01/2010"
                     className="bg-white/[0.06] border-white/20 text-xs rounded-xl text-white backdrop-blur-md focus:border-white/40"
                   />
                 </div>

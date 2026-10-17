@@ -38,7 +38,7 @@ export const MembersPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newFullName, setNewFullName] = useState('');
   const [newRole, setNewRole] = useState('Thành viên');
-  const [newBirthDate, setNewBirthDate] = useState('15/03/2009');
+  const [newBirthDate, setNewBirthDate] = useState('15/03/2010');
   const [newPhone, setNewPhone] = useState('');
   const [newQuote, setNewQuote] = useState('');
   const [newHobbies, setNewHobbies] = useState('');
@@ -79,7 +79,7 @@ export const MembersPage: React.FC = () => {
       id: `m-${Date.now()}`,
       fullName: newFullName.trim(),
       role: newRole,
-      birthDate: newBirthDate.trim() || '01/01/2009',
+      birthDate: newBirthDate.trim() || '01/01/2010',
       phone: newPhone.trim() || undefined,
       quote: newQuote.trim() || undefined,
       hobbies: newHobbies ? newHobbies.split(/[,;]+/).map((s) => s.trim()) : [],

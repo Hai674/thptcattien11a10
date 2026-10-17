@@ -35,6 +35,22 @@ export function loadMembersFromStorage(): Member[] {
       saveMembersToStorage(INITIAL_MEMBERS);
       return INITIAL_MEMBERS;
     }
+
+    // Tự động nâng cấp năm sinh từ 2009 sang 2010 cho học sinh
+    let updatedYear = false;
+    const migrated = list.map((m: Member) => {
+      if (m.birthDate === '2009' || m.birthDate?.includes('2009')) {
+        updatedYear = true;
+        return { ...m, birthDate: m.birthDate.replace('2009', '2010') };
+      }
+      return m;
+    });
+
+    if (updatedYear) {
+      saveMembersToStorage(migrated);
+      return migrated;
+    }
+
     return list;
   } catch {
     saveMembersToStorage(INITIAL_MEMBERS);
@@ -64,7 +80,7 @@ export function downloadSampleMembersExcel() {
       idx + 1,
       m.fullName,
       m.role || 'Thành viên',
-      m.birthDate || '2009',
+      m.birthDate || '2010',
       m.phone || '',
       m.quote || 'Tập thể 11A10',
       (m.hobbies || []).join(', '),
@@ -142,7 +158,7 @@ export async function parseMembersFromExcel(file: File): Promise<Member[]> {
     if (!fullName || fullName.length < 2) continue;
 
     const role = roleCol !== -1 && row[roleCol] ? String(row[roleCol]).trim() : 'Thành viên';
-    const birthDate = birthCol !== -1 && row[birthCol] ? String(row[birthCol]).trim() : '2009';
+    const birthDate = birthCol !== -1 && row[birthCol] ? String(row[birthCol]).trim() : '2010';
     const phone = phoneCol !== -1 && row[phoneCol] ? String(row[phoneCol]).trim() : undefined;
     const quote = quoteCol !== -1 && row[quoteCol] ? String(row[quoteCol]).trim() : undefined;
     const hobbiesStr = hobbyCol !== -1 && row[hobbyCol] ? String(row[hobbyCol]).trim() : '';
