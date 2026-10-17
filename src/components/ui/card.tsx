@@ -43,22 +43,9 @@ const glassCardStyles = `
     inset 0 -1px 2px rgba(0, 0, 0, 0.5),
     0 16px 40px -12px rgba(0, 0, 0, 0.65),
     0 0 24px -4px rgba(99, 102, 241, 0.12);
-  box-shadow:
-    inset 0 .15em .15em oklch(from var(--foreground) l c h / 14%),
-    inset 0 -.15em .15em oklch(from var(--background) l c h / 50%),
-    0 .25em .15em -.15em oklch(from var(--foreground) l c h / 20%),
-    0 0 .1em .25em inset oklch(from var(--background) l c h / 20%),
-    0 16px 40px -12px rgba(0, 0, 0, 0.65),
-    0 0 24px -4px rgba(99, 102, 241, 0.12);
 }
 
 .glass-card-element:hover {
-  background: linear-gradient(
-    -75deg,
-    rgba(9, 13, 26, 0.78),
-    rgba(15, 23, 42, 0.88),
-    rgba(9, 13, 26, 0.78)
-  );
   background: linear-gradient(
     -75deg,
     oklch(from var(--background) l c h / 24%),
@@ -68,13 +55,6 @@ const glassCardStyles = `
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.22),
     inset 0 -1px 3px rgba(0, 0, 0, 0.6),
-    0 24px 50px -10px rgba(0, 0, 0, 0.75),
-    0 0 35px 0 rgba(99, 102, 241, 0.22);
-  box-shadow:
-    inset 0 .2em .2em oklch(from var(--foreground) l c h / 22%),
-    inset 0 -.2em .2em oklch(from var(--background) l c h / 60%),
-    0 .35em .15em -.1em oklch(from var(--foreground) l c h / 25%),
-    0 0 .1em .25em inset oklch(from var(--background) l c h / 40%),
     0 24px 50px -10px rgba(0, 0, 0, 0.75),
     0 0 35px 0 rgba(99, 102, 241, 0.22);
 }

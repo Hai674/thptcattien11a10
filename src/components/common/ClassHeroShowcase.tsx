@@ -259,9 +259,6 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
             transformStyle: 'preserve-3d',
           }}
         >
-          {/* Specular Sheen Sweep Flare */}
-          <div className="glass-card-sheen" />
-
           {/* Card Inner Content */}
           <div className="relative z-10">
             {/* macOS Title Bar */}
@@ -379,11 +376,8 @@ export const ClassHeroShowcase: React.FC<ClassHeroShowcaseProps> = () => {
             {/* Main Timetable Content: Today's Classes List or Off-day */}
             {isOffDay ? (
               <div
-                className="glass-card-element relative overflow-hidden rounded-2xl p-6 sm:p-8 text-center space-y-3 my-2 transition-all duration-300"
+                className="relative overflow-hidden rounded-2xl p-6 sm:p-8 text-center space-y-3 my-2 bg-slate-900/60 border border-white/10 backdrop-blur-xl transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]"
               >
-                {/* Specular Glass Highlight */}
-                <div className="glass-card-sheen" />
-
                 <div className="relative z-10 space-y-3">
                   <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/25 text-purple-300 mx-auto flex items-center justify-center shadow-lg backdrop-blur-md">
                     <Calendar className="w-6 h-6 text-purple-300" />

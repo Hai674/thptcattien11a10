@@ -82,6 +82,7 @@
   -webkit-tap-highlight-color: transparent;
   -webkit-backdrop-filter: blur(28px);
   backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: linear-gradient(
     -75deg,
     oklch(from var(--card-bg) l c h / 18%),
@@ -89,10 +90,8 @@
     oklch(from var(--card-bg) l c h / 18%)
   );
   box-shadow:
-    inset 0 .15em .15em oklch(from var(--card-fg) l c h / 14%),
-    inset 0 -.15em .15em oklch(from var(--card-bg) l c h / 50%),
-    0 .25em .15em -.15em oklch(from var(--card-fg) l c h / 20%),
-    0 0 .1em .25em inset oklch(from var(--card-bg) l c h / 20%),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5),
     0 16px 40px -12px rgba(0, 0, 0, 0.65),
     0 0 24px -4px rgba(99, 102, 241, 0.12);
 }
@@ -105,77 +104,22 @@
     oklch(from var(--card-bg) l c h / 24%)
   );
   box-shadow:
-    inset 0 .2em .2em oklch(from var(--card-fg) l c h / 22%),
-    inset 0 -.2em .2em oklch(from var(--card-bg) l c h / 60%),
-    0 .35em .15em -.1em oklch(from var(--card-fg) l c h / 25%),
-    0 0 .1em .25em inset oklch(from var(--card-bg) l c h / 40%),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.6),
     0 24px 50px -10px rgba(0, 0, 0, 0.75),
     0 0 35px 0 rgba(99, 102, 241, 0.22);
 }
 
-/* Specular Sheen Sweep */
+/* Lớp vệt kính quang học - tắt triệt để để loại bỏ vệt lóa sáng trắng ở góc bo */
 .glass-card-element .glass-card-sheen,
 .glass-card .glass-card-sheen {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-sizing: border-box;
-  background: linear-gradient(
-    var(--card-angle-2),
-    transparent 0%,
-    oklch(from var(--card-fg) l c h / 20%) 40% 50%,
-    transparent 55%
-  );
-  z-index: 2;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  transition: background-position calc(var(--anim-time) * 1.5) var(--anim-ease), --card-angle-2 calc(var(--anim-time) * 1.5) var(--anim-ease);
-  background-position: 0%;
-  background-size: 200% 200%;
+  display: none !important;
 }
 
-.glass-card-element:hover .glass-card-sheen,
-.glass-card:hover .glass-card-sheen {
-  background-position: 30%;
-  --card-angle-2: -25deg;
-}
-
-/* Conic Rim Rotating Border with XOR mask composite */
+/* Loại bỏ viền xoay conic đa sắc tạo đốm lóa trắng chói mắt ở góc bo */
 .glass-card-element:after,
 .glass-card:after {
-  content: "";
-  z-index: 3;
-  position: absolute;
-  inset: 0;
-  padding: var(--border-width, 1.5px);
-  border-radius: inherit;
-  box-sizing: border-box;
-  pointer-events: none;
-  background: conic-gradient(
-    from var(--card-angle-1) at 50% 50%,
-    oklch(from var(--card-fg) l c h / 55%) 0%,
-    transparent 8% 42%,
-    oklch(from var(--card-fg) l c h / 65%) 50%,
-    transparent 58% 92%,
-    oklch(from var(--card-fg) l c h / 55%) 100%
-  ),
-  linear-gradient(180deg, oklch(from var(--card-bg) l c h / 50%), oklch(from var(--card-bg) l c h / 50%));
-  transition: all var(--anim-time) var(--anim-ease), --card-angle-1 .6s ease;
-  box-shadow: inset 0 0 0 calc(var(--border-width, 1.5px) / 2) oklch(from var(--card-bg) l c h / 50%);
-  -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-  -webkit-mask-clip: content-box, border-box;
-  mask-clip: content-box, border-box;
-  -webkit-mask-origin: content-box, border-box;
-  mask-origin: content-box, border-box;
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.glass-card-element:hover:after,
-.glass-card:hover:after {
-  --card-angle-1: -135deg;
+  display: none !important;
 }
 
 
