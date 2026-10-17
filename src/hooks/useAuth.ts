@@ -91,7 +91,11 @@ export function useAuth() {
               (profile && profile.role === 'admin') ||
               (localData && localData.role === 'admin')
             );
-            const isHai = session.user.email?.toLowerCase() === 'haivanong2007@gmail.com';
+            const isHai =
+              session.user.email?.toLowerCase() === 'haivannong2007@gmail.com' ||
+              session.user.email?.toLowerCase() === 'haivanong2007@gmail.com' ||
+              Boolean(session.user.email?.toLowerCase().includes('haivannong')) ||
+              Boolean(session.user.email?.toLowerCase().includes('haivanong'));
 
             if (profile && isMounted) {
               const mergedUser: User = {
@@ -167,7 +171,11 @@ export function useAuth() {
               (profile && profile.role === 'admin') ||
               (localData && localData.role === 'admin')
             );
-            const isHai = session.user.email?.toLowerCase() === 'haivanong2007@gmail.com';
+            const isHai =
+              session.user.email?.toLowerCase() === 'haivannong2007@gmail.com' ||
+              session.user.email?.toLowerCase() === 'haivanong2007@gmail.com' ||
+              Boolean(session.user.email?.toLowerCase().includes('haivannong')) ||
+              Boolean(session.user.email?.toLowerCase().includes('haivanong'));
 
             if (profile && isMounted) {
               const mergedUser: User = {

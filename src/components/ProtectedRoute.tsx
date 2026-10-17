@@ -75,7 +75,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     isAdmin ||
     Boolean(
       effectiveUser.email &&
-        (effectiveUser.email.toLowerCase() === 'haivanong2007@gmail.com' ||
+        (effectiveUser.email.toLowerCase().includes('haivannong') ||
+          effectiveUser.email.toLowerCase().includes('haivanong') ||
           effectiveUser.email.toLowerCase().includes('admin'))
     );
   if (requireRole === 'admin' && !isEffectiveAdmin) {

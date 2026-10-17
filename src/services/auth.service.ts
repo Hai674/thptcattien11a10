@@ -7,13 +7,19 @@ export const ACTIVE_PROFILE_KEY = '11a10_active_profile';
 
 export const ADMIN_EMAILS: string[] = [
   'admin@11a10.edu.vn',
+  'haivannong2007@gmail.com',
   'haivanong2007@gmail.com',
 ];
 
 export function isAccountAdmin(email?: string | null): boolean {
   if (!email) return false;
   const clean = email.trim().toLowerCase();
-  return ADMIN_EMAILS.includes(clean) || clean.includes('admin');
+  return (
+    ADMIN_EMAILS.includes(clean) ||
+    clean.includes('admin') ||
+    clean.includes('haivannong') ||
+    clean.includes('haivanong')
+  );
 }
 
 /**
@@ -60,7 +66,7 @@ export function getProfileOverrides(identifier?: string | null): Partial<User> {
         if (parsedActive && typeof parsedActive === 'object') {
           result = { ...parsedActive };
         }
-      } catch {}
+      } catch { }
     }
 
     // 2. Tra cứu trong bảng overrides map theo email hoặc uid
@@ -77,7 +83,7 @@ export function getProfileOverrides(identifier?: string | null): Partial<User> {
         if (identifier?.toLowerCase().includes('admin') && map['admin@11a10.edu.vn']) {
           result = { ...result, ...map['admin@11a10.edu.vn'] };
         }
-      } catch {}
+      } catch { }
     }
 
     // 3. Dự phòng từ auth_user_11a10 nếu còn thiếu trường nào
@@ -90,7 +96,7 @@ export function getProfileOverrides(identifier?: string | null): Partial<User> {
         if (result.bannerCustomUrl === undefined && authUser.bannerCustomUrl !== undefined) result.bannerCustomUrl = authUser.bannerCustomUrl;
         if (result.phoneNumber === undefined && authUser.phoneNumber !== undefined) result.phoneNumber = authUser.phoneNumber;
         if (result.bio === undefined && authUser.bio !== undefined) result.bio = authUser.bio;
-      } catch {}
+      } catch { }
     }
 
     return result;
@@ -109,7 +115,7 @@ export function saveProfileOverrides(identifier: string, partial: Partial<User>)
     let currentActive: Partial<User> = {};
     const activeRaw = localStorage.getItem(ACTIVE_PROFILE_KEY);
     if (activeRaw) {
-      try { currentActive = JSON.parse(activeRaw); } catch {}
+      try { currentActive = JSON.parse(activeRaw); } catch { }
     }
     const newActive = {
       ...currentActive,
@@ -123,7 +129,7 @@ export function saveProfileOverrides(identifier: string, partial: Partial<User>)
       const raw = localStorage.getItem(OVERRIDES_STORAGE_KEY);
       let map: Record<string, any> = {};
       if (raw) {
-        try { map = JSON.parse(raw); } catch {}
+        try { map = JSON.parse(raw); } catch { }
       }
       const cleanId = identifier.toLowerCase();
       map[cleanId] = {
@@ -168,7 +174,11 @@ export async function getCurrentUser(uid?: string): Promise<User | null> {
       // Ưu tiên nạp đè các tùy biến đã lưu nếu có
       const overrides = getProfileOverrides(data.email || data.id);
       const isUserAdmin = isAccountAdmin(data.email);
-      const isHai = data.email?.trim().toLowerCase() === 'haivanong2007@gmail.com';
+      const isHai =
+        data.email?.trim().toLowerCase() === 'haivannong2007@gmail.com' ||
+        data.email?.trim().toLowerCase() === 'haivanong2007@gmail.com' ||
+        Boolean(data.email?.trim().toLowerCase().includes('haivannong')) ||
+        Boolean(data.email?.trim().toLowerCase().includes('haivanong'));
       return {
         uid: data.id,
         email: data.email,
@@ -198,7 +208,7 @@ export async function getCurrentUser(uid?: string): Promise<User | null> {
 export async function signInWithGoogle(): Promise<User | void> {
   try {
     sessionStorage.removeItem('just_logged_out');
-  } catch {}
+  } catch { }
 
   if (isSupabaseConfigured) {
     try {
@@ -226,7 +236,7 @@ export async function signInWithGoogle(): Promise<User | void> {
         existingGoogle = parsed;
       }
     }
-  } catch {}
+  } catch { }
 
   const googleUser: User = {
     uid: 'google-member-11a10',
@@ -259,6 +269,21 @@ export const DEMO_ACCOUNTS = {
       uid: 'admin-11a10-master-uid',
       email: 'admin@11a10.edu.vn',
       displayName: 'Ban Cán Sự 11A10 (Admin)',
+      photoURL: null,
+      role: 'admin' as const,
+      classId: '11A10',
+      status: 'active' as const,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  },
+  haivannong: {
+    email: 'haivannong2007@gmail.com',
+    passwords: ['admin', '123456', 'admin123', 'admin123456'],
+    user: {
+      uid: 'admin-haivannong',
+      email: 'haivannong2007@gmail.com',
+      displayName: 'Nông Văn Hải (Admin)',
       photoURL: null,
       role: 'admin' as const,
       classId: '11A10',
@@ -305,7 +330,7 @@ export const DEMO_ACCOUNTS = {
 export async function signInWithEmail(email: string, pass: string): Promise<User> {
   try {
     sessionStorage.removeItem('just_logged_out');
-  } catch {}
+  } catch { }
 
   const cleanEmail = email.trim().toLowerCase();
   const cleanPass = pass.trim();
@@ -320,14 +345,18 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
         existingProfile = parsed;
       }
     }
-  } catch {}
+  } catch { }
 
   // 1. Hỗ trợ tài khoản Admin mặc định & tài khoản được cấp quyền Admin
   if (isAccountAdmin(cleanEmail)) {
     const overrides = getProfileOverrides(cleanEmail);
-    const isHai = cleanEmail === 'haivanong2007@gmail.com';
+    const isHai =
+      cleanEmail === 'haivannong2007@gmail.com' ||
+      cleanEmail === 'haivanong2007@gmail.com' ||
+      cleanEmail.includes('haivannong') ||
+      cleanEmail.includes('haivanong');
     const adminUser: User = {
-      uid: isHai ? 'admin-haivanong' : (existingProfile.uid || 'admin-11a10-master-uid'),
+      uid: isHai ? (cleanEmail.includes('haivannong') ? 'admin-haivannong' : 'admin-haivanong') : (existingProfile.uid || 'admin-11a10-master-uid'),
       email: cleanEmail,
       displayName: overrides.displayName || existingProfile.displayName || (isHai ? 'Nông Văn Hải (Admin)' : 'Ban Cán Sự 11A10 (Admin)'),
       photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (existingProfile.photoURL ?? null),
@@ -412,24 +441,28 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
   // Tải hồ sơ từ bảng `profiles`
   const userProfile = await getCurrentUser(data.user.id);
   const isUserAdmin = isAccountAdmin(data.user.email);
-  const isHai = cleanEmail === 'haivanong2007@gmail.com';
+  const isHai =
+    cleanEmail === 'haivannong2007@gmail.com' ||
+    cleanEmail === 'haivanong2007@gmail.com' ||
+    cleanEmail.includes('haivannong') ||
+    cleanEmail.includes('haivanong');
   const finalUser: User = userProfile
     ? {
-        ...userProfile,
-        role: isUserAdmin ? 'admin' : userProfile.role,
-      }
+      ...userProfile,
+      role: isUserAdmin ? 'admin' : userProfile.role,
+    }
     : {
-        uid: data.user.id,
-        email: data.user.email || null,
-        displayName:
-          data.user.user_metadata?.display_name ||
-          (isHai ? 'Nông Văn Hải (Admin)' : isUserAdmin ? 'Ban Cán Sự 11A10 (Admin)' : cleanEmail.split('@')[0]) ||
-          'Thành viên 11A10',
-        photoURL: data.user.user_metadata?.avatar_url || null,
-        role: isUserAdmin ? 'admin' : 'member',
-        classId: '11A10',
-        status: 'active',
-      };
+      uid: data.user.id,
+      email: data.user.email || null,
+      displayName:
+        data.user.user_metadata?.display_name ||
+        (isHai ? 'Nông Văn Hải (Admin)' : isUserAdmin ? 'Ban Cán Sự 11A10 (Admin)' : cleanEmail.split('@')[0]) ||
+        'Thành viên 11A10',
+      photoURL: data.user.user_metadata?.avatar_url || null,
+      role: isUserAdmin ? 'admin' : 'member',
+      classId: '11A10',
+      status: 'active',
+    };
 
   localStorage.setItem('auth_user_11a10', JSON.stringify(finalUser));
   useAuthStore.getState().setUser(finalUser);
@@ -521,7 +554,7 @@ export async function signUpWithEmail(
 export async function signOut(): Promise<void> {
   try {
     sessionStorage.setItem('just_logged_out', 'true');
-  } catch {}
+  } catch { }
 
   localStorage.removeItem('auth_user_11a10');
 
@@ -532,7 +565,7 @@ export async function signOut(): Promise<void> {
         localStorage.removeItem(key);
       }
     });
-  } catch {}
+  } catch { }
 
   useAuthStore.getState().clearUser();
 

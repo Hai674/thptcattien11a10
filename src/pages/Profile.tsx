@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { cyberAudio } from '@/utils/cyberAudio';
 import { compressAvatar, compressBanner } from '@/utils/imageCompressor';
 import { getGivenName } from '@/utils/nameUtils';
+import { isAccountAdmin } from '@/services/auth.service';
 
 // Danh sách các mẫu avatar học sinh tuyển chọn
 const PRESET_AVATARS = [
@@ -239,11 +240,14 @@ export const ProfilePage: React.FC = () => {
 
       {/* ================= THẺ ĐỊNH DANH HỌC SINH / BAN CÁN SỰ (FULL BÌA TOÀN BỘ CARD) ================= */}
       <Card
-        className="text-white shadow-2xl overflow-hidden rounded-3xl relative border border-white/20 bg-cover bg-center transition-all duration-300"
+        className="text-white shadow-2xl overflow-hidden rounded-3xl relative border border-white/20 transition-all duration-300"
         style={{
           backgroundImage: bannerCustomUrl
             ? `url('${bannerCustomUrl}')`
             : 'linear-gradient(135deg, #1e3a8a 0%, #312e81 40%, #581c87 100%)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
         }}
       >
         {/* Lớp phủ chuyển sắc tối nhẹ dạng kính mờ (Liquid Glass Dark Overlay) để giữ trọn vẹn màu sắc của ảnh bìa nhưng chữ và thông tin vẫn siêu rõ nét */}
@@ -310,7 +314,7 @@ export const ProfilePage: React.FC = () => {
                     <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 drop-shadow" />
                   </h2>
                   <span className="text-xs font-mono font-medium text-blue-300">
-                    {user?.role === 'admin' ? 'Ban Cán Sự (Admin)' : 'Thành viên 11A10'}
+                    {user?.role === 'admin' || isAccountAdmin(user?.email) ? 'Ban Cán Sự (Admin)' : 'Thành viên 11A10'}
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-200/90 font-medium drop-shadow flex items-center gap-2">
@@ -321,12 +325,12 @@ export const ProfilePage: React.FC = () => {
 
             {/* Khung Ghi chú & Châm ngôn cá nhân (Bio) nằm trọn trong card full bìa */}
             <div className="p-4 rounded-2xl bg-black/45 backdrop-blur-xl border border-white/15 shadow-2xl max-w-2xl">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider mb-1.5">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+              <div className="flex items-center gap-2 text-xs font-bold text-cyan-300 uppercase tracking-wider mb-1.5">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
                 <span>Ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
               </div>
               {bio ? (
-                <p className="text-sm sm:text-base text-white font-medium italic leading-relaxed pl-2 border-l-2 border-amber-400/80 ml-0.5">
+                <p className="text-sm sm:text-base text-white font-medium italic leading-relaxed pl-2 border-l-2 border-cyan-400/80 ml-0.5">
                   “{bio}”
                 </p>
               ) : (

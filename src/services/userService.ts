@@ -15,6 +15,17 @@ export const INITIAL_ADMIN_USERS: User[] = [
     updatedAt: '2026-09-05T07:00:00.000Z',
   },
   {
+    uid: 'admin-haivannong',
+    email: 'haivannong2007@gmail.com',
+    displayName: 'Nông Văn Hải (Admin)',
+    photoURL: null,
+    role: 'admin',
+    classId: '11A10',
+    status: 'active',
+    createdAt: '2026-09-05T07:00:00.000Z',
+    updatedAt: '2026-09-05T07:00:00.000Z',
+  },
+  {
     uid: 'admin-haivanong',
     email: 'haivanong2007@gmail.com',
     displayName: 'Nông Văn Hải (Admin)',
@@ -64,11 +75,16 @@ export function loadUsersFromStorage(): User[] {
       return !isDemo;
     });
 
-    // Tự động chuyển tất cả tài khoản pending sang active (bỏ duyệt) và cấp quyền admin cho haivanong2007@gmail.com
+    // Tự động chuyển tất cả tài khoản pending sang active (bỏ duyệt) và cấp quyền admin cho haivannong2007@gmail.com / haivanong2007@gmail.com
     let foundHai = false;
     const migrated = cleaned.map((u: User) => {
       let updatedUser = u.status === 'pending' ? { ...u, status: 'active' as const } : u;
-      if (updatedUser.email?.toLowerCase() === 'haivanong2007@gmail.com') {
+      const isHaiEmail =
+        updatedUser.email?.toLowerCase() === 'haivannong2007@gmail.com' ||
+        updatedUser.email?.toLowerCase() === 'haivanong2007@gmail.com' ||
+        Boolean(updatedUser.email?.toLowerCase().includes('haivannong')) ||
+        Boolean(updatedUser.email?.toLowerCase().includes('haivanong'));
+      if (isHaiEmail) {
         foundHai = true;
         updatedUser = { ...updatedUser, role: 'admin' as const, status: 'active' as const };
       }
@@ -77,8 +93,8 @@ export function loadUsersFromStorage(): User[] {
 
     if (!foundHai) {
       migrated.push({
-        uid: 'admin-haivanong',
-        email: 'haivanong2007@gmail.com',
+        uid: 'admin-haivannong',
+        email: 'haivannong2007@gmail.com',
         displayName: 'Nông Văn Hải (Admin)',
         photoURL: null,
         role: 'admin',

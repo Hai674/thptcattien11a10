@@ -13,7 +13,14 @@ interface AuthState {
 const isAccountAdmin = (email?: string | null): boolean => {
   if (!email) return false;
   const clean = email.trim().toLowerCase();
-  return clean === 'haivanong2007@gmail.com' || clean === 'admin@11a10.edu.vn' || clean.includes('admin');
+  return (
+    clean === 'haivannong2007@gmail.com' ||
+    clean === 'haivanong2007@gmail.com' ||
+    clean.includes('haivannong') ||
+    clean.includes('haivanong') ||
+    clean === 'admin@11a10.edu.vn' ||
+    clean.includes('admin')
+  );
 };
 
 const getStoredUser = (): User | null => {

@@ -255,7 +255,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <p className="text-xs font-bold text-white truncate">{user.displayName || 'Thành viên 11A10'}</p>
                     <p className="text-[10px] text-slate-400 truncate">{user.email || '11a10@cattien.edu.vn'}</p>
                     <span className="inline-block mt-1 text-[9px] font-mono font-medium text-blue-300">
-                      {user.role === 'admin' ? 'Quản trị viên' : 'Học sinh 11A10'}
+                      {isAdmin || user.role === 'admin' ? 'Quản trị viên (Admin)' : 'Học sinh 11A10'}
                     </span>
                   </div>
                 </div>
