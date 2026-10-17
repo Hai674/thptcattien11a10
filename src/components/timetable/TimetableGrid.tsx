@@ -16,22 +16,35 @@ const SUBJECT_COLORS: Record<string, { bg: string; text: string; border: string 
   'Ngữ Văn': { bg: 'bg-pink-500/15', text: 'text-pink-300', border: 'border-pink-500/30' },
   'Tiếng Anh': { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
   'Vật Lý': { bg: 'bg-violet-500/15', text: 'text-violet-300', border: 'border-violet-500/30' },
+  'Lý': { bg: 'bg-violet-500/15', text: 'text-violet-300', border: 'border-violet-500/30' },
   'Hóa Học': { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/30' },
+  'Hóa': { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/30' },
   'Sinh Học': { bg: 'bg-teal-500/15', text: 'text-teal-300', border: 'border-teal-500/30' },
+  'Sinh': { bg: 'bg-teal-500/15', text: 'text-teal-300', border: 'border-teal-500/30' },
   'Lịch Sử': { bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/30' },
+  'Sử': { bg: 'bg-orange-500/15', text: 'text-orange-300', border: 'border-orange-500/30' },
   'Địa Lý': { bg: 'bg-cyan-500/15', text: 'text-cyan-300', border: 'border-cyan-500/30' },
+  'Địa': { bg: 'bg-cyan-500/15', text: 'text-cyan-300', border: 'border-cyan-500/30' },
+  'KTPL': { bg: 'bg-indigo-500/15', text: 'text-indigo-300', border: 'border-indigo-500/30' },
   'GDCD': { bg: 'bg-lime-500/15', text: 'text-lime-300', border: 'border-lime-500/30' },
   'Tin Học': { bg: 'bg-sky-500/15', text: 'text-sky-300', border: 'border-sky-500/30' },
+  'Tin': { bg: 'bg-sky-500/15', text: 'text-sky-300', border: 'border-sky-500/30' },
   'Thể Dục': { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
+  'GDTC': { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/30' },
   'GDQP-AN': { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30' },
+  'GDQPAN': { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30' },
+  'GDQP': { bg: 'bg-yellow-500/15', text: 'text-yellow-300', border: 'border-yellow-500/30' },
+  'HDTNHN': { bg: 'bg-rose-500/15', text: 'text-rose-300', border: 'border-rose-500/30' },
+  'GDĐP': { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/30' },
   'Sinh hoạt lớp': { bg: 'bg-purple-500/15', text: 'text-purple-300', border: 'border-purple-500/30' },
-  'Công Nghệ': { bg: 'bg-slate-500/15', text: 'text-slate-300', border: 'border-slate-500/30' },
+  'Công Nghệ': { bg: 'bg-cyan-500/15', text: 'text-cyan-300', border: 'border-cyan-500/30' },
 };
 
 function getSubjectColor(subject: string) {
   if (!subject) return null;
+  const s = subject.toLowerCase();
   for (const [key, val] of Object.entries(SUBJECT_COLORS)) {
-    if (subject.toLowerCase().includes(key.toLowerCase())) return val;
+    if (s.includes(key.toLowerCase())) return val;
   }
   return {
     bg: 'bg-blue-500/10',
@@ -58,11 +71,20 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
     { key: '6', label: 'Thứ Sáu' },
   ];
 
+  // Kiểm tra xem có tiết 5 sáng hoặc chiều hay không
+  const hasMorningPeriod5 = Object.values(timetable.schedule || {}).some(
+    (daySlots) => daySlots && daySlots['5'] && daySlots['5'].subject
+  );
+  const hasAfternoonPeriod5 = Object.values(timetable.schedule || {}).some(
+    (daySlots) => daySlots && daySlots['c5'] && daySlots['c5'].subject
+  );
+
   const morningPeriods = [
     { key: '1', name: 'Tiết 1' },
     { key: '2', name: 'Tiết 2' },
     { key: '3', name: 'Tiết 3' },
     { key: '4', name: 'Tiết 4' },
+    ...(hasMorningPeriod5 || isEditable ? [{ key: '5', name: 'Tiết 5' }] : []),
   ];
 
   const afternoonPeriods = [
@@ -70,6 +92,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
     { key: 'c2', name: 'Tiết 2 (Chiều)' },
     { key: 'c3', name: 'Tiết 3 (Chiều)' },
     { key: 'c4', name: 'Tiết 4 (Chiều)' },
+    ...(hasAfternoonPeriod5 || isEditable ? [{ key: 'c5', name: 'Tiết 5 (Chiều)' }] : []),
   ];
 
   const now = new Date();
@@ -107,7 +130,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
               {sessionIcon}
               <span>{sessionTitle}</span>
               <span className="text-[10px] text-slate-500 font-mono font-normal">
-                (Chuẩn 4 tiết học)
+                ({periodsList.length} tiết học)
               </span>
             </div>
           </td>
