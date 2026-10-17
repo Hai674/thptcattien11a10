@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
           <span className="text-[11px] text-slate-400">
             Thiết kế &amp; Phát triển bởi{' '}
             <strong className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-sky-300 font-bold">
-              Haibods X Tajbun_Twg
+              Haibdos X Tajbun_Hwg
             </strong>
           </span>
         </div>
