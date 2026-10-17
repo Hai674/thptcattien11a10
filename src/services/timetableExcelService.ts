@@ -51,6 +51,34 @@ export interface ParseResult {
 }
 
 /**
+ * Bảng giáo viên bộ môn chính thức của lớp 11A10 - THPT Cát Tiên
+ * Dùng để tự động làm giàu thông tin khi file trường chỉ có tên môn học
+ */
+export const DEFAULT_11A10_TEACHERS = [
+  { match: ['toan', 'toan hoc', 'dai so', 'hinh hoc'], subject: 'Toán', teacher: 'P.X.Cương' },
+  { match: ['ngu van', 'van', 'van hoc'], subject: 'Ngữ văn', teacher: 'Đ.V.Hường' },
+  { match: ['tieng anh', 'anh', 'tienganh', 'ngoai ngu', 'nn'], subject: 'Tiếng Anh', teacher: 'Đ.A.Tuấn' },
+  { match: ['vat ly', 'vat li', 'ly', 'li'], subject: 'Vật lý', teacher: 'N.V.Phúc' },
+  { match: ['hoa hoc', 'hoa'], subject: 'Hóa học', teacher: 'Giáo viên bộ môn' },
+  { match: ['sinh hoc', 'sinh'], subject: 'Sinh học', teacher: 'Giáo viên bộ môn' },
+  { match: ['lich su', 'su'], subject: 'Lịch sử', teacher: 'T.S.Khánh' },
+  { match: ['dia ly', 'dia li', 'dia'], subject: 'Địa lý', teacher: 'Giáo viên bộ môn' },
+  { match: ['ktpl', 'gdkt&pl', 'kinh te phap luat', 'gdcd'], subject: 'KTPL', teacher: 'N.T.H.Yến' },
+  { match: ['tin hoc', 'tin'], subject: 'Tin học', teacher: 'H.S.Trúc' },
+  { match: ['cong nghe', 'cn', 'cong nghe nong nghiep', 'cn nong nghiep'], subject: 'Công nghệ Nông nghiệp', teacher: 'T.T.Hà' },
+  { match: ['gdtc', 'the duc', 'td'], subject: 'GDTC', teacher: 'Đ.V.Chiến' },
+  { match: ['gdqp', 'gdqpan', 'gdqp-an', 'quoc phong', 'qp'], subject: 'GDQPAN', teacher: 'V.V.Vượng' },
+  { match: ['hdtnhn', 'trai nghiem', 'hdtn'], subject: 'HDTNHN', teacher: 'Đ.A.Tuấn' },
+  { match: ['gddp', 'dia phuong', 'gddp su'], subject: 'GDĐP SỬ', teacher: 'T.S.Khánh' },
+  { match: ['chao co', 'cc'], subject: 'Chào cờ', teacher: 'BGH' },
+  { match: ['sinh hoat lop', 'sinh hoat', 'shl'], subject: 'Sinh hoạt lớp', teacher: 'P.X.Cương (GVCN)' },
+  { match: ['cd toan'], subject: 'CĐ Toán', teacher: 'P.X.Cương' },
+  { match: ['cd ly', 'cd vat ly'], subject: 'CĐ Lý', teacher: 'N.V.Phúc' },
+  { match: ['cd ktpl'], subject: 'CĐ KTPL', teacher: 'N.T.H.Yến' },
+  { match: ['cd cong nghe', 'cd cn', 'cd cong nghe nong nghiep'], subject: 'CĐ Công nghệ Nông nghiệp', teacher: 'T.T.Hà' },
+];
+
+/**
  * Loại bỏ dấu tiếng Việt để so khớp chuỗi siêu bền vững
  */
 export function removeVietnameseTones(str: string): string {
@@ -65,14 +93,12 @@ export function removeVietnameseTones(str: string): string {
 /**
  * Nhận diện chính xác tên lớp mục tiêu (ví dụ: '11A10') trong ô Excel bất kỳ
  * Tránh nhầm lẫn với các lớp 11A1, 11A11, 11A12, 10A10...
- * Hỗ trợ các biến thể: "11A10", "11a10", "Lớp 11A10", "LỚP 11A10", "11 A 10", "11.10", "11/10", "11-A10", "K11A10", "11A10 (Sáng)"...
  */
 export function matchTargetClass(cellVal: any, targetClass = '11A10'): boolean {
   if (!cellVal) return false;
   const raw = String(cellVal).trim();
   const clean = removeVietnameseTones(raw).toLowerCase().trim();
 
-  // Tách targetClass thành: grade (11), letter (A), num (10)
   const tm = targetClass.match(/^(\d+)\s*([a-zA-Z]*)\s*(\d*)$/);
   if (!tm) {
     const norm = clean.replace(/[^a-z0-9]/g, '');
@@ -83,7 +109,6 @@ export function matchTargetClass(cellVal: any, targetClass = '11A10'): boolean {
   const [, grade, letter, num] = tm;
   let patternStr = '';
   if (letter && num) {
-    // Khớp: 11A10, 11 A 10, lop 11a10, khoi 11 - 11a10, 11.10, 11/10, 11-a10
     patternStr = `(?:^|[^a-z0-9])(?:lop\\s*|khoi\\s*)?${grade}\\s*[-_./]?\\s*(?:${letter.toLowerCase()}|[./-])?\\s*${num}(?:[^a-z0-9]|$)`;
   } else if (num) {
     patternStr = `(?:^|[^a-z0-9])(?:lop\\s*|khoi\\s*)?${grade}\\s*[-_./]?\\s*${num}(?:[^a-z0-9]|$)`;
@@ -94,7 +119,6 @@ export function matchTargetClass(cellVal: any, targetClass = '11A10'): boolean {
   const regex = new RegExp(patternStr, 'i');
   if (regex.test(clean)) return true;
 
-  // Fallback: So khớp tuyệt đối khi loại bỏ tất cả ký tự phi số/chữ
   const norm = clean.replace(/[^a-z0-9]/g, '');
   const normTarget = removeVietnameseTones(targetClass).toLowerCase().replace(/[^a-z0-9]/g, '');
   if (norm === normTarget || norm === 'lop' + normTarget || norm === 'k' + normTarget) {
@@ -112,51 +136,148 @@ export function detectDay(val: any): string | null {
   const s = String(val).trim();
   const clean = removeVietnameseTones(s).toLowerCase();
 
-  // 1. Kiểm tra khớp theo số: "Thứ 2", "Thu 2", "T2", "T.2", "T 2"
-  const mNum = clean.match(/(?:thu|t\.?|t\s*)\s*([2-7])/);
+  // Khớp chính xác "Thứ 2", "T2", "T.2", "Thứ: 2", "Ngày 2"
+  const mNum = clean.match(/^(?:thu\s*|t\.?\s*|ngay\s*)([2-7])$/);
   if (mNum) return mNum[1];
 
-  // 2. Kiểm tra khớp theo chữ tiếng Việt (chú ý 'bay' trước 'ba' để tránh nhầm)
-  if (clean.includes('bay')) return '7';
-  if (clean.includes('hai')) return '2';
-  if (/\bba\b/.test(clean) || clean.includes('thu ba') || clean.includes('thuba')) return '3';
-  if (clean.includes('tu') || clean.includes('bon')) return '4';
-  if (clean.includes('nam')) return '5';
-  if (clean.includes('sau')) return '6';
+  // Khớp chính xác chữ ngày tiếng Việt trọn vẹn (không match nửa vời)
+  if (/^thu\s*(?:hai|ba|tu|bon|nam|sau|bay)$/.test(clean)) {
+    if (clean.includes('hai')) return '2';
+    if (clean.includes('ba')) return '3';
+    if (clean.includes('tu') || clean.includes('bon')) return '4';
+    if (clean.includes('nam')) return '5';
+    if (clean.includes('sau')) return '6';
+    if (clean.includes('bay')) return '7';
+  }
 
-  // 3. Tiếng Anh: Monday, Tue, Wed, Thu, Fri, Sat
-  if (clean.includes('mon')) return '2';
-  if (clean.includes('tue')) return '3';
-  if (clean.includes('wed')) return '4';
-  if (clean.includes('thu')) return '5';
-  if (clean.includes('fri')) return '6';
-  if (clean.includes('sat')) return '7';
+  // Khớp tiếng Anh trọn vẹn
+  if (/^(?:monday|mon\.?)$/.test(clean)) return '2';
+  if (/^(?:tuesday|tue\.?)$/.test(clean)) return '3';
+  if (/^(?:wednesday|wed\.?)$/.test(clean)) return '4';
+  if (/^(?:thursday|thu\.?)$/.test(clean)) return '5';
+  if (/^(?:friday|fri\.?)$/.test(clean)) return '6';
+  if (/^(?:saturday|sat\.?)$/.test(clean)) return '7';
 
-  // Đơn giản là số 2..7 đứng độc lập
+  // Chữ số nguyên đơn lẻ từ 2 đến 7
   if (/^[2-7]$/.test(clean)) return clean;
-
   return null;
 }
 
 /**
- * Nhận diện Tiết học từ ô bảng tính bất kỳ (Tiết 1 đến Tiết 5)
+ * Nhận diện Tiết học từ ô bảng tính (Tiết 1 đến Tiết 10)
+ * Hỗ trợ cả tiết 6, 7, 8, 9, 10 của buổi chiều
  */
 export function detectPeriod(val: any): number | null {
   if (val === undefined || val === null || val === '') return null;
   const s = String(val).trim();
 
-  // 1. Số nguyên đứng một mình: 1, 2, 3, 4, 5
-  if (/^[1-5]$/.test(s)) return parseInt(s, 10);
+  // Số nguyên 1 đến 10
+  if (/^([1-9]|10)$/.test(s)) return parseInt(s, 10);
 
-  // 2. Chữ "Tiết 1", "T.1", "T1", "Tiết: 1", "tiet 1"
-  const m = s.match(/(?:tiết|tiet|t\.?|t\s*)\s*([1-5])/i);
+  // Chữ "Tiết 1", "T.1", "T1", "Tiết: 1", "tiet 1", "Tiết 6"...
+  const m = s.match(/^(?:tiết|tiet|t\.?|t\s*)?\s*([1-9]|10)$/i);
   if (m) return parseInt(m[1], 10);
 
   return null;
 }
 
 /**
- * Tự động phát hiện buổi học (Sáng / Chiều) từ tên file, tên sheet và nội dung
+ * Trích xuất chuẩn xác Môn học và Giáo viên từ ô bảng tính
+ * Xử lý: ô nhiều dòng, dấu gạch nối, dấu ngoặc, dòng kế tiếp và tự động làm giàu từ danh sách giáo viên
+ */
+export function parseSubjectAndTeacher(
+  cellVal: any,
+  nextRowVal: any = ''
+): { subject: string; teacher: string } {
+  let raw = String(cellVal || '').trim();
+  let next = String(nextRowVal || '').trim();
+
+  raw = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  next = next.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  let subject = '';
+  let teacher = '';
+
+  // 1. Ô có nhiều dòng (Alt + Enter)
+  if (raw.includes('\n')) {
+    const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length >= 2) {
+      subject = lines[0];
+      teacher = lines.slice(1).join(' - ');
+    } else if (lines.length === 1) {
+      subject = lines[0];
+    }
+  }
+
+  // 2. Ngăn cách bằng gạch nối: "Toán - P.X.Cương", "Toán-P.X.Cương", "Toán – P.X.Cương"
+  if (!subject) {
+    const dashMatch = raw.match(/^([^-–—]+)\s*[-–—]\s*(.+)$/);
+    if (dashMatch) {
+      subject = dashMatch[1].trim();
+      teacher = dashMatch[2].trim();
+    }
+  }
+
+  // 3. Ngăn cách bằng ngoặc: "Toán (P.X.Cương)" hoặc "Toán (Cương)"
+  if (!subject) {
+    const parenMatch = raw.match(/^([^(]+)\s*\(([^)]+)\)$/);
+    if (parenMatch) {
+      subject = parenMatch[1].trim();
+      teacher = parenMatch[2].trim();
+    }
+  }
+
+  // 4. Ngăn cách bằng dấu xuyệt hoặc hai chấm: "Toán / P.X.Cương" hoặc "Toán: P.X.Cương"
+  if (!subject) {
+    const slashMatch = raw.match(/^([^/:]+)\s*[/:]\s*(.+)$/);
+    if (slashMatch) {
+      subject = slashMatch[1].trim();
+      teacher = slashMatch[2].trim();
+    }
+  }
+
+  // 5. Nếu chưa tách được, subject là toàn bộ chuỗi
+  if (!subject) {
+    subject = raw;
+  }
+
+  // 6. Nếu chưa có teacher, kiểm tra dòng tiếp theo (nextRowVal)
+  if ((!teacher || teacher === 'Giáo viên bộ môn') && next) {
+    const nextNorm = removeVietnameseTones(next).toLowerCase();
+    const isNextSubject = DEFAULT_11A10_TEACHERS.some((item) =>
+      item.match.some((m) => nextNorm === m)
+    );
+    if (!isNextSubject && !/^(tiết|tiet|thứ|thu|\d+$)/i.test(nextNorm)) {
+      teacher = next;
+    }
+  }
+
+  // 7. Làm sạch tiền tố dư thừa
+  if (teacher) {
+    teacher = teacher.replace(/^gv\s*[:.-]?\s*/i, '').trim();
+  }
+
+  // 8. Tự động làm giàu thông tin giáo viên nếu file chỉ ghi tên môn
+  if (!teacher || teacher === 'Giáo viên bộ môn') {
+    const subNorm = removeVietnameseTones(subject).toLowerCase();
+    for (const item of DEFAULT_11A10_TEACHERS) {
+      if (item.match.some((m) => subNorm === m || subNorm.startsWith(m + ' ') || subNorm.endsWith(' ' + m))) {
+        teacher = item.teacher;
+        break;
+      }
+    }
+  }
+
+  return {
+    subject: subject || raw,
+    teacher: teacher || 'Giáo viên bộ môn',
+  };
+}
+
+/**
+ * Tự động phát hiện buổi học (Sáng / Chiều) siêu chuẩn xác
+ * Hỗ trợ các từ khóa: Buổi 2, Buổi Chiều, Trái Buổi, B2, TKB2, Chiều...
+ * Tự động phân tích các môn đặc thù của buổi chiều (GDTC, GDQP, HDTNHN...)
  */
 export function detectSessionFromContext(
   fileName: string,
@@ -170,39 +291,68 @@ export function detectSessionFromContext(
 
   const nameContext = removeVietnameseTones(`${fileName} ${sheetName}`).toLowerCase();
 
-  // Ưu tiên 1: Tên file hoặc tên sheet chỉ định rõ ràng
-  if (nameContext.includes('chieu') || nameContext.includes('afternoon') || nameContext.includes('buoi chieu') || nameContext.includes('tkb chieu')) {
+  // 1. Tên file hoặc tên sheet chỉ định rõ ràng
+  if (
+    nameContext.includes('chieu') ||
+    nameContext.includes('afternoon') ||
+    nameContext.includes('buoi 2') ||
+    nameContext.includes('buoi2') ||
+    nameContext.includes('buoi hai') ||
+    nameContext.includes('trai buoi') ||
+    nameContext.includes('b2') ||
+    nameContext.includes('tkb2') ||
+    nameContext.includes('ca chieu')
+  ) {
     return 'Chiều';
   }
-  if (nameContext.includes('sang') || nameContext.includes('morning') || nameContext.includes('buoi sang') || nameContext.includes('tkb sang')) {
+  if (
+    nameContext.includes('sang') ||
+    nameContext.includes('morning') ||
+    nameContext.includes('buoi 1') ||
+    nameContext.includes('buoi1') ||
+    nameContext.includes('buoi mot') ||
+    nameContext.includes('chinh khoa') ||
+    nameContext.includes('b1') ||
+    nameContext.includes('tkb1') ||
+    nameContext.includes('ca sang')
+  ) {
     return 'Sáng';
   }
 
-  // Ưu tiên 2: Quét nội dung tiêu đề các dòng đầu
-  for (let r = 0; r < Math.min(rowsSample.length, 10); r++) {
+  // 2. Quét tiêu đề và các dòng đầu bảng
+  let afternoonHits = 0;
+  let morningHits = 0;
+
+  for (let r = 0; r < Math.min(rowsSample.length, 30); r++) {
     const text = removeVietnameseTones(rowsSample[r].join(' ').toLowerCase());
-    if (text.includes('buoi chieu') || text.includes('tkb chieu') || text.includes('thoi khoa bieu buoi chieu')) {
+    if (
+      text.includes('buoi chieu') ||
+      text.includes('tkb chieu') ||
+      text.includes('thoi khoa bieu buoi chieu') ||
+      text.includes('buoi 2') ||
+      text.includes('buoi hai') ||
+      text.includes('trai buoi')
+    ) {
       return 'Chiều';
     }
-    if (text.includes('buoi sang') || text.includes('tkb sang') || text.includes('thoi khoa bieu buoi sang')) {
+    if (
+      text.includes('buoi sang') ||
+      text.includes('tkb sang') ||
+      text.includes('thoi khoa bieu buoi sang') ||
+      text.includes('buoi 1') ||
+      text.includes('chinh khoa')
+    ) {
       return 'Sáng';
     }
-  }
-
-  // Ưu tiên 3: Quét các môn học đặc thù của buổi chiều THPT Cát Tiên (GDTC, GDQP, HDTNHN, Chuyên đề)
-  let afternoonSubjectHits = 0;
-  let morningSubjectHits = 0;
-  for (let r = 0; r < Math.min(rowsSample.length, 40); r++) {
-    const rowText = removeVietnameseTones(rowsSample[r].join(' ').toLowerCase());
-    if (rowText.includes('gdtc') || rowText.includes('gdqp') || rowText.includes('hdtnhn') || rowText.includes('chuyen de')) {
-      afternoonSubjectHits++;
+    if (text.includes('gdtc') || text.includes('gdqp') || text.includes('hdtnhn') || text.includes('chuyen de')) {
+      afternoonHits++;
     }
-    if (rowText.includes('chao co') || rowText.includes('sinh hoat lop')) {
-      morningSubjectHits++;
+    if (text.includes('chao co') || text.includes('sinh hoat lop')) {
+      morningHits++;
     }
   }
 
-  if (afternoonSubjectHits >= 3 && morningSubjectHits === 0) {
+  if (afternoonHits >= 2 && morningHits === 0) {
     return 'Chiều';
   }
 
@@ -231,7 +381,10 @@ export function countTimetableSlots(schedule: Timetable['schedule']): {
 }
 
 /**
- * Hợp nhất thông minh lịch học: Giữ nguyên buổi không bị ghi đè
+ * HỢP NHẤT BẢO TOÀN LỊCH HỌC TUYỆT ĐỐI
+ * - Khi nạp buổi Chiều: Cập nhật c1..c5, GIỮ NGUYÊN 100% các tiết sáng (1..5)
+ * - Khi nạp buổi Sáng: Cập nhật 1..5, GIỮ NGUYÊN 100% các tiết chiều (c1..c5)
+ * - Không bao giờ xảy ra tình trạng "up buổi lên thì sáng mất"!
  */
 export function mergeTimetableSchedules(
   base: Timetable,
@@ -240,53 +393,78 @@ export function mergeTimetableSchedules(
   incomingFileName?: string
 ): Timetable {
   const mergedSchedule: Timetable['schedule'] = {
-    '2': { ...(base.schedule['2'] || {}) },
-    '3': { ...(base.schedule['3'] || {}) },
-    '4': { ...(base.schedule['4'] || {}) },
-    '5': { ...(base.schedule['5'] || {}) },
-    '6': { ...(base.schedule['6'] || {}) },
+    '2': { ...(base?.schedule?.['2'] || {}) },
+    '3': { ...(base?.schedule?.['3'] || {}) },
+    '4': { ...(base?.schedule?.['4'] || {}) },
+    '5': { ...(base?.schedule?.['5'] || {}) },
+    '6': { ...(base?.schedule?.['6'] || {}) },
   };
 
   const days = ['2', '3', '4', '5', '6'];
 
-  if (session === 'Sáng') {
-    // Chỉ cập nhật các tiết sáng (1, 2, 3, 4, 5), giữ nguyên tiết chiều (c1, c2, c3, c4, c5)
-    days.forEach((day) => {
-      ['1', '2', '3', '4', '5'].forEach((p) => {
-        delete mergedSchedule[day][p];
-      });
-      if (incomingSchedule[day]) {
-        Object.entries(incomingSchedule[day]).forEach(([p, slot]) => {
-          if (!p.startsWith('c') && slot && slot.subject) {
-            mergedSchedule[day][p] = slot;
-          }
-        });
+  let incomingHasMorning = false;
+  let incomingHasAfternoon = false;
+  for (const d of days) {
+    for (const [pKey, slot] of Object.entries(incomingSchedule[d] || {})) {
+      if (slot && slot.subject) {
+        if (pKey.startsWith('c')) incomingHasAfternoon = true;
+        else incomingHasMorning = true;
       }
-    });
-  } else if (session === 'Chiều') {
-    // Chỉ cập nhật các tiết chiều (c1, c2, c3, c4, c5), giữ nguyên tiết sáng (1, 2, 3, 4, 5)
-    days.forEach((day) => {
-      ['c1', 'c2', 'c3', 'c4', 'c5'].forEach((p) => {
-        delete mergedSchedule[day][p];
-      });
-      if (incomingSchedule[day]) {
-        Object.entries(incomingSchedule[day]).forEach(([p, slot]) => {
-          if (p.startsWith('c') && slot && slot.subject) {
-            mergedSchedule[day][p] = slot;
-          }
-        });
-      }
-    });
-  } else {
-    // Cả ngày: ghi đè toàn bộ
-    days.forEach((day) => {
-      mergedSchedule[day] = { ...(incomingSchedule[day] || {}) };
-    });
+    }
   }
 
-  // Cập nhật tên file kết hợp nếu có
-  let fileName = incomingFileName || base.fileName;
-  if (base.fileName && incomingFileName && base.fileName !== incomingFileName) {
+  if (session === 'Chiều' || (!incomingHasMorning && incomingHasAfternoon)) {
+    // 1. Chỉ cập nhật tiết chiều (c1..c5)
+    // 2. TUYỆT ĐỐI KHÔNG XÓA HOẶC THAY ĐỔI CÁC TIẾT SÁNG (1..5)!
+    for (const d of days) {
+      ['c1', 'c2', 'c3', 'c4', 'c5'].forEach((p) => delete mergedSchedule[d][p]);
+      if (incomingSchedule[d]) {
+        for (const [pKey, slot] of Object.entries(incomingSchedule[d])) {
+          if (slot && slot.subject) {
+            const pNum = pKey.replace(/\D/g, '');
+            const normalizedKey = `c${pNum}`;
+            mergedSchedule[d][normalizedKey] = {
+              ...slot,
+              room: slot.room || 'Phòng 204 (Chiều)',
+            };
+          }
+        }
+      }
+    }
+  } else if (session === 'Sáng' || (incomingHasMorning && !incomingHasAfternoon)) {
+    // 1. Chỉ cập nhật tiết sáng (1..5)
+    // 2. TUYỆT ĐỐI KHÔNG XÓA HOẶC THAY ĐỔI CÁC TIẾT CHIỀU (c1..c5)!
+    for (const d of days) {
+      ['1', '2', '3', '4', '5'].forEach((p) => delete mergedSchedule[d][p]);
+      if (incomingSchedule[d]) {
+        for (const [pKey, slot] of Object.entries(incomingSchedule[d])) {
+          if (slot && slot.subject) {
+            const pNum = pKey.replace(/\D/g, '');
+            if (pNum) {
+              mergedSchedule[d][pNum] = {
+                ...slot,
+                room: slot.room || 'Phòng 204 (Sáng)',
+              };
+            }
+          }
+        }
+      }
+    }
+  } else {
+    // Cả ngày: file chứa cả sáng và chiều
+    for (const d of days) {
+      if (incomingSchedule[d]) {
+        for (const [pKey, slot] of Object.entries(incomingSchedule[d])) {
+          if (slot && slot.subject) {
+            mergedSchedule[d][pKey] = slot;
+          }
+        }
+      }
+    }
+  }
+
+  let fileName = incomingFileName || base?.fileName || 'TKB_11A10.xlsx';
+  if (base?.fileName && incomingFileName && base.fileName !== incomingFileName) {
     if (session === 'Sáng') {
       fileName = `Sáng: ${incomingFileName} | Chiều: ${base.fileName}`;
     } else if (session === 'Chiều') {
@@ -300,6 +478,44 @@ export function mergeTimetableSchedules(
     updatedBy: 'Ban Cán Sự 11A10 (Import Excel)',
     fileName,
     schedule: mergedSchedule,
+  };
+}
+
+/**
+ * Chuyển đổi linh hoạt giữa lịch Sáng và Chiều khi cần
+ */
+export function toggleTimetableSession(timetable: Timetable, targetSession: 'Sáng' | 'Chiều'): Timetable {
+  const newSchedule: Timetable['schedule'] = {
+    '2': {},
+    '3': {},
+    '4': {},
+    '5': {},
+    '6': {},
+  };
+
+  const days = ['2', '3', '4', '5', '6'];
+
+  days.forEach((d) => {
+    const slots = timetable.schedule[d] || {};
+    Object.entries(slots).forEach(([p, slot]) => {
+      if (!slot) return;
+      if (targetSession === 'Chiều') {
+        // Chuyển 1..5 thành c1..c5
+        const pNum = p.replace(/\D/g, '');
+        const newKey = `c${pNum}`;
+        newSchedule[d][newKey] = slot;
+      } else {
+        // Chuyển c1..c5 thành 1..5
+        const pNum = p.replace(/\D/g, '');
+        newSchedule[d][pNum] = slot;
+      }
+    });
+  });
+
+  return {
+    ...timetable,
+    updatedAt: new Date().toISOString(),
+    schedule: newSchedule,
   };
 }
 
@@ -388,7 +604,6 @@ function parseSheetContent(
 
   const foundClassesSet = new Set<string>();
 
-  // 1. Quét tìm tất cả các tên lớp trong toàn bộ bảng
   for (let r = 0; r < rows.length; r++) {
     const row = rows[r];
     for (let c = 0; c < row.length; c++) {
@@ -402,7 +617,7 @@ function parseSheetContent(
   }
   const foundClasses = Array.from(foundClassesSet);
 
-  // 2. Xác định Buổi học của Sheet
+  // Xác định Buổi học của Sheet
   const session = detectSessionFromContext(fileName, sheetName, rows, forcedSession);
 
   // =========================================================================
@@ -424,16 +639,24 @@ function parseSheetContent(
   }
 
   if (classCol !== -1) {
-    // Tìm cột Thứ và cột Tiết ở bên trái của classCol
-    let dayCol = -1;
-    let periodCol = -1;
+    let dayCol = 0;
+    let periodCol = 1;
 
-    for (let r = Math.max(0, headerRow - 3); r <= Math.min(rows.length - 1, headerRow + 1); r++) {
-      const row = rows[r];
-      for (let c = 0; c < classCol; c++) {
-        const val = removeVietnameseTones(String(row[c] || '').toLowerCase().trim());
-        if (val.includes('thu') || val.includes('ngay')) dayCol = c;
-        else if (val.includes('tiet') || val.includes('buoi/tiet')) periodCol = c;
+    // Tìm cột Thứ và cột Tiết ở hàng tiêu đề (headerRow) hoặc các hàng trước đó
+    for (let c = 0; c < Math.min(6, classCol); c++) {
+      const valHeader = removeVietnameseTones(String(rows[headerRow]?.[c] || '')).toLowerCase().trim();
+      if (valHeader === 'thu' || valHeader === 'ngay' || valHeader === 'thu/ngay' || valHeader === 'thu ngay') {
+        dayCol = c;
+      } else if (valHeader === 'tiet' || valHeader === 'buoi/tiet' || valHeader === 'tiet/buoi' || valHeader === 'tiet hoc') {
+        periodCol = c;
+      }
+    }
+
+    if (headerRow > 0 && dayCol === 0 && periodCol === 1) {
+      for (let c = 0; c < Math.min(6, classCol); c++) {
+        const valAbove = removeVietnameseTones(String(rows[headerRow - 1]?.[c] || '')).toLowerCase().trim();
+        if (valAbove === 'thu' || valAbove === 'ngay') dayCol = c;
+        if (valAbove === 'tiet') periodCol = c;
       }
     }
 
@@ -446,86 +669,99 @@ function parseSheetContent(
     };
     let currentDay = '';
     let slotCount = 0;
+    let afternoonIndicatorsCount = 0;
 
     for (let r = headerRow + 1; r < rows.length; r++) {
       const row = rows[r];
       if (!row || row.length === 0) continue;
 
-      // Nhận diện Thứ
-      let rowDay: string | null = null;
-      if (dayCol !== -1 && row[dayCol] !== undefined && row[dayCol] !== '') {
-        rowDay = detectDay(row[dayCol]);
+      // 1. Nhận diện Thứ trong tuần từ dayCol DUY NHẤT (không quét lung tung sang các cột lớp khác)
+      const dayVal = row[dayCol];
+      const parsedDay = detectDay(dayVal);
+      if (parsedDay) {
+        currentDay = parsedDay;
       }
-      if (!rowDay) {
-        for (let c = 0; c < classCol; c++) {
-          const d = detectDay(row[c]);
-          if (d) {
-            rowDay = d;
-            if (dayCol === -1) dayCol = c;
-            break;
-          }
-        }
-      }
-      if (rowDay) currentDay = rowDay;
 
-      // Nhận diện Tiết
-      let periodNum: number | null = null;
-      if (periodCol !== -1 && row[periodCol] !== undefined && row[periodCol] !== '') {
-        periodNum = detectPeriod(row[periodCol]);
-      }
+      // 2. Nhận diện Tiết học từ periodCol DUY NHẤT (hoặc các cột đầu 0..2)
+      let periodNum = detectPeriod(row[periodCol]);
       if (!periodNum) {
-        for (let c = 0; c < classCol; c++) {
+        for (let c = 0; c < Math.min(3, classCol); c++) {
           if (c === dayCol) continue;
           const p = detectPeriod(row[c]);
           if (p) {
             periodNum = p;
-            if (periodCol === -1) periodCol = c;
             break;
           }
         }
       }
 
-      // Đọc dữ liệu môn học
       if (currentDay && periodNum && currentDay in schedule) {
         const cellVal = String(row[classCol] || '').trim();
-        const periodKey = session === 'Chiều' ? `c${periodNum}` : `${periodNum}`;
+
+        // Đọc giá trị dòng kế tiếp để tìm giáo viên nếu dòng kế không có số tiết mới (2 dòng / tiết)
+        const nextRow = rows[r + 1];
+        let nextRowVal = '';
+        if (nextRow) {
+          const nextPeriod = periodCol !== -1 ? detectPeriod(nextRow[periodCol]) : null;
+          if (!nextPeriod) {
+            nextRowVal = String(nextRow[classCol] || '').trim();
+          }
+        }
 
         if (cellVal) {
-          let subject = cellVal;
-          let teacher = 'Giáo viên bộ môn';
+          const { subject, teacher } = parseSubjectAndTeacher(cellVal, nextRowVal);
 
-          if (cellVal.includes(' - ')) {
-            const parts = cellVal.split(' - ');
-            subject = parts[0].trim();
-            teacher = parts.slice(1).join(' - ').trim();
-          } else if (cellVal.match(/^([^(]+)\s*\(([^)]+)\)$/)) {
-            const m = cellVal.match(/^([^(]+)\s*\(([^)]+)\)$/);
-            if (m) {
-              subject = m[1].trim();
-              teacher = m[2].trim();
-            }
-          } else if (cellVal.includes('\n')) {
-            const parts = cellVal.split('\n');
-            subject = parts[0].trim();
-            teacher = parts.slice(1).join(' ').trim();
-          } else if (cellVal.includes(' / ')) {
-            const parts = cellVal.split(' / ');
-            subject = parts[0].trim();
-            teacher = parts.slice(1).join(' / ').trim();
+          // Kiểm tra xem môn học có phải là môn đặc thù buổi chiều không
+          const subClean = removeVietnameseTones(subject).toLowerCase();
+          if (
+            subClean.includes('gdtc') ||
+            subClean.includes('gdqp') ||
+            subClean.includes('hdtnhn') ||
+            subClean.includes('gddp') ||
+            subClean.includes('chuyen de')
+          ) {
+            afternoonIndicatorsCount++;
+          }
+
+          let periodKey = '';
+          if (periodNum > 5) {
+            periodKey = `c${periodNum - 5}`;
+          } else if (session === 'Chiều') {
+            periodKey = `c${periodNum}`;
+          } else {
+            periodKey = `${periodNum}`;
           }
 
           schedule[currentDay][periodKey] = {
             subject,
             teacher,
-            room: session === 'Chiều' ? 'Phòng 204 (Chiều)' : 'Phòng 204 (Sáng)',
+            room: session === 'Chiều' || periodNum > 5 ? 'Phòng 204 (Chiều)' : 'Phòng 204 (Sáng)',
           };
           slotCount++;
         }
       }
     }
 
+    // Nếu lúc đầu đoán là Sáng nhưng các môn đọc được toàn là môn Chiều -> Tự động chuyển thành Chiều!
+    let finalSession = session;
+    if (session === 'Sáng' && afternoonIndicatorsCount >= 2 && forcedSession !== 'Sáng') {
+      finalSession = 'Chiều';
+      // Đổi các key 1..5 thành c1..c5
+      for (const d of ['2', '3', '4', '5', '6']) {
+        const daySlots = { ...(schedule[d] || {}) };
+        schedule[d] = {};
+        for (const [p, slot] of Object.entries(daySlots)) {
+          const pNum = p.replace(/\D/g, '');
+          schedule[d][`c${pNum}`] = {
+            ...slot,
+            room: 'Phòng 204 (Chiều)',
+          };
+        }
+      }
+    }
+
     if (slotCount > 0) {
-      return { schedule, slotCount, session, foundClasses };
+      return { schedule, slotCount, session: finalSession, foundClasses };
     }
   }
 
@@ -580,11 +816,14 @@ function parseSheetContent(
         const c = parseInt(colIdxStr, 10);
         const cellVal = String(targetRow[c] || '').trim();
         if (cellVal && day in schedule) {
-          const periodKey = session === 'Chiều' ? `c${period}` : `${period}`;
+          const { subject, teacher } = parseSubjectAndTeacher(cellVal, '');
+          const periodKey =
+            period > 5 ? `c${period - 5}` : session === 'Chiều' ? `c${period}` : `${period}`;
+
           schedule[day][periodKey] = {
-            subject: cellVal,
-            teacher: 'Giáo viên bộ môn',
-            room: session === 'Chiều' ? 'Phòng 204 (Chiều)' : 'Phòng 204 (Sáng)',
+            subject,
+            teacher,
+            room: session === 'Chiều' || period > 5 ? 'Phòng 204 (Chiều)' : 'Phòng 204 (Sáng)',
           };
           slotCount++;
         }
@@ -632,9 +871,9 @@ function parseSheetContent(
       if (!row || row.length === 0) continue;
 
       const rowStr = removeVietnameseTones(row.map((v) => String(v)).join(' ').toLowerCase());
-      if (rowStr.includes('buoi chieu') || rowStr.includes('chieu') || rowStr.includes('afternoon')) {
+      if (rowStr.includes('buoi chieu') || rowStr.includes('chieu') || rowStr.includes('afternoon') || rowStr.includes('buoi 2')) {
         rowSession = 'Chiều';
-      } else if (rowStr.includes('buoi sang') || rowStr.includes('sang') || rowStr.includes('morning')) {
+      } else if (rowStr.includes('buoi sang') || rowStr.includes('sang') || rowStr.includes('morning') || rowStr.includes('buoi 1')) {
         rowSession = 'Sáng';
       }
 
@@ -649,33 +888,22 @@ function parseSheetContent(
 
       if (!periodNumber) continue;
 
-      const periodKey = rowSession === 'Chiều' ? `c${periodNumber}` : `${periodNumber}`;
-      if (rowSession === 'Chiều') hasAfternoon = true;
+      const isAfternoonSlot = rowSession === 'Chiều' || periodNumber > 5;
+      const actualP = periodNumber > 5 ? periodNumber - 5 : periodNumber;
+      const periodKey = isAfternoonSlot ? `c${actualP}` : `${actualP}`;
+
+      if (isAfternoonSlot) hasAfternoon = true;
       else hasMorning = true;
 
       Object.entries(singleDayColMap).forEach(([dKey, colIdx]) => {
         if (!(dKey in schedule)) return;
         const cellVal = String(row[colIdx] || '').trim();
         if (cellVal) {
-          let subject = cellVal;
-          let teacher = 'Giáo viên bộ môn';
-
-          if (cellVal.includes(' - ')) {
-            const parts = cellVal.split(' - ');
-            subject = parts[0].trim();
-            teacher = parts.slice(1).join(' - ').trim();
-          } else if (cellVal.match(/^([^(]+)\s*\(([^)]+)\)$/)) {
-            const m = cellVal.match(/^([^(]+)\s*\(([^)]+)\)$/);
-            if (m) {
-              subject = m[1].trim();
-              teacher = m[2].trim();
-            }
-          }
-
+          const { subject, teacher } = parseSubjectAndTeacher(cellVal, '');
           schedule[dKey][periodKey] = {
             subject,
             teacher,
-            room: rowSession === 'Chiều' ? 'Phòng 204 (Chiều)' : 'Phòng 204 (Sáng)',
+            room: isAfternoonSlot ? 'Phòng 204 (Chiều)' : 'Phòng 204 (Sáng)',
           };
           slotCount++;
         }
@@ -684,9 +912,15 @@ function parseSheetContent(
 
     if (slotCount > 0) {
       let finalSession: 'Sáng' | 'Chiều' | 'Cả ngày' = session;
-      if (hasMorning && hasAfternoon) finalSession = 'Cả ngày';
-      else if (hasAfternoon) finalSession = 'Chiều';
-      else finalSession = 'Sáng';
+      if (forcedSession && forcedSession !== 'auto') {
+        finalSession = forcedSession;
+      } else if (hasMorning && hasAfternoon) {
+        finalSession = 'Cả ngày';
+      } else if (hasAfternoon) {
+        finalSession = 'Chiều';
+      } else {
+        finalSession = 'Sáng';
+      }
 
       return { schedule, slotCount, session: finalSession, foundClasses };
     }
@@ -760,7 +994,6 @@ export async function parseTimetableFromExcel(
           session: parsed.session,
           sheetName,
         };
-        // Tìm thấy kết quả tốt, ưu tiên dừng lại
         break;
       }
     }
@@ -788,8 +1021,8 @@ export async function parseTimetableFromExcel(
 
   let isMerged = false;
 
-  // Nếu người dùng cung cấp existingTimetable và file chỉ là một buổi -> Hợp nhất thông minh!
-  if (options.existingTimetable && bestResult.session !== 'Cả ngày') {
+  // Nếu người dùng cung cấp existingTimetable: LUÔN HỢP NHẤT BẢO TOÀN BUỔI KIA!
+  if (options.existingTimetable) {
     finalTimetable = mergeTimetableSchedules(
       options.existingTimetable,
       bestResult.schedule,
@@ -829,15 +1062,20 @@ export async function processMultipleTimetableFiles(
   }
 
   let currentTimetable: Timetable =
-    options.existingTimetable || loadTimetableFromStorage() || EMPTY_TIMETABLE;
+    options.existingTimetable ||
+    (typeof window !== 'undefined' ? loadTimetableFromStorage() : null) ||
+    EMPTY_TIMETABLE;
 
-  // Nếu người dùng chọn đúng 2 file (thường là 1 file Sáng và 1 file Chiều)
-  // Sắp xếp file Sáng trước, Chiều sau để nạp tuần tự và gộp chính xác
+  // Phân loại và sắp xếp: Sáng trước, Chiều sau
   const sortedFiles = [...fileArray].sort((a, b) => {
     const aName = removeVietnameseTones(a.name).toLowerCase();
     const bName = removeVietnameseTones(b.name).toLowerCase();
-    if (aName.includes('sang') && bName.includes('chieu')) return -1;
-    if (aName.includes('chieu') && bName.includes('sang')) return 1;
+    const isASang = aName.includes('sang') || aName.includes('buoi 1') || aName.includes('b1');
+    const isBChieu = bName.includes('chieu') || bName.includes('buoi 2') || bName.includes('b2');
+    if (isASang && isBChieu) return -1;
+    const isAChieu = aName.includes('chieu') || aName.includes('buoi 2') || aName.includes('b2');
+    const isBSang = bName.includes('sang') || bName.includes('buoi 1') || bName.includes('b1');
+    if (isAChieu && isBSang) return 1;
     return 0;
   });
 
@@ -848,11 +1086,27 @@ export async function processMultipleTimetableFiles(
     const file = sortedFiles[i];
     let fileForceSession = options.forceSession || 'auto';
 
-    // Nếu người dùng chọn 2 file và tên file có gợi ý sáng/chiều:
-    if (sortedFiles.length === 2 && fileForceSession === 'auto') {
+    if (fileForceSession === 'auto') {
       const fn = removeVietnameseTones(file.name).toLowerCase();
-      if (fn.includes('sang') || fn.includes('morning')) fileForceSession = 'Sáng';
-      else if (fn.includes('chieu') || fn.includes('afternoon')) fileForceSession = 'Chiều';
+      if (
+        fn.includes('chieu') ||
+        fn.includes('buoi 2') ||
+        fn.includes('b2') ||
+        fn.includes('trai buoi') ||
+        fn.includes('afternoon')
+      ) {
+        fileForceSession = 'Chiều';
+      } else if (
+        fn.includes('sang') ||
+        fn.includes('buoi 1') ||
+        fn.includes('b1') ||
+        fn.includes('morning') ||
+        fn.includes('chinh khoa')
+      ) {
+        fileForceSession = 'Sáng';
+      } else if (sortedFiles.length === 2) {
+        fileForceSession = i === 0 ? 'Sáng' : 'Chiều';
+      }
     }
 
     const result = await parseTimetableFromExcel(file, {
@@ -887,6 +1141,7 @@ export async function processMultipleTimetableFiles(
  * Lưu thời khóa biểu vào LocalStorage
  */
 export function saveTimetableToStorage(timetable: Timetable) {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
   try {
     localStorage.setItem('11a10_timetable_data', JSON.stringify(timetable));
   } catch (e) {
@@ -898,6 +1153,7 @@ export function saveTimetableToStorage(timetable: Timetable) {
  * Xóa dữ liệu thời khóa biểu khỏi LocalStorage
  */
 export function clearTimetableFromStorage() {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
   localStorage.removeItem('11a10_timetable_data');
 }
 
@@ -905,6 +1161,7 @@ export function clearTimetableFromStorage() {
  * Tải thời khóa biểu từ LocalStorage (hoặc null nếu chưa có)
  */
 export function loadTimetableFromStorage(): Timetable | null {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') return null;
   const raw = localStorage.getItem('11a10_timetable_data');
   if (!raw) return null;
   try {
