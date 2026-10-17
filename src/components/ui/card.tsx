@@ -79,66 +79,14 @@ const glassCardStyles = `
     0 0 35px 0 rgba(99, 102, 241, 0.22);
 }
 
-/* Lớp vệt sáng xiên quét qua mặt kính (Specular Sheen Sweep) */
+/* Lớp vệt kính mờ tự nhiên, không tạo vệt sáng trắng chói góc */
 .glass-card-element .glass-card-sheen {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-sizing: border-box;
-  background: linear-gradient(
-    var(--card-angle-2),
-    transparent 0%,
-    oklch(from var(--foreground) l c h / 20%) 40% 50%,
-    transparent 55%
-  );
-  z-index: 2;
-  mix-blend-mode: screen;
-  pointer-events: none;
-  transition: background-position calc(var(--anim-time) * 1.5) var(--anim-ease), --card-angle-2 calc(var(--anim-time) * 1.5) var(--anim-ease);
-  background-position: 0%;
-  background-size: 200% 200%;
+  display: none;
 }
 
-.glass-card-element:hover .glass-card-sheen {
-  background-position: 30%;
-  --card-angle-2: -25deg;
-}
-
-/* Viền phản quang xoay tròn đa sắc quang học (Iridescent Rotating Conic Rim) */
+/* Loại bỏ viền xoay đa sắc tạo vệt trắng chói ở góc bo */
 .glass-card-element:after {
-  content: "";
-  z-index: 3;
-  width: calc(100% + var(--border-width) * 2);
-  height: calc(100% + var(--border-width) * 2);
-  top: calc(0% - var(--border-width));
-  left: calc(0% - var(--border-width));
-  padding: var(--border-width);
-  box-sizing: border-box;
-  background: conic-gradient(
-    from var(--card-angle-1) at 50% 50%,
-    oklch(from var(--foreground) l c h / 50%) 0%,
-    transparent 8% 42%,
-    oklch(from var(--foreground) l c h / 60%) 50%,
-    transparent 58% 92%,
-    oklch(from var(--foreground) l c h / 50%) 100%
-  ),
-  linear-gradient(180deg, oklch(from var(--background) l c h / 50%), oklch(from var(--background) l c h / 50%));
-  transition: all var(--anim-time) var(--anim-ease), --card-angle-1 .6s ease;
-  box-shadow: inset 0 0 0 calc(var(--border-width) / 2) oklch(from var(--background) l c h / 50%);
-  border-radius: inherit;
-  position: absolute;
-  pointer-events: none;
-  -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
-  mask-image: linear-gradient(#000 0,#000 0), linear-gradient(#000 0,#000 0);
-  -webkit-mask-clip: content-box, border-box;
-  mask-clip: content-box, border-box;
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.glass-card-element:hover:after {
-  --card-angle-1: -135deg;
+  display: none;
 }
 `;
 

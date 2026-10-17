@@ -341,22 +341,18 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Footer dưới cùng: Email & Số điện thoại với kính mờ */}
-          <div className="pt-4 mt-6 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-200">
+          {/* Footer dưới cùng: Email & Số điện thoại (chỉ hiển thị khi có thông tin) */}
+          <div className="pt-4 mt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-200">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-white/90 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                <Mail className="w-4 h-4 text-purple-300" />
+              <span className="flex items-center gap-1.5 text-slate-200 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                <Mail className="w-4 h-4 text-cyan-400" />
                 <span>{user?.email || 'Chưa liên kết email'}</span>
               </span>
             </div>
-            {phoneNumber ? (
-              <span className="flex items-center gap-1.5 text-emerald-300 font-medium bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+            {phoneNumber && (
+              <span className="flex items-center gap-1.5 text-emerald-300 font-medium bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-emerald-500/20">
                 <Phone className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{phoneNumber}</span>
-              </span>
-            ) : (
-              <span className="text-[11px] text-white/60 italic bg-black/30 px-2.5 py-1 rounded-lg">
-                Chưa cập nhật số điện thoại
               </span>
             )}
           </div>
