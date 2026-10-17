@@ -10,6 +10,12 @@ interface AuthState {
   setLoading: (loading: boolean) => void;
 }
 
+const isAccountAdmin = (email?: string | null): boolean => {
+  if (!email) return false;
+  const clean = email.trim().toLowerCase();
+  return clean === 'haivanong2007@gmail.com' || clean === 'admin@11a10.edu.vn' || clean.includes('admin');
+};
+
 const getStoredUser = (): User | null => {
   if (typeof window === 'undefined') return null;
   try {
@@ -43,6 +49,10 @@ const getStoredUser = (): User | null => {
         };
       }
     }
+    if (user && isAccountAdmin(user.email)) {
+      user.role = 'admin';
+      user.status = 'active';
+    }
     return user;
   } catch {
     return null;
@@ -58,14 +68,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: initialUser,
   loading: false,
   setUser: (user) => {
-    if (user) {
+    let finalUser = user;
+    if (finalUser && isAccountAdmin(finalUser.email)) {
+      finalUser = { ...finalUser, role: 'admin', status: 'active' };
+    }
+    if (finalUser) {
       try {
-        localStorage.setItem('auth_user_11a10', JSON.stringify(user));
+        localStorage.setItem('auth_user_11a10', JSON.stringify(finalUser));
       } catch (err) {
         console.warn('Lỗi lưu auth_user_11a10 vào localStorage:', err);
       }
     }
-    set({ user, loading: false });
+    set({ user: finalUser, loading: false });
   },
   updateUser: (partial) => {
     set((state) => {
@@ -78,11 +92,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         classId: '11A10',
         status: 'active',
       };
-      const updated: User = {
+      let updated: User = {
         ...baseUser,
         ...partial,
         updatedAt: new Date().toISOString(),
       };
+      if (isAccountAdmin(updated.email)) {
+        updated = { ...updated, role: 'admin', status: 'active' };
+      }
       try {
         localStorage.setItem('auth_user_11a10', JSON.stringify(updated));
         // Cập nhật luôn active profile đồng thời

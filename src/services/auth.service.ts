@@ -5,6 +5,17 @@ import { useAuthStore } from '@/store/authStore';
 export const OVERRIDES_STORAGE_KEY = '11a10_user_profile_overrides';
 export const ACTIVE_PROFILE_KEY = '11a10_active_profile';
 
+export const ADMIN_EMAILS: string[] = [
+  'admin@11a10.edu.vn',
+  'haivanong2007@gmail.com',
+];
+
+export function isAccountAdmin(email?: string | null): boolean {
+  if (!email) return false;
+  const clean = email.trim().toLowerCase();
+  return ADMIN_EMAILS.includes(clean) || clean.includes('admin');
+}
+
 /**
  * Lưu vào LocalStorage an toàn với cơ chế tự động dọn dẹp cache nếu chạm hạn mức Quota 5MB
  */
@@ -156,16 +167,18 @@ export async function getCurrentUser(uid?: string): Promise<User | null> {
     if (data) {
       // Ưu tiên nạp đè các tùy biến đã lưu nếu có
       const overrides = getProfileOverrides(data.email || data.id);
+      const isUserAdmin = isAccountAdmin(data.email);
+      const isHai = data.email?.trim().toLowerCase() === 'haivanong2007@gmail.com';
       return {
         uid: data.id,
         email: data.email,
-        displayName: overrides.displayName || data.display_name || 'Thành viên 11A10',
+        displayName: overrides.displayName || data.display_name || (isHai ? 'Nông Văn Hải (Admin)' : isUserAdmin ? 'Ban Cán Sự 11A10 (Admin)' : 'Thành viên 11A10'),
         photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (data.photo_url || null),
-        role: data.role || 'member',
+        role: isUserAdmin ? 'admin' : (data.role || 'member'),
         classId: data.class_id || '11A10',
         status: data.status || 'active',
         phoneNumber: overrides.phoneNumber !== undefined ? overrides.phoneNumber : (data.phone_number || undefined),
-        bio: overrides.bio !== undefined ? overrides.bio : (data.bio || undefined),
+        bio: overrides.bio !== undefined ? overrides.bio : (data.bio || (isUserAdmin ? 'Quản trị viên lớp 11A10 - THPT Cát Tiên' : undefined)),
         bannerCustomUrl: overrides.bannerCustomUrl,
         bannerTheme: overrides.bannerTheme,
         createdAt: data.created_at,
@@ -254,6 +267,21 @@ export const DEMO_ACCOUNTS = {
       updatedAt: new Date().toISOString(),
     },
   },
+  haivanong: {
+    email: 'haivanong2007@gmail.com',
+    passwords: ['admin', '123456', 'admin123', 'admin123456'],
+    user: {
+      uid: 'admin-haivanong',
+      email: 'haivanong2007@gmail.com',
+      displayName: 'Nông Văn Hải (Admin)',
+      photoURL: null,
+      role: 'admin' as const,
+      classId: '11A10',
+      status: 'active' as const,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  },
   member: {
     email: 'hocsinh@11a10.edu.vn',
     passwords: ['123456', 'hocsinh123'],
@@ -288,22 +316,23 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
     const savedRaw = localStorage.getItem('auth_user_11a10');
     if (savedRaw) {
       const parsed = JSON.parse(savedRaw);
-      if (parsed.email === cleanEmail || (cleanEmail.includes('admin') && parsed.role === 'admin')) {
+      if (parsed.email === cleanEmail || (isAccountAdmin(cleanEmail) && parsed.role === 'admin')) {
         existingProfile = parsed;
       }
     }
   } catch {}
 
-  // 1. Hỗ trợ tài khoản Admin mặc định
-  if (cleanEmail.includes('admin') || cleanEmail === 'admin@11a10.edu.vn') {
+  // 1. Hỗ trợ tài khoản Admin mặc định & tài khoản được cấp quyền Admin
+  if (isAccountAdmin(cleanEmail)) {
     const overrides = getProfileOverrides(cleanEmail);
+    const isHai = cleanEmail === 'haivanong2007@gmail.com';
     const adminUser: User = {
-      uid: 'admin-11a10-master-uid',
+      uid: isHai ? 'admin-haivanong' : (existingProfile.uid || 'admin-11a10-master-uid'),
       email: cleanEmail,
-      displayName: overrides.displayName || existingProfile.displayName || 'Ban Cán Sự 11A10 (Admin)',
+      displayName: overrides.displayName || existingProfile.displayName || (isHai ? 'Nông Văn Hải (Admin)' : 'Ban Cán Sự 11A10 (Admin)'),
       photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (existingProfile.photoURL ?? null),
       phoneNumber: overrides.phoneNumber || existingProfile.phoneNumber || '',
-      bio: overrides.bio || existingProfile.bio || 'Học sinh lớp 11A10 - THPT Cát Tiên',
+      bio: overrides.bio || existingProfile.bio || (isHai ? 'Quản trị viên lớp 11A10 - THPT Cát Tiên' : 'Học sinh lớp 11A10 - THPT Cát Tiên'),
       bannerCustomUrl: overrides.bannerCustomUrl || existingProfile.bannerCustomUrl,
       bannerTheme: overrides.bannerTheme || existingProfile.bannerTheme,
       role: 'admin',
@@ -382,15 +411,25 @@ export async function signInWithEmail(email: string, pass: string): Promise<User
 
   // Tải hồ sơ từ bảng `profiles`
   const userProfile = await getCurrentUser(data.user.id);
-  const finalUser: User = userProfile || {
-    uid: data.user.id,
-    email: data.user.email || null,
-    displayName: data.user.user_metadata?.display_name || cleanEmail.split('@')[0] || 'Thành viên 11A10',
-    photoURL: data.user.user_metadata?.avatar_url || null,
-    role: 'member',
-    classId: '11A10',
-    status: 'active',
-  };
+  const isUserAdmin = isAccountAdmin(data.user.email);
+  const isHai = cleanEmail === 'haivanong2007@gmail.com';
+  const finalUser: User = userProfile
+    ? {
+        ...userProfile,
+        role: isUserAdmin ? 'admin' : userProfile.role,
+      }
+    : {
+        uid: data.user.id,
+        email: data.user.email || null,
+        displayName:
+          data.user.user_metadata?.display_name ||
+          (isHai ? 'Nông Văn Hải (Admin)' : isUserAdmin ? 'Ban Cán Sự 11A10 (Admin)' : cleanEmail.split('@')[0]) ||
+          'Thành viên 11A10',
+        photoURL: data.user.user_metadata?.avatar_url || null,
+        role: isUserAdmin ? 'admin' : 'member',
+        classId: '11A10',
+        status: 'active',
+      };
 
   localStorage.setItem('auth_user_11a10', JSON.stringify(finalUser));
   useAuthStore.getState().setUser(finalUser);

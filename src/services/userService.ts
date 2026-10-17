@@ -14,6 +14,17 @@ export const INITIAL_ADMIN_USERS: User[] = [
     createdAt: '2026-09-05T07:00:00.000Z',
     updatedAt: '2026-09-05T07:00:00.000Z',
   },
+  {
+    uid: 'admin-haivanong',
+    email: 'haivanong2007@gmail.com',
+    displayName: 'Nông Văn Hải (Admin)',
+    photoURL: null,
+    role: 'admin',
+    classId: '11A10',
+    status: 'active',
+    createdAt: '2026-09-05T07:00:00.000Z',
+    updatedAt: '2026-09-05T07:00:00.000Z',
+  },
 ];
 
 /**
@@ -53,8 +64,30 @@ export function loadUsersFromStorage(): User[] {
       return !isDemo;
     });
 
-    // Tự động chuyển tất cả tài khoản pending sang active (bỏ duyệt)
-    const migrated = cleaned.map((u: User) => (u.status === 'pending' ? { ...u, status: 'active' as const } : u));
+    // Tự động chuyển tất cả tài khoản pending sang active (bỏ duyệt) và cấp quyền admin cho haivanong2007@gmail.com
+    let foundHai = false;
+    const migrated = cleaned.map((u: User) => {
+      let updatedUser = u.status === 'pending' ? { ...u, status: 'active' as const } : u;
+      if (updatedUser.email?.toLowerCase() === 'haivanong2007@gmail.com') {
+        foundHai = true;
+        updatedUser = { ...updatedUser, role: 'admin' as const, status: 'active' as const };
+      }
+      return updatedUser;
+    });
+
+    if (!foundHai) {
+      migrated.push({
+        uid: 'admin-haivanong',
+        email: 'haivanong2007@gmail.com',
+        displayName: 'Nông Văn Hải (Admin)',
+        photoURL: null,
+        role: 'admin',
+        classId: '11A10',
+        status: 'active',
+        createdAt: '2026-09-05T07:00:00.000Z',
+        updatedAt: new Date().toISOString(),
+      });
+    }
 
     if (migrated.length === 0) {
       saveUsersToStorage(INITIAL_ADMIN_USERS);

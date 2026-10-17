@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '@/supabase/config';
-import { getCurrentUser, updateUserProfile, getProfileOverrides } from '@/services/auth.service';
+import { getCurrentUser, updateUserProfile, getProfileOverrides, isAccountAdmin } from '@/services/auth.service';
 import { useAuthStore } from '@/store/authStore';
 import { User } from '@/types';
 
@@ -86,26 +86,35 @@ export function useAuth() {
               } catch {}
             }
 
+            const isUserAdmin = Boolean(
+              (session.user.email && isAccountAdmin(session.user.email)) ||
+              (profile && profile.role === 'admin') ||
+              (localData && localData.role === 'admin')
+            );
+            const isHai = session.user.email?.toLowerCase() === 'haivanong2007@gmail.com';
+
             if (profile && isMounted) {
               const mergedUser: User = {
                 ...profile,
-                displayName: overrides.displayName || localData.displayName || profile.displayName,
+                displayName: overrides.displayName || localData.displayName || (isHai ? 'Nông Văn Hải (Admin)' : profile.displayName),
                 photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : profile.photoURL),
                 bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : (localData.bannerCustomUrl || profile.bannerCustomUrl),
                 bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : (localData.bannerTheme || profile.bannerTheme),
                 phoneNumber: overrides.phoneNumber !== undefined ? overrides.phoneNumber : (localData.phoneNumber || profile.phoneNumber),
-                bio: overrides.bio !== undefined ? overrides.bio : (localData.bio || profile.bio),
+                bio: overrides.bio !== undefined ? overrides.bio : (localData.bio || (isUserAdmin ? 'Quản trị viên lớp 11A10 - THPT Cát Tiên' : profile.bio)),
+                role: isUserAdmin ? 'admin' : (profile.role || 'member'),
+                status: 'active',
               };
               setUser(mergedUser);
             } else if (isMounted) {
               const fallbackUser: User = {
                 uid: session.user.id,
                 email: session.user.email || null,
-                displayName: overrides.displayName || localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
+                displayName: overrides.displayName || localData.displayName || session.user.user_metadata?.display_name || (isHai ? 'Nông Văn Hải (Admin)' : isUserAdmin ? 'Ban Cán Sự 11A10 (Admin)' : (session.user.email?.split('@')[0] || 'Thành viên 11A10')),
                 photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null)),
                 bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : localData.bannerCustomUrl,
                 bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : localData.bannerTheme,
-                role: 'member',
+                role: isUserAdmin ? 'admin' : 'member',
                 classId: '11A10',
                 status: 'active',
               };
@@ -153,26 +162,35 @@ export function useAuth() {
               } catch {}
             }
 
+            const isUserAdmin = Boolean(
+              (session.user.email && isAccountAdmin(session.user.email)) ||
+              (profile && profile.role === 'admin') ||
+              (localData && localData.role === 'admin')
+            );
+            const isHai = session.user.email?.toLowerCase() === 'haivanong2007@gmail.com';
+
             if (profile && isMounted) {
               const mergedUser: User = {
                 ...profile,
-                displayName: overrides.displayName || localData.displayName || profile.displayName,
+                displayName: overrides.displayName || localData.displayName || (isHai ? 'Nông Văn Hải (Admin)' : profile.displayName),
                 photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : profile.photoURL),
                 bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : (localData.bannerCustomUrl || profile.bannerCustomUrl),
                 bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : (localData.bannerTheme || profile.bannerTheme),
                 phoneNumber: overrides.phoneNumber !== undefined ? overrides.phoneNumber : (localData.phoneNumber || profile.phoneNumber),
-                bio: overrides.bio !== undefined ? overrides.bio : (localData.bio || profile.bio),
+                bio: overrides.bio !== undefined ? overrides.bio : (localData.bio || (isUserAdmin ? 'Quản trị viên lớp 11A10 - THPT Cát Tiên' : profile.bio)),
+                role: isUserAdmin ? 'admin' : (profile.role || 'member'),
+                status: 'active',
               };
               setUser(mergedUser);
             } else if (isMounted) {
               const fallbackUser: User = {
                 uid: session.user.id,
                 email: session.user.email || null,
-                displayName: overrides.displayName || localData.displayName || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'Thành viên 11A10',
+                displayName: overrides.displayName || localData.displayName || session.user.user_metadata?.display_name || (isHai ? 'Nông Văn Hải (Admin)' : isUserAdmin ? 'Ban Cán Sự 11A10 (Admin)' : (session.user.email?.split('@')[0] || 'Thành viên 11A10')),
                 photoURL: overrides.photoURL !== undefined ? overrides.photoURL : (localData.photoURL !== undefined ? localData.photoURL : (session.user.user_metadata?.avatar_url || null)),
                 bannerCustomUrl: overrides.bannerCustomUrl !== undefined ? overrides.bannerCustomUrl : localData.bannerCustomUrl,
                 bannerTheme: overrides.bannerTheme !== undefined ? overrides.bannerTheme : localData.bannerTheme,
-                role: 'member',
+                role: isUserAdmin ? 'admin' : 'member',
                 classId: '11A10',
                 status: 'active',
               };
@@ -206,8 +224,8 @@ export function useAuth() {
     return await updateUserProfile(partial);
   }, []);
 
-  const isAdmin = user?.role === 'admin';
-  const isMember = user?.role === 'member' || user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || Boolean(user?.email && isAccountAdmin(user.email));
+  const isMember = user?.role === 'member' || isAdmin;
   const isActive = user?.status === 'active';
 
   return {
