@@ -29,7 +29,12 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
   soundEnabled = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const needleRef = useRef<HTMLDivElement | null>(null);
+  const hudNumberRef = useRef<HTMLSpanElement | null>(null);
+  const hudNameRef = useRef<HTMLSpanElement | null>(null);
+  const lastTickTimeRef = useRef<number>(0);
+
   const currentAngleRef = useRef<number>(0);
   const animFrameRef = useRef<number>(0);
   const delayTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -41,38 +46,123 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
   const count = Math.max(candidates.length, 1);
   const arc = (2 * Math.PI) / count;
 
-  // Cập nhật activeCandidate khi danh sách candidates thay đổi
+  // Cập nhật candidate đầu tiên
   useEffect(() => {
     if (candidates.length > 0 && !activeCandidate) {
       setActiveCandidate(candidates[0]);
     }
   }, [candidates, activeCandidate]);
 
+  // Âm thanh tick được throttle để tránh nghẽn thread Web Audio khi quay tốc độ cao
   const playTickSound = useCallback(() => {
     if (!soundEnabled) return;
-    try {
-      cyberAudio.playTick();
-    } catch {
-      try {
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(600, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.03);
-        gain.gain.setValueAtTime(0.04, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.03);
-      } catch {}
-    }
+    const now = performance.now();
+    if (now - lastTickTimeRef.current < 40) return; // Tối đa 25 tiếng/giây
+    lastTickTimeRef.current = now;
+    cyberAudio.playTick();
   }, [soundEnabled]);
 
-  // Vẽ toàn bộ vòng quay với đồ họa Cyber Luxury cao cấp
+  // 1. VẼ TRƯỚC (PRE-RENDER) ĐĨA QUAY VÀO OFFSCREEN CANVAS ĐỂ TỐI ƯU 60-120 FPS
+  const renderOffscreenDisc = useCallback(() => {
+    const size = 900;
+    const center = size / 2;
+    const radius = center - 38;
+    const innerRadius = 72;
+
+    const offscreen = document.createElement("canvas");
+    offscreen.width = size;
+    offscreen.height = size;
+    const ctx = offscreen.getContext("2d");
+    if (!ctx) return null;
+
+    // Vành ngoài Metallic Titanium
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center, center, radius + 18, 0, 2 * Math.PI);
+    ctx.fillStyle = "#070b14";
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(245, 158, 11, 0.5)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(center, center, radius + 4, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.3)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Vẽ toàn bộ các nan quạt và tên học sinh một lần duy nhất
+    candidates.forEach((student, i) => {
+      const startAngle = i * arc;
+      const endAngle = startAngle + arc;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.arc(center, center, radius, startAngle, endAngle);
+      ctx.closePath();
+
+      // Nan xen kẽ 2 tone màu sang trọng: Obsidian Navy & Deep Cyber Indigo
+      const radGrad = ctx.createRadialGradient(center, center, innerRadius, center, center, radius);
+      if (i % 2 === 0) {
+        radGrad.addColorStop(0, "#080d1a");
+        radGrad.addColorStop(0.4, "#0f172a");
+        radGrad.addColorStop(1, "#17233f");
+      } else {
+        radGrad.addColorStop(0, "#0c081a");
+        radGrad.addColorStop(0.4, "#130f28");
+        radGrad.addColorStop(1, "#1e1642");
+      }
+      ctx.fillStyle = radGrad;
+      ctx.fill();
+
+      // Đường viền nan quạt
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Vẽ STT và Tên
+      ctx.save();
+      ctx.translate(center, center);
+      ctx.rotate(startAngle + arc / 2);
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+
+      const isMany = count > 20;
+
+      if (isMany) {
+        // STT to rõ ở rìa ngoài
+        ctx.font = '800 13px "JetBrains Mono", monospace';
+        ctx.fillStyle = i % 2 === 0 ? "#38bdf8" : "#fbbf24";
+        ctx.fillText(String(i + 1).padStart(2, "0"), radius - 10, 0);
+
+        // Tên rút gọn (Đệm + Tên)
+        ctx.font = '700 11px "Be Vietnam Pro", sans-serif';
+        const shortName = student.fullName.split(" ").slice(-2).join(" ");
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.fillText(shortName, radius - 36, 0);
+      } else {
+        // Ít bạn: hiển thị cả họ tên đầy đủ
+        ctx.font = '700 13.5px "Be Vietnam Pro", sans-serif';
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(student.fullName, radius - 18, 0);
+      }
+
+      ctx.restore();
+      ctx.restore();
+    });
+
+    return offscreen;
+  }, [candidates, count, arc]);
+
+  // Cập nhật lại offscreen khi danh sách học sinh thay đổi
+  useEffect(() => {
+    offscreenCanvasRef.current = renderOffscreenDisc();
+  }, [renderOffscreenDisc]);
+
+  // 2. HÀM VẼ KHUNG HÌNH (CỰC NHANH NHỜ DRAWIMAGE TỪ OFFSCREEN)
   const drawWheel = useCallback(
     (rotation: number, winningIdx: number | null = null) => {
       const canvas = canvasRef.current;
@@ -83,33 +173,61 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
       const size = canvas.width;
       const center = size / 2;
       const radius = center - 38;
-      const innerRadius = 72; // Trục giữa khít với nút bấm tròn
+      const innerRadius = 72;
 
       ctx.clearRect(0, 0, size, size);
 
-      // 1. Vành ngoài Metallic Titanium với bóng đổ sâu
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(center, center, radius + 20, 0, 2 * Math.PI);
-      ctx.fillStyle = "#070b14";
-      ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-      ctx.shadowBlur = 30;
-      ctx.fill();
+      // A. Vẽ đĩa quay đã được pre-render sẵn (chỉ xoay góc rotation)
+      if (offscreenCanvasRef.current) {
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(rotation);
+        ctx.drawImage(offscreenCanvasRef.current, -center, -center);
 
-      // Vòng hào quang kim loại mạ vàng ngoài cùng
-      ctx.strokeStyle = "rgba(245, 158, 11, 0.4)";
-      ctx.lineWidth = 3;
-      ctx.stroke();
+        // Nếu có học sinh trúng giải: vẽ nan quạt phát sáng vàng Honey Gold đè lên
+        if (winningIdx !== null) {
+          const winStart = winningIdx * arc;
+          const winEnd = winStart + arc;
 
-      // Vòng tròn định vị phụ sát mép nan quạt
-      ctx.beginPath();
-      ctx.arc(center, center, radius + 4, 0, 2 * Math.PI);
-      ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.restore();
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.arc(0, 0, radius, winStart, winEnd);
+          ctx.closePath();
 
-      // 2. Vẽ dàn đèn LED đuổi vòng quanh vành (Chasing LED Bulbs)
+          const winGrad = ctx.createRadialGradient(0, 0, innerRadius, 0, 0, radius);
+          winGrad.addColorStop(0, "#fef08a");
+          winGrad.addColorStop(0.35, "#f59e0b");
+          winGrad.addColorStop(1, "#b45309");
+          ctx.fillStyle = winGrad;
+          ctx.fill();
+
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+
+          // Chữ trên ô chiến thắng
+          ctx.save();
+          ctx.rotate(winStart + arc / 2);
+          ctx.textAlign = "right";
+          ctx.textBaseline = "middle";
+
+          const winStudent = candidates[winningIdx];
+          if (winStudent) {
+            ctx.font = '800 13px "JetBrains Mono", monospace';
+            ctx.fillStyle = "#0f172a";
+            ctx.fillText(String(winningIdx + 1).padStart(2, "0"), radius - 10, 0);
+
+            ctx.font = '700 12px "Be Vietnam Pro", sans-serif';
+            const shortName = winStudent.fullName.split(" ").slice(-2).join(" ");
+            ctx.fillText(shortName, radius - 36, 0);
+          }
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      // B. Vẽ dàn đèn LED đuổi quanh vành (nhanh, không shadow nặng khi quay)
       const numBulbs = Math.min(Math.max(count, 32), 48);
       const bulbStep = (2 * Math.PI) / numBulbs;
       const activeBulbShift = Math.floor((rotation / (2 * Math.PI)) * numBulbs * 2);
@@ -118,103 +236,15 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
         const bAngle = b * bulbStep;
         const bx = center + Math.cos(bAngle) * (radius + 12);
         const by = center + Math.sin(bAngle) * (radius + 12);
-
         const isBulbLit = winningIdx !== null ? true : (b + activeBulbShift) % 3 === 0;
 
-        ctx.save();
         ctx.beginPath();
         ctx.arc(bx, by, isBulbLit ? 3.5 : 2.5, 0, 2 * Math.PI);
-        if (winningIdx !== null) {
-          ctx.fillStyle = "#fef08a";
-          ctx.shadowColor = "#f59e0b";
-          ctx.shadowBlur = 10;
-        } else if (isBulbLit) {
-          ctx.fillStyle = b % 2 === 0 ? "#38bdf8" : "#fbbf24";
-          ctx.shadowColor = b % 2 === 0 ? "#38bdf8" : "#f59e0b";
-          ctx.shadowBlur = 8;
-        } else {
-          ctx.fillStyle = "#1e293b";
-        }
+        ctx.fillStyle = winningIdx !== null ? "#fef08a" : isBulbLit ? (b % 2 === 0 ? "#38bdf8" : "#fbbf24") : "#1e293b";
         ctx.fill();
-        ctx.restore();
       }
 
-      // 3. Vẽ từng nan quạt (Cyber Dark Luxury: Obsidian & Midnight Violet)
-      candidates.forEach((student, i) => {
-        const startAngle = rotation + i * arc;
-        const endAngle = startAngle + arc;
-        const isWinner = winningIdx === i;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, startAngle, endAngle);
-        ctx.closePath();
-
-        const radGrad = ctx.createRadialGradient(center, center, innerRadius, center, center, radius);
-
-        if (isWinner) {
-          // Ô trúng giải: Vàng Honey Gold phát sáng rực rỡ
-          radGrad.addColorStop(0, "#fef08a");
-          radGrad.addColorStop(0.35, "#f59e0b");
-          radGrad.addColorStop(1, "#b45309");
-        } else {
-          // Nan xen kẽ 2 tone màu tối sang trọng: Obsidian Navy & Deep Cyber Indigo
-          if (i % 2 === 0) {
-            radGrad.addColorStop(0, "#080d1a");
-            radGrad.addColorStop(0.4, "#0f172a");
-            radGrad.addColorStop(1, "#17233f");
-          } else {
-            radGrad.addColorStop(0, "#0c081a");
-            radGrad.addColorStop(0.4, "#130f28");
-            radGrad.addColorStop(1, "#1e1642");
-          }
-        }
-
-        ctx.fillStyle = radGrad;
-        ctx.fill();
-
-        // Đường chỉ nan quạt thanh mảnh ánh kim
-        ctx.strokeStyle = isWinner ? "#ffffff" : "rgba(255, 255, 255, 0.08)";
-        ctx.lineWidth = isWinner ? 2 : 1;
-        ctx.stroke();
-
-        // 4. Vẽ Số thứ tự (STT) và Tên học sinh
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(startAngle + arc / 2);
-        ctx.textAlign = "right";
-        ctx.textBaseline = "middle";
-
-        const isMany = count > 20;
-
-        if (isMany) {
-          // STT to rõ ở rìa ngoài
-          ctx.font = '800 13px "JetBrains Mono", monospace';
-          ctx.fillStyle = isWinner ? "#0f172a" : (i % 2 === 0 ? "#38bdf8" : "#fbbf24");
-          ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-          ctx.shadowBlur = 4;
-          ctx.fillText(String(i + 1).padStart(2, "0"), radius - 10, 0);
-
-          // Tên rút gọn (Đệm + Tên) hướng vào trong
-          ctx.font = '700 11px "Be Vietnam Pro", sans-serif';
-          const shortName = student.fullName.split(" ").slice(-2).join(" ");
-          ctx.fillStyle = isWinner ? "#0f172a" : "rgba(255, 255, 255, 0.85)";
-          ctx.fillText(shortName, radius - 36, 0);
-        } else {
-          // Ít bạn: hiển thị cả họ tên đầy đủ
-          ctx.font = '700 13.5px "Be Vietnam Pro", sans-serif';
-          ctx.fillStyle = isWinner ? "#0f172a" : "#ffffff";
-          ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-          ctx.shadowBlur = 5;
-          ctx.fillText(student.fullName, radius - 18, 0);
-        }
-
-        ctx.restore();
-        ctx.restore();
-      });
-
-      // 5. Trục tâm tròn (Center Hub) mạ viền vàng & titan
+      // C. Trục tâm tròn (Center Hub)
       ctx.save();
       ctx.beginPath();
       ctx.arc(center, center, innerRadius, 0, 2 * Math.PI);
@@ -222,16 +252,12 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
       hubGrad.addColorStop(0, "#0b0f19");
       hubGrad.addColorStop(1, "#030712");
       ctx.fillStyle = hubGrad;
-      ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-      ctx.shadowBlur = 18;
       ctx.fill();
 
-      // Viền vàng kim loại sang trọng
       ctx.strokeStyle = "rgba(245, 158, 11, 0.85)";
       ctx.lineWidth = 3.5;
       ctx.stroke();
 
-      // Vòng tròn hairline xanh ngọc bên trong
       ctx.beginPath();
       ctx.arc(center, center, innerRadius - 6, 0, 2 * Math.PI);
       ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
@@ -246,7 +272,7 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
     drawWheel(currentAngleRef.current, highlightWinnerIndex);
   }, [drawWheel, highlightWinnerIndex]);
 
-  // Vòng lặp quay số mượt mà
+  // 3. VÒNG LẶP ANIMATION ĐẠT CHUẨN 60-120 FPS
   useEffect(() => {
     if (!isSpinning || candidates.length === 0) return;
 
@@ -280,7 +306,7 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      // Đường cong easing mềm mại tự nhiên
+      // Easing kịch tính tự nhiên (quay nhanh lúc đầu, giảm tốc thót tim về cuối)
       const easeOut = 1 - Math.pow(1 - progress, 2.9);
       const currentRotation = startAngle + totalAngleToRotate * easeOut;
 
@@ -292,15 +318,23 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
 
       if (currentSliceUnderPointer !== lastSlicePassed) {
         lastSlicePassed = currentSliceUnderPointer;
-        const candidateNow = candidates[currentSliceUnderPointer] || null;
-        if (candidateNow) setActiveCandidate(candidateNow);
+        const candidateNow = candidates[currentSliceUnderPointer];
+        if (candidateNow) {
+          // Cập nhật trực tiếp DOM để tránh kích hoạt React re-render gây giật lag
+          if (hudNumberRef.current) {
+            hudNumberRef.current.textContent = `#${String(currentSliceUnderPointer + 1).padStart(2, "0")}`;
+          }
+          if (hudNameRef.current) {
+            hudNameRef.current.textContent = candidateNow.fullName;
+          }
+        }
         playTickSound();
 
         if (needleRef.current) {
-          needleRef.current.style.transform = "rotate(14deg)";
+          needleRef.current.style.transform = "rotate(12deg)";
           setTimeout(() => {
             if (needleRef.current) needleRef.current.style.transform = "rotate(0deg)";
-          }, 40);
+          }, 35);
         }
       }
 
@@ -336,13 +370,15 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
   return (
     <div className={`flex flex-col items-center select-none ${className}`}>
       {/* 1. Màn hình HUD LED quét tên trực tiếp theo thời gian thực */}
-      <div className={`w-full max-w-[280px] sm:max-w-xs mb-3 px-3 py-2 rounded-xl border backdrop-blur-md transition-all duration-200 flex items-center justify-between gap-2 shadow-lg ${
-        isWaitingSuspense
-          ? "bg-amber-950/80 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
-          : isSpinning
-          ? "bg-slate-950/90 border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-          : "bg-slate-950/70 border-white/10"
-      }`}>
+      <div
+        className={`w-full max-w-[280px] sm:max-w-xs mb-3 px-3 py-2 rounded-xl border backdrop-blur-md transition-all duration-200 flex items-center justify-between gap-2 shadow-lg ${
+          isWaitingSuspense
+            ? "bg-amber-950/80 border-amber-400/80 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+            : isSpinning
+            ? "bg-slate-950/90 border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+            : "bg-slate-950/70 border-white/10"
+        }`}
+      >
         <div className="flex items-center gap-2 truncate">
           <span
             className={`w-2.5 h-2.5 rounded-full shrink-0 ${
@@ -353,10 +389,11 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
                 : "bg-emerald-400"
             }`}
           />
-          <span className="font-mono text-xs text-amber-400 font-bold shrink-0">
+          <span ref={hudNumberRef} className="font-mono text-xs text-amber-400 font-bold shrink-0">
             #{String(activeCandidate ? candidates.findIndex((c) => c.id === activeCandidate.id) + 1 : 1).padStart(2, "0")}
           </span>
           <span
+            ref={hudNameRef}
             className={`font-display font-bold text-xs sm:text-sm truncate ${
               isWaitingSuspense
                 ? "text-amber-200 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]"

@@ -31,7 +31,6 @@ import { AdminTimetablePage } from '@/pages/admin/AdminTimetable';
 import { AdminSettingsPage } from '@/pages/admin/AdminSettings';
 import { ConveyorLoop } from '@/components/ui/conveyor-loop';
 import { NotFound } from '@/components/ui/not-found-2';
-import { initAntiF12 } from '@/utils/antiDevtools';
 import { useAuth } from '@/hooks/useAuth';
 
 export const App: React.FC = () => {
@@ -42,11 +41,6 @@ export const App: React.FC = () => {
     // Chỉ hiển thị intro 1 lần trong mỗi phiên mở trình duyệt để tránh load lâu
     return !sessionStorage.getItem('11a10_intro_viewed');
   });
-
-  React.useEffect(() => {
-    const cleanup = initAntiF12();
-    return cleanup;
-  }, []);
 
   React.useEffect(() => {
     if (!showIntro) return;
@@ -69,15 +63,8 @@ export const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Tuyến đường dành cho Thành viên Lớp (Member Routes) */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
-          }
-        >
+        {/* Tuyến đường chính cho mọi người: Khách có thể xem và quay số mà không cần đăng nhập */}
+        <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="thong-bao" element={<AnnouncementsPage />} />
           <Route path="thong-bao/:id" element={<AnnouncementDetailPage />} />
@@ -85,7 +72,14 @@ export const App: React.FC = () => {
           <Route path="thu-vien" element={<LibraryPage />} />
           <Route path="thoi-khoa-bieu" element={<TimetablePage />} />
           <Route path="vong-quay" element={<RandomGamePage />} />
-          <Route path="ca-nhan" element={<ProfilePage />} />
+          <Route
+            path="ca-nhan"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Tuyến đường dành riêng cho Ban Cán Sự & GVCN (Admin Routes) */}
@@ -106,8 +100,7 @@ export const App: React.FC = () => {
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>
 
-        {/* Route Demo & 404 Not Found */}
-        <Route path="/demo" element={<NotFound />} />
+        {/* 404 Not Found */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
