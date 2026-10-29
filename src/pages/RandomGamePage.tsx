@@ -5,6 +5,8 @@ import { DEFAULT_11A10_STUDENTS, StudentCandidate } from '@/data/classDefaultStu
 import { LuckyWheelCanvas } from '@/components/games/LuckyWheelCanvas';
 import { CyberSlotRoller } from '@/components/games/CyberSlotRoller';
 import { MysteryCardDeck } from '@/components/games/MysteryCardDeck';
+import { DuckRaceGame } from '@/components/games/DuckRaceGame';
+import { UfoAbductionGame } from '@/components/games/UfoAbductionGame';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -28,7 +30,7 @@ import confetti from 'canvas-confetti';
 import { cyberAudio } from '@/utils/cyberAudio';
 import { toast } from 'sonner';
 
-type GameMode = 'wheel' | 'card' | 'slot';
+type GameMode = 'wheel' | 'card' | 'slot' | 'duck' | 'ufo';
 
 export const RandomGamePage: React.FC = () => {
   // Danh sách học sinh tổng
@@ -232,6 +234,8 @@ export const RandomGamePage: React.FC = () => {
             { id: 'wheel', label: '🎡 Vòng quay kỳ diệu' },
             { id: 'card', label: '🃏 Bốc thăm 46 lá bài' },
             { id: 'slot', label: '🎰 Máy xèng tốc độ' },
+            { id: 'duck', label: '🦆 Đua vịt vượt thác' },
+            { id: 'ufo', label: '🛸 UFO bắt cóc' },
           ].map((mode) =>
             gameMode === mode.id ? (
               <GlassButton
@@ -289,7 +293,7 @@ export const RandomGamePage: React.FC = () => {
       {/* ================= KHU VỰC TRÒ CHƠI CHÍNH ================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Cột chính: Trò chơi (Col 8) */}
-        <div className="lg:col-span-8 flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-slate-900/90 via-indigo-950/40 to-slate-900/90 border border-white/10 backdrop-blur-2xl relative min-h-[500px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.1)]">
+        <div className="lg:col-span-8 flex flex-col items-center justify-center p-3 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-slate-900/90 via-indigo-950/40 to-slate-900/90 border border-white/10 backdrop-blur-2xl relative min-h-[420px] sm:min-h-[500px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.1)]">
           {/* Radiant Cosmic Ambient Glow behind game */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-gradient-to-tr from-indigo-600/25 via-purple-600/20 to-cyan-500/20 rounded-full blur-3xl opacity-85" />
@@ -297,15 +301,15 @@ export const RandomGamePage: React.FC = () => {
           </div>
 
           {/* Thông báo số lượng khả dụng */}
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 text-xs font-mono text-slate-300">
-            <Users className="w-4 h-4 text-blue-400" />
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono text-slate-300">
+            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" />
             <span>
               Sẵn sàng: <strong className="text-white">{activeCandidates.length}</strong> / {allStudents.length} học sinh
             </span>
           </div>
 
           {/* Banner chế độ */}
-          <div className="mb-4 inline-flex items-center gap-2 text-slate-300 text-xs font-medium relative z-10">
+          <div className="mt-6 sm:mt-0 mb-3 sm:mb-4 inline-flex items-center gap-1.5 sm:gap-2 text-slate-300 text-[11px] sm:text-xs font-medium relative z-10">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
             <span>Tập thể lớp 11A10 • THPT Cát Tiên</span>
           </div>
@@ -346,16 +350,30 @@ export const RandomGamePage: React.FC = () => {
                   onSpinEnd={handleSpinEnd}
                 />
               )}
+
+              {gameMode === 'duck' && (
+                <DuckRaceGame
+                  candidates={activeCandidates}
+                  onSelectWinner={handleSpinEnd}
+                />
+              )}
+
+              {gameMode === 'ufo' && (
+                <UfoAbductionGame
+                  candidates={activeCandidates}
+                  onSelectWinner={handleSpinEnd}
+                />
+              )}
             </div>
           )}
 
           {/* ================= MODAL / POPUP CHIẾN THẮNG HIỆN LÊN KHI TRÚNG ================= */}
           {winner && (
-            <div className="absolute inset-0 z-30 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-300">
+            <div className="absolute inset-0 z-30 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-300">
               {/* Outer Golden Glow Halo */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] h-[340px] bg-gradient-to-tr from-amber-500/25 via-purple-600/20 to-indigo-500/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
 
-              <div className="w-full max-w-sm rounded-3xl bg-gradient-to-b from-slate-900/95 via-indigo-950/90 to-slate-900/95 border border-white/15 p-6 sm:p-7 text-center space-y-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(245,158,11,0.2)] relative overflow-hidden">
+              <div className="w-full max-w-[90vw] sm:max-w-sm rounded-2xl sm:rounded-3xl bg-gradient-to-b from-slate-900/95 via-indigo-950/90 to-slate-900/95 border border-white/15 p-4 sm:p-7 text-center space-y-4 sm:space-y-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(245,158,11,0.2)] relative overflow-hidden">
                 {/* Top Radiant Bar */}
                 <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-400" />
 
@@ -363,35 +381,35 @@ export const RandomGamePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setWinner(null)}
-                  className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                  className="absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white flex items-center justify-center transition-colors text-xs"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
 
                 {/* Celebration Trophy Icon */}
-                <div className="relative mx-auto w-20 h-20 pt-1">
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-amber-400 to-orange-500 blur-lg opacity-50 animate-pulse" />
-                  <div className="relative w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-400 via-amber-500 to-rose-500 flex items-center justify-center text-white shadow-xl ring-4 ring-white/20">
-                    <Trophy className="w-10 h-10 text-amber-100 drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" />
+                <div className="relative mx-auto w-14 h-14 sm:w-20 sm:h-20 pt-1">
+                  <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-amber-400 to-orange-500 blur-lg opacity-50 animate-pulse" />
+                  <div className="relative w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-amber-400 via-amber-500 to-rose-500 flex items-center justify-center text-white shadow-xl ring-4 ring-white/20">
+                    <Trophy className="w-7 h-7 sm:w-10 sm:h-10 text-amber-100 drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]" />
                   </div>
                 </div>
 
                 {/* Text Content */}
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold font-mono tracking-wider uppercase">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <div className="space-y-1.5 sm:space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs font-bold font-mono tracking-wider uppercase">
+                    <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
                     <span>CHÚC MỪNG BẠN</span>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight font-display bg-gradient-to-r from-amber-100 via-white to-amber-200 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(251,191,36,0.35)] pt-1">
+                  <h2 className="text-xl sm:text-3xl font-black tracking-tight font-display bg-gradient-to-r from-amber-100 via-white to-amber-200 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(251,191,36,0.35)] pt-0.5 sm:pt-1">
                     {winner.fullName}
                   </h2>
 
-                  <div className="flex items-center justify-center gap-2 pt-0.5">
-                    <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-2 pt-0.5">
+                    <span className="text-[10px] sm:text-xs font-mono px-2 sm:px-2.5 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
                       {winner.role || 'Học sinh'}
                     </span>
-                    <span className="text-xs text-slate-400 font-mono">
+                    <span className="text-[10px] sm:text-xs text-slate-400 font-mono">
                       Tập thể 11A10 • THPT Cát Tiên
                     </span>
                   </div>

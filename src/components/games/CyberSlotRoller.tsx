@@ -71,23 +71,23 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
   }, [isSpinning, candidates, onSpinEnd]);
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 rounded-3xl bg-slate-950/80 border border-indigo-500/30 shadow-2xl backdrop-blur-xl text-center space-y-6 relative overflow-hidden">
+    <div className="w-full max-w-xs sm:max-w-md mx-auto p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-slate-950/80 border border-indigo-500/30 shadow-2xl backdrop-blur-xl text-center space-y-4 sm:space-y-6 relative overflow-hidden">
       {/* Vệt sáng trang trí Cyber */}
       <div className="absolute -top-12 -right-12 w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none" />
       <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
 
       {/* Tiêu đề máy xèng */}
-      <div className="flex items-center justify-center gap-2 text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest">
-        <Zap className="w-4 h-4 text-amber-400 animate-pulse" />
+      <div className="flex items-center justify-center gap-2 text-[10px] sm:text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest">
+        <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 animate-pulse" />
         <span>11A10 CYBER LOTTO ROLLER</span>
       </div>
 
       {/* Cửa sổ hiển thị cuộn máy xèng */}
-      <div className="p-6 rounded-2xl bg-black/80 border-2 border-indigo-500/40 shadow-inner space-y-3 relative overflow-hidden">
+      <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl bg-black/80 border-2 border-indigo-500/40 shadow-inner space-y-2 sm:space-y-3 relative overflow-hidden">
         {/* Số thứ tự lớn */}
         <div className="flex items-center justify-center">
           <div
-            className={`font-mono font-black text-6xl tracking-wider transition-all duration-75 ${
+            className={`font-mono font-black text-4xl sm:text-6xl tracking-wider transition-all duration-75 ${
               isSpinning ? 'text-cyan-400 scale-105 blur-[0.5px]' : 'text-amber-400 drop-shadow-[0_0_20px_rgba(245,158,11,0.6)]'
             }`}
           >
@@ -97,7 +97,7 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
 
         {/* Tên học sinh */}
         <div
-          className={`font-display font-bold text-2xl sm:text-3xl transition-colors duration-75 min-h-[40px] flex items-center justify-center ${
+          className={`font-display font-bold text-lg sm:text-2xl transition-colors duration-75 min-h-[32px] sm:min-h-[40px] flex items-center justify-center px-1 leading-snug ${
             isSpinning ? 'text-indigo-300' : 'text-white'
           }`}
         >
@@ -105,7 +105,7 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
         </div>
 
         {/* Thông tin vai trò / tổ */}
-        <div className="text-xs font-mono text-slate-400">
+        <div className="text-[10px] sm:text-xs font-mono text-slate-400">
           {slotRole}
         </div>
 
@@ -118,7 +118,7 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
         type="button"
         disabled={isSpinning || isWaitingSuspense || candidates.length === 0}
         onClick={onSpinStart}
-        className={`w-full py-4 px-6 rounded-2xl font-display font-black text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2 active:scale-98 ${
+        className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl sm:rounded-2xl font-display font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2 active:scale-95 ${
           isSpinning || isWaitingSuspense
             ? 'bg-slate-800 text-slate-400 cursor-not-allowed'
             : candidates.length === 0
@@ -126,7 +126,7 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
             : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-indigo-600/40 hover:shadow-indigo-600/60'
         }`}
       >
-        <Dices className="w-5 h-5 text-amber-300" />
+        <Dices className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
         <span>
           {isSpinning
             ? 'Đang quay số xèng...'

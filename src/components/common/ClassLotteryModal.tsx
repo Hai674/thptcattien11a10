@@ -5,6 +5,8 @@ import { DEFAULT_11A10_STUDENTS, StudentCandidate } from '@/data/classDefaultStu
 import { LuckyWheelCanvas } from '@/components/games/LuckyWheelCanvas';
 import { CyberSlotRoller } from '@/components/games/CyberSlotRoller';
 import { MysteryCardDeck } from '@/components/games/MysteryCardDeck';
+import { DuckRaceGame } from '@/components/games/DuckRaceGame';
+import { UfoAbductionGame } from '@/components/games/UfoAbductionGame';
 import { GlassButton } from '@/components/ui/glass-button';
 import { Link } from 'react-router-dom';
 import {
@@ -30,7 +32,7 @@ interface ClassLotteryModalProps {
   onClose: () => void;
 }
 
-type GameMode = 'wheel' | 'slot' | 'card';
+type GameMode = 'card' | 'wheel' | 'slot' | 'duck' | 'ufo';
 
 export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, onClose }) => {
   const [allStudents, setAllStudents] = useState<StudentCandidate[]>([]);
@@ -126,50 +128,50 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-3xl bg-slate-900 border border-white/10 p-5 sm:p-6 text-center space-y-4 shadow-2xl my-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto">
+      <div className="relative w-full max-w-3xl max-h-[96vh] sm:max-h-[92vh] overflow-y-auto rounded-2xl sm:rounded-3xl bg-slate-900 border border-white/10 p-3.5 sm:p-6 text-center space-y-3 sm:space-y-4 shadow-2xl my-auto">
         {/* Nút đóng modal */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors z-20"
+          className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors z-20 text-xs sm:text-base"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Tiêu đề Modal & Nút mở toàn màn hình */}
-        <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-center gap-4">
-            <span className="inline-flex items-center gap-1.5 text-slate-400 text-xs font-mono">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+        <div className="space-y-1 sm:space-y-1.5 pt-1">
+          <div className="flex items-center justify-center gap-3 sm:gap-4">
+            <span className="inline-flex items-center gap-1.5 text-slate-400 text-[10px] sm:text-xs font-mono">
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
               <span>Bốc Thăm & Gọi Tên 11A10</span>
             </span>
             <Link
               to="/vong-quay"
               onClick={onClose}
-              className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium transition-colors"
+              className="text-[10px] sm:text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium transition-colors"
             >
               <Maximize2 className="w-3 h-3" />
               <span>Chế độ chiếu Tivi</span>
             </Link>
           </div>
-          <h2 className="font-display text-xl sm:text-2xl font-black text-white">
+          <h2 className="font-display text-base sm:text-2xl font-black text-white">
             Chọn Ngẫu Nhiên Học Sinh Lên Bảng
           </h2>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Bốc thăm cả lớp 46 học sinh: 46 lá bài bí mật, Vòng quay may mắn hoặc Máy xèng tốc độ
+          <p className="text-[10px] sm:text-xs text-slate-400 max-w-md mx-auto">
+            Bốc thăm cả lớp 46 học sinh: Thẻ bài, Vòng quay, Xèng số, Đua vịt & UFO bắt cóc
           </p>
         </div>
 
         {/* Chọn Chế độ chơi */}
-        <div className="flex items-center justify-center gap-2 pt-1">
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-white/5">
+        <div className="flex items-center justify-center gap-2 pt-0.5 sm:pt-1">
+          <div className="flex items-center gap-1 sm:gap-1.5 bg-slate-950 p-1 rounded-xl border border-white/5 max-w-full overflow-x-auto scrollbar-thin">
             <button
               type="button"
               onClick={() => {
                 setGameMode('card');
                 cyberAudio.playClick();
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
                 gameMode === 'card' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
               }`}
               title="Lật 46 thẻ bài ma thuật"
@@ -182,7 +184,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                 setGameMode('wheel');
                 cyberAudio.playClick();
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
                 gameMode === 'wheel' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
               }`}
               title="Vòng quay kỳ diệu"
@@ -195,27 +197,53 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                 setGameMode('slot');
                 cyberAudio.playClick();
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
                 gameMode === 'slot' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
               }`}
               title="Quay số xèng tốc độ"
             >
               🎰 Xèng số
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setGameMode('duck');
+                cyberAudio.playClick();
+              }}
+              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
+                gameMode === 'duck' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              }`}
+              title="Đua vịt cao tốc"
+            >
+              🦆 Đua vịt
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setGameMode('ufo');
+                cyberAudio.playClick();
+              }}
+              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
+                gameMode === 'ufo' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              }`}
+              title="UFO quét và bắt cóc"
+            >
+              🛸 UFO bắt cóc
+            </button>
           </div>
         </div>
 
         {/* Thanh trạng thái sĩ số & Tránh gọi trùng */}
-        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-950/60 border border-white/5 text-xs">
-          <div className="flex items-center gap-2 text-slate-300">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-950/60 border border-white/5 text-[10px] sm:text-xs">
+          <div className="flex items-center gap-1.5 sm:gap-2 text-slate-300">
             <Users className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="text-[11px]">
+            <span>
               Sĩ số: <strong className="text-white">{allStudents.length} học sinh</strong> • Sẵn sàng: <strong className="text-amber-400">{activeCandidates.length}</strong>
             </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 text-[11px] select-none">
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 select-none">
               <input
                 type="checkbox"
                 checked={excludeCalled}
@@ -290,6 +318,20 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                   onSelectWinner={handleSpinEnd}
                 />
               )}
+
+              {gameMode === 'duck' && (
+                <DuckRaceGame
+                  candidates={activeCandidates}
+                  onSelectWinner={handleSpinEnd}
+                />
+              )}
+
+              {gameMode === 'ufo' && (
+                <UfoAbductionGame
+                  candidates={activeCandidates}
+                  onSelectWinner={handleSpinEnd}
+                />
+              )}
             </div>
           )}
 
@@ -299,7 +341,7 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
               {/* Outer Golden Glow Halo */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] bg-gradient-to-tr from-amber-500/25 via-purple-600/20 to-indigo-500/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
 
-              <div className="w-full max-w-xs rounded-3xl bg-gradient-to-b from-slate-900/95 via-indigo-950/90 to-slate-900/95 border border-white/15 p-6 text-center space-y-4 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(245,158,11,0.2)] relative overflow-hidden">
+              <div className="w-full max-w-[90vw] sm:max-w-xs rounded-2xl sm:rounded-3xl bg-gradient-to-b from-slate-900/95 via-indigo-950/90 to-slate-900/95 border border-white/15 p-4 sm:p-6 text-center space-y-3 sm:space-y-4 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_40px_rgba(245,158,11,0.2)] relative overflow-hidden">
                 {/* Top Radiant Bar */}
                 <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-rose-400 to-indigo-400" />
 
@@ -307,42 +349,42 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                 <button
                   type="button"
                   onClick={() => setWinner(null)}
-                  className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+                  className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
 
                 {/* Celebration Trophy Icon */}
-                <div className="relative mx-auto w-16 h-16 pt-1">
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 blur-md opacity-50 animate-pulse" />
-                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 via-amber-500 to-rose-500 flex items-center justify-center text-white shadow-lg ring-4 ring-white/20">
-                    <Trophy className="w-8 h-8 text-amber-100 drop-shadow" />
+                <div className="relative mx-auto w-12 h-12 sm:w-16 sm:h-16 pt-0.5 sm:pt-1">
+                  <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 blur-md opacity-50 animate-pulse" />
+                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-400 via-amber-500 to-rose-500 flex items-center justify-center text-white shadow-lg ring-4 ring-white/20">
+                    <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-amber-100 drop-shadow" />
                   </div>
                 </div>
 
                 {/* Text Content */}
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[11px] font-bold font-mono tracking-wider uppercase">
+                <div className="space-y-1 sm:space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] sm:text-[11px] font-bold font-mono tracking-wider uppercase">
                     <Sparkles className="w-3 h-3 text-amber-400" />
                     <span>CHÚC MỪNG BẠN</span>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-black tracking-tight font-display bg-gradient-to-r from-amber-100 via-white to-amber-200 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(251,191,36,0.35)] pt-0.5">
+                  <h3 className="text-lg sm:text-2xl font-black tracking-tight font-display bg-gradient-to-r from-amber-100 via-white to-amber-200 bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(251,191,36,0.35)] pt-0.5">
                     {winner.fullName}
                   </h3>
 
                   <div className="flex items-center justify-center gap-1.5 pt-0.5">
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
+                    <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
                       {winner.role || 'Học sinh'}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-mono">
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">
                       11A10 • Cát Tiên
                     </span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col gap-2 pt-1">
+                <div className="flex flex-col gap-1.5 sm:gap-2 pt-1">
                   <GlassButton
                     size="sm"
                     variant="primary"
