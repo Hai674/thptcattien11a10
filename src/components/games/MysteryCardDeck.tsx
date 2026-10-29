@@ -45,9 +45,10 @@ export const MysteryCardDeck: React.FC<MysteryCardDeckProps> = ({
     if (revealedIdx !== null || isShuffling) return;
     setRevealedIdx(idx);
     cyberAudio.playClick();
+    // Chờ lật lá bài ra nhìn rõ tên trong 1.5 giây rồi mới mở popup vinh danh
     setTimeout(() => {
       onSelectWinner(cardPool[idx]);
-    }, 550);
+    }, 1500);
   };
 
   const handleShuffleNewDeck = () => {

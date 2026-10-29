@@ -19,9 +19,13 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
   const [slotNumber, setSlotNumber] = useState('??');
   const [slotName, setSlotName] = useState('Sẵn sàng quay số...');
   const [slotRole, setSlotRole] = useState('Lớp 11A10 THPT Cát Tiên');
+  const [isWaitingSuspense, setIsWaitingSuspense] = useState(false);
 
   useEffect(() => {
-    if (!isSpinning || candidates.length === 0) return;
+    if (!isSpinning || candidates.length === 0) {
+      setIsWaitingSuspense(false);
+      return;
+    }
 
     let count = 0;
     const maxTicks = 42;
@@ -51,7 +55,13 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
         setSlotNumber(String(winnerIndex >= 0 ? winnerIndex + 1 : 1).padStart(2, '0'));
         setSlotName(winner.fullName);
         setSlotRole(winner.role || winner.group || 'Học sinh 11A10');
-        onSpinEnd(winner);
+        setIsWaitingSuspense(true);
+
+        // Dừng số lại cho cả lớp nhìn rõ con số và tên trúng trong 1.5 giây
+        timer = setTimeout(() => {
+          setIsWaitingSuspense(false);
+          onSpinEnd(winner); // Sau 1.5s mới bật bảng chúc mừng
+        }, 1500);
       }
     };
 
@@ -106,10 +116,10 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
       {/* Nút bấm Gạt Cần Quay */}
       <button
         type="button"
-        disabled={isSpinning || candidates.length === 0}
+        disabled={isSpinning || isWaitingSuspense || candidates.length === 0}
         onClick={onSpinStart}
         className={`w-full py-4 px-6 rounded-2xl font-display font-black text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2 active:scale-98 ${
-          isSpinning
+          isSpinning || isWaitingSuspense
             ? 'bg-slate-800 text-slate-400 cursor-not-allowed'
             : candidates.length === 0
             ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
@@ -117,7 +127,13 @@ export const CyberSlotRoller: React.FC<CyberSlotRollerProps> = ({
         }`}
       >
         <Dices className="w-5 h-5 text-amber-300" />
-        <span>{isSpinning ? 'Đang quay số xèng...' : `Gạt cần quay số (${candidates.length} bạn)`}</span>
+        <span>
+          {isSpinning
+            ? 'Đang quay số xèng...'
+            : isWaitingSuspense
+            ? 'Đang chốt số...'
+            : `Gạt cần quay số (${candidates.length} bạn)`}
+        </span>
       </button>
     </div>
   );
