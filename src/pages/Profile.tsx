@@ -24,6 +24,7 @@ import { cyberAudio } from '@/utils/cyberAudio';
 import { compressAvatar, compressBanner } from '@/utils/imageCompressor';
 import { getGivenName } from '@/utils/nameUtils';
 import { isAccountAdmin } from '@/services/auth.service';
+import { cn } from '@/utils/cn';
 
 // Danh sách các mẫu avatar học sinh tuyển chọn
 const PRESET_AVATARS = [
@@ -240,27 +241,34 @@ export const ProfilePage: React.FC = () => {
 
       {/* ================= THẺ ĐỊNH DANH HỌC SINH / BAN CÁN SỰ (FULL BÌA TOÀN BỘ CARD) ================= */}
       <Card
-        className="text-white shadow-2xl overflow-hidden rounded-3xl relative border border-white/20 transition-all duration-300"
-        style={{
-          backgroundImage: bannerCustomUrl
-            ? `url('${bannerCustomUrl}')`
-            : 'linear-gradient(135deg, #1e3a8a 0%, #312e81 40%, #581c87 100%)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
+        className={cn(
+          "text-white shadow-2xl overflow-hidden rounded-3xl relative transition-all duration-300",
+          bannerCustomUrl ? "border border-white/20" : "border border-white/10"
+        )}
+        style={
+          bannerCustomUrl
+            ? {
+                backgroundImage: `url('${bannerCustomUrl}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }
+            : undefined
+        }
       >
-        {/* Lớp phủ chuyển sắc tối nhẹ dạng kính mờ (Liquid Glass Dark Overlay) để giữ trọn vẹn màu sắc của ảnh bìa nhưng chữ và thông tin vẫn siêu rõ nét */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80 backdrop-blur-[2px] pointer-events-none" />
+        {/* Lớp phủ chuyển sắc tối nhẹ dạng kính mờ chỉ bật khi có ảnh bìa tùy chỉnh để giữ trọn vẹn màu sắc của ảnh bìa nhưng chữ và thông tin vẫn siêu rõ nét */}
+        {bannerCustomUrl && (
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/80 backdrop-blur-[2px] pointer-events-none" />
+        )}
 
         <div className="relative z-10 p-6 sm:p-8 flex flex-col justify-between min-h-[380px] sm:min-h-[420px]">
           {/* Header trên cùng: Trường lớp & Nút đổi ảnh bìa */}
           <div className="flex items-center justify-between gap-3 mb-6">
             <div className="flex items-center gap-2">
-              <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-black/40 backdrop-blur-md border border-white/20 text-white flex items-center gap-1.5 shadow-lg">
-                <GraduationCap className="w-4 h-4 text-cyan-400" />
+              <div className="flex items-center gap-2 text-xs font-mono font-medium text-blue-300">
+                <GraduationCap className="w-4 h-4 text-blue-400" />
                 <span>THPT CÁT TIÊN • LỚP 11A10</span>
-              </span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -271,19 +279,20 @@ export const ProfilePage: React.FC = () => {
                 onChange={handleBannerUpload}
                 className="hidden"
               />
-              <button
-                type="button"
+              <GlassButton
+                size="sm"
+                variant="default"
                 onClick={() => bannerFileInputRef.current?.click()}
-                className="px-3.5 py-2 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/25 text-xs font-semibold text-slate-100 hover:text-white flex items-center gap-1.5 transition-all shadow-xl hover:scale-105 active:scale-95"
+                contentClassName="flex items-center gap-1.5 text-xs font-medium text-slate-200"
               >
-                <Camera className="w-4 h-4 text-cyan-400" />
+                <Camera className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Đổi ảnh bìa</span>
-              </button>
+              </GlassButton>
               {bannerCustomUrl && (
                 <button
                   type="button"
                   onClick={handleRemoveBanner}
-                  className="px-2.5 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/90 backdrop-blur-md border border-red-500/40 text-xs text-red-200 hover:text-white flex items-center gap-1 transition-all shadow-xl hover:scale-105 active:scale-95"
+                  className="px-2.5 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/90 backdrop-blur-md border border-red-500/40 text-xs text-red-200 hover:text-white flex items-center gap-1 transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
                   title="Gỡ ảnh bìa tùy chỉnh"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -324,9 +333,12 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Khung Ghi chú & Châm ngôn cá nhân (Bio) nằm trọn trong card full bìa */}
-            <div className="p-4 rounded-2xl bg-black/45 backdrop-blur-xl border border-white/15 shadow-2xl max-w-2xl">
-              <div className="flex items-center gap-2 text-xs font-bold text-cyan-300 uppercase tracking-wider mb-1.5">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+            <div className={cn(
+              "p-4 rounded-2xl max-w-2xl transition-all",
+              bannerCustomUrl ? "bg-black/40 backdrop-blur-md border border-white/15 shadow-2xl" : "bg-white/[0.03] border border-white/10"
+            )}>
+              <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1.5 font-mono">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Ghi chú &amp; Châm ngôn cá nhân (Bio)</span>
               </div>
               {bio ? (
@@ -334,7 +346,7 @@ export const ProfilePage: React.FC = () => {
                   “{bio}”
                 </p>
               ) : (
-                <p className="text-xs text-slate-300/80 italic">
+                <p className="text-xs text-slate-400 italic">
                   Chưa có nội dung ghi chú. Bạn có thể nhập ghi chú / châm ngôn ở form bên dưới và bấm "Lưu thông tin".
                 </p>
               )}
@@ -343,17 +355,15 @@ export const ProfilePage: React.FC = () => {
 
           {/* Footer dưới cùng: Email & Số điện thoại (chỉ hiển thị khi có thông tin) */}
           <div className="pt-4 mt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-200">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-slate-200 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                <Mail className="w-4 h-4 text-cyan-400" />
-                <span>{user?.email || 'Chưa liên kết email'}</span>
-              </span>
+            <div className="flex items-center gap-2 text-slate-300 font-mono">
+              <Mail className="w-3.5 h-3.5 text-cyan-400" />
+              <span>{user?.email || 'Chưa liên kết email'}</span>
             </div>
             {phoneNumber && (
-              <span className="flex items-center gap-1.5 text-emerald-300 font-medium bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-emerald-500/20">
-                <Phone className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="flex items-center gap-2 text-emerald-400 font-medium font-mono">
+                <Phone className="w-3.5 h-3.5" />
                 <span>{phoneNumber}</span>
-              </span>
+              </div>
             )}
           </div>
         </div>

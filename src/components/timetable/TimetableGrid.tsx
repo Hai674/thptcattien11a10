@@ -159,7 +159,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
           >
             {/* Cột số tiết */}
             <td className="p-3 text-center bg-white/[0.04] border-r border-white/10 w-24 sm:w-28 backdrop-blur-md">
-              <span className="inline-block px-2.5 py-1 rounded-lg bg-white/10 border border-white/15 text-white font-bold text-xs">
+              <span className="font-bold text-xs text-slate-200">
                 {p.name}
               </span>
             </td>
@@ -232,7 +232,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                             {slot.subject}
                           </p>
                           {accent?.tag && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/10 text-slate-300 border border-white/15 shrink-0">
+                            <span className="text-[9px] font-mono font-bold text-slate-400 shrink-0">
                               {accent.tag}
                             </span>
                           )}
@@ -372,7 +372,7 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
                     >
                       <div className="flex flex-col items-center justify-center gap-1">
                         {isCurrentDay && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 shadow-[0_0_10px_rgba(34,211,238,0.3)] tracking-wide">
+                          <span className="text-[10px] font-mono font-bold text-cyan-400 tracking-wider uppercase">
                             Hôm nay
                           </span>
                         )}

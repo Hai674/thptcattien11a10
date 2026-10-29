@@ -247,7 +247,7 @@ export const TimetablePage: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsUploadModalOpen(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-cyan-300 hover:text-cyan-200 transition-all cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
         >
           <FileSpreadsheet className="w-3.5 h-3.5" />
           <span>{stats.total > 0 ? 'Đổi / Nạp lại Excel' : 'Nạp file Excel'}</span>
