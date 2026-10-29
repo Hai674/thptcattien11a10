@@ -110,17 +110,17 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Brand Logo & Name */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-transform group-hover:scale-105 shrink-0">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden border border-white/10 bg-slate-900 shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-transform group-hover:scale-105 shrink-0">
             <img src="/logo-11a10.jpg" alt="Logo Lớp 11A10" className="w-full h-full object-cover" />
           </div>
 
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display font-bold text-base tracking-tight text-white group-hover:text-blue-400 transition-colors">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="font-display font-bold text-sm sm:text-base tracking-tight text-white group-hover:text-blue-400 transition-colors">
                 Lớp 11A10
               </span>
-              <span className="text-[10px] font-medium text-blue-300">
+              <span className="text-[9px] sm:text-[10px] font-medium text-blue-300 hidden xs:inline">
                 THPT Cát Tiên
               </span>
             </div>
@@ -173,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
           </GlassButton>
 
           {notiOpen && (
-            <div className="absolute right-0 top-full mt-2 w-80 rounded-3xl p-4 z-50 bg-slate-950/85 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.75)] text-slate-100 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-24px))] rounded-3xl p-4 z-50 bg-slate-950/85 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.75)] text-slate-100 animate-in fade-in zoom-in-95 duration-150">
               <div className="relative z-10">
                 <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
                   <h4 className="font-semibold text-xs text-white">Thông báo lớp học</h4>
@@ -244,7 +244,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           {dropdownOpen && user && (
-            <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-3xl p-3.5 z-50 bg-slate-950/85 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.75)] text-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-24px))] rounded-3xl p-3.5 z-50 bg-slate-950/85 backdrop-blur-2xl border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.75)] text-slate-200 animate-in fade-in zoom-in-95 duration-150">
               <div className="relative z-10 space-y-2">
                 {/* Header User Profile Card */}
                 <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center gap-3 backdrop-blur-md">

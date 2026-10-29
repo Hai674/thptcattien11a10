@@ -423,12 +423,12 @@ export const DuckRaceGame: React.FC<DuckRaceGameProps> = ({
       </div>
 
       {/* 3. Nút điều khiển cuộc đua */}
-      <div className="flex items-center gap-3 pt-1">
+      <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
         <button
           type="button"
           disabled={raceState === "racing" || raceState === "countdown" || candidates.length === 0}
           onClick={handleStartRace}
-          className={`px-6 py-3 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center gap-2 active:scale-95 ${
+          className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center gap-2 active:scale-95 ${
             raceState === "racing" || raceState === "countdown"
               ? "bg-slate-800 text-slate-400 cursor-not-allowed"
               : candidates.length === 0
@@ -444,7 +444,7 @@ export const DuckRaceGame: React.FC<DuckRaceGameProps> = ({
           <button
             type="button"
             onClick={handleReset}
-            className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
             <span>Đua lại lượt mới</span>

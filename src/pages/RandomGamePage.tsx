@@ -229,7 +229,7 @@ export const RandomGamePage: React.FC = () => {
       {/* ================= THANH TÙY CHỌN & BỘ ĐIỀU HƯỚNG CHẾ ĐỘ ================= */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         {/* Bộ chọn chế độ dạng Tabs chuẩn */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 w-fit">
+        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 w-full sm:w-fit overflow-x-auto scrollbar-thin">
           {[
             { id: 'wheel', label: '🎡 Vòng quay kỳ diệu' },
             { id: 'card', label: '🃏 Bốc thăm 46 lá bài' },
@@ -246,7 +246,7 @@ export const RandomGamePage: React.FC = () => {
                   setGameMode(mode.id as GameMode);
                   cyberAudio.playClick();
                 }}
-                contentClassName="px-4 py-1.5 text-xs text-white font-semibold flex items-center gap-1.5"
+                contentClassName="px-3 sm:px-4 py-1.5 text-xs text-white font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0"
               >
                 <span>{mode.label}</span>
               </GlassButton>
@@ -258,7 +258,7 @@ export const RandomGamePage: React.FC = () => {
                   setGameMode(mode.id as GameMode);
                   cyberAudio.playClick();
                 }}
-                className="h-9 px-4 rounded-full inline-flex items-center justify-center text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                className="h-8 sm:h-9 px-3 sm:px-4 rounded-full inline-flex items-center justify-center text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap shrink-0"
               >
                 {mode.label}
               </button>

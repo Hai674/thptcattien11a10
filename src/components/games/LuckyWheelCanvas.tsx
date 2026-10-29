@@ -451,7 +451,7 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
           type="button"
           disabled={isSpinning || isWaitingSuspense || candidates.length === 0}
           onClick={onSpinStart}
-          className={`absolute z-10 w-16 h-16 sm:w-22 sm:h-22 rounded-full flex flex-col items-center justify-center font-display font-black text-[10px] sm:text-xs tracking-wider uppercase transition-all shadow-2xl active:scale-95 border-2 ${
+          className={`absolute z-10 w-16 h-16 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center font-display font-black text-[10px] sm:text-xs tracking-wider uppercase transition-all shadow-2xl active:scale-95 border-2 ${
             isSpinning || isWaitingSuspense
               ? "bg-slate-900 border-indigo-500/60 text-cyan-300 cursor-not-allowed opacity-95 animate-pulse shadow-indigo-500/30"
               : candidates.length === 0

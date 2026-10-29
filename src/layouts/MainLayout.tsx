@@ -83,6 +83,7 @@ export const MainLayout: React.FC = () => {
       touchStartY = e.touches[0].clientY;
     };
     const handleTouchMove = (e: TouchEvent) => {
+      if (isSidebarOpen) return;
       const touchY = e.touches[0].clientY;
       if (Math.abs(touchY - touchStartY) > 10) {
         handleCollapse();
@@ -100,7 +101,7 @@ export const MainLayout: React.FC = () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [handleCollapse]);
+  }, [handleCollapse, isSidebarOpen]);
 
   // Khi chuyển trang (route change), tự động thu hồi sidebar và đưa header về hiển thị
   useEffect(() => {

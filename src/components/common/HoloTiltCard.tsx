@@ -15,6 +15,7 @@ export const HoloTiltCard: React.FC<HoloTiltCardProps> = ({
   const [glareStyle, setGlareStyle] = useState<React.CSSProperties>({ opacity: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -47,6 +48,7 @@ export const HoloTiltCard: React.FC<HoloTiltCardProps> = ({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchEnd={handleMouseLeave}
       style={{
         transform,
         transformStyle: 'preserve-3d',

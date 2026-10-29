@@ -90,9 +90,9 @@ export function TreeNav({
 
   const centerY = useMotionValue(0);
   const visibility = useMotionValue(0);
-  const pillY = useTransform(centerY, (v) => v - ROW_H / 2);
-  const markerY = useTransform(centerY, (v) => v - MARKER / 2);
-  const accentScale = useTransform(centerY, (v) => (end > 0 ? Math.min(1, Math.max(0, v / end)) : 0));
+  const pillY = useTransform(centerY, (v: number) => v - ROW_H / 2);
+  const markerY = useTransform(centerY, (v: number) => v - MARKER / 2);
+  const accentScale = useTransform(centerY, (v: number) => (end > 0 ? Math.min(1, Math.max(0, v / end)) : 0));
 
   const moveTo = React.useCallback(
     (index: number | null, immediate = false) => {
