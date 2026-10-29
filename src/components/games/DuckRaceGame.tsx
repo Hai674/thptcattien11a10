@@ -384,7 +384,7 @@ export const DuckRaceGame: React.FC<DuckRaceGameProps> = ({
         {raceState === "racing" && leaders.length > 0 && (
           <div className="flex items-center gap-2 font-mono text-[11px] text-slate-300">
             <span className="text-amber-400 font-bold">TOP 1:</span>
-            <span className="text-white font-bold bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-400/40 animate-pulse">
+            <span className="text-amber-300 font-bold animate-pulse">
               {leaders[0]?.fullName}
             </span>
           </div>

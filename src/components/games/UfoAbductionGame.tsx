@@ -207,16 +207,16 @@ export const UfoAbductionGame: React.FC<UfoAbductionGameProps> = ({
         <div className="flex items-center gap-2 font-mono text-[11px]">
           <span className="text-slate-400">TRẠNG THÁI:</span>
           <span
-            className={`font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider ${
+            className={`font-bold uppercase tracking-wider ${
               phase === "scanning"
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 animate-pulse"
+                ? "text-cyan-400 animate-pulse"
                 : phase === "locked"
-                ? "bg-rose-500/30 text-rose-300 border border-rose-400/60 animate-bounce"
+                ? "text-rose-400 animate-bounce"
                 : phase === "abducting"
-                ? "bg-amber-500/30 text-amber-300 border border-amber-400/60 animate-pulse"
+                ? "text-amber-400 animate-pulse"
                 : phase === "captured"
-                ? "bg-emerald-500/25 text-emerald-300 border border-emerald-400/50"
-                : "bg-white/5 text-slate-400"
+                ? "text-emerald-400 font-black"
+                : "text-slate-400"
             }`}
           >
             {phase === "scanning"
@@ -226,7 +226,7 @@ export const UfoAbductionGame: React.FC<UfoAbductionGameProps> = ({
               : phase === "abducting"
               ? "🛸 ĐANG HÚT LÊN ĐĨA BAY..."
               : phase === "captured"
-              ? "🎉 ĐÃ THU NẠP VÀO UFO!"
+              ? "🛸 ĐÃ BẮT VÀO ĐĨA BAY!"
               : "SẴN SÀNG PHÓNG UFO"}
           </span>
         </div>

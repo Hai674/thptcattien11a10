@@ -348,11 +348,11 @@ const WinnerModal: React.FC<WinnerModalProps> = ({ winner, onClose, onConfirmCal
         </div>
 
         <div className="space-y-1">
-          <span className="text-[10px] sm:text-[11px] font-bold text-amber-300 uppercase tracking-widest bg-amber-500/20 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border border-amber-400/30">
+          <span className="text-[10px] sm:text-[11px] font-bold text-amber-400 uppercase tracking-widest font-mono">
             CHÚC MỪNG BẠN
           </span>
           <h3 className="text-xl sm:text-2xl font-black text-white pt-1 sm:pt-2">{winner.fullName}</h3>
-          <p className="text-[11px] sm:text-xs text-slate-400 font-mono">{winner.role || "Học sinh 11A10"}</p>
+          <p className="text-[11px] sm:text-xs text-blue-400 font-mono font-medium">{winner.role || "Học sinh 11A10"}</p>
         </div>
 
         <div className="flex gap-2 pt-1 sm:pt-2">
@@ -461,52 +461,27 @@ export const RandomStudentPicker: React.FC<RandomStudentPickerProps> = ({
         </div>
 
         {/* Chuyển đổi 5 Tab */}
-        <div className="flex items-center justify-start sm:justify-center gap-1 sm:gap-1.5 bg-slate-950 p-1 sm:p-1.5 rounded-xl border border-white/5 w-fit max-w-full mx-auto overflow-x-auto scrollbar-thin">
-          <button
-            type="button"
-            onClick={() => { setActiveTab("wheel"); sfx.playClick(); }}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              activeTab === "wheel" ? "bg-purple-600 text-white shadow" : "text-slate-400 hover:text-white"
-            }`}
-          >
-            🎡 Vòng quay
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab("slot"); sfx.playClick(); }}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              activeTab === "slot" ? "bg-purple-600 text-white shadow" : "text-slate-400 hover:text-white"
-            }`}
-          >
-            🎰 Xèng số
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab("card"); sfx.playClick(); }}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              activeTab === "card" ? "bg-purple-600 text-white shadow" : "text-slate-400 hover:text-white"
-            }`}
-          >
-            🃏 46 Thẻ bài
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab("duck"); sfx.playClick(); }}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              activeTab === "duck" ? "bg-purple-600 text-white shadow" : "text-slate-400 hover:text-white"
-            }`}
-          >
-            🦆 Đua vịt
-          </button>
-          <button
-            type="button"
-            onClick={() => { setActiveTab("ufo"); sfx.playClick(); }}
-            className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-              activeTab === "ufo" ? "bg-purple-600 text-white shadow" : "text-slate-400 hover:text-white"
-            }`}
-          >
-            🛸 UFO bắt cóc
-          </button>
+        <div className="flex items-center justify-start sm:justify-center gap-1 sm:gap-1.5 bg-slate-950/70 p-1 sm:p-1.5 rounded-xl border border-white/5 w-fit max-w-full mx-auto overflow-x-auto scrollbar-thin">
+          {[
+            { id: "wheel", label: "🎡 Vòng quay" },
+            { id: "slot", label: "🎰 Xèng số" },
+            { id: "card", label: "🃏 46 Thẻ bài" },
+            { id: "duck", label: "🦆 Đua vịt" },
+            { id: "ufo", label: "🛸 UFO bắt cóc" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => { setActiveTab(tab.id as any); sfx.playClick(); }}
+              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                activeTab === tab.id
+                  ? "text-white bg-white/10 shadow-sm"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Thanh cấu hình trạng thái */}

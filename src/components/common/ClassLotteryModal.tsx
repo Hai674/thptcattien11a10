@@ -164,72 +164,31 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
 
         {/* Chọn Chế độ chơi */}
         <div className="flex items-center justify-center gap-2 pt-0.5 sm:pt-1">
-          <div className="flex items-center gap-1 sm:gap-1.5 bg-slate-950 p-1 rounded-xl border border-white/5 max-w-full overflow-x-auto scrollbar-thin">
-            <button
-              type="button"
-              onClick={() => {
-                setGameMode('card');
-                cyberAudio.playClick();
-              }}
-              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
-                gameMode === 'card' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Lật 46 thẻ bài ma thuật"
-            >
-              🃏 46 Thẻ bài
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setGameMode('wheel');
-                cyberAudio.playClick();
-              }}
-              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
-                gameMode === 'wheel' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Vòng quay kỳ diệu"
-            >
-              🎡 Vòng quay
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setGameMode('slot');
-                cyberAudio.playClick();
-              }}
-              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
-                gameMode === 'slot' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Quay số xèng tốc độ"
-            >
-              🎰 Xèng số
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setGameMode('duck');
-                cyberAudio.playClick();
-              }}
-              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
-                gameMode === 'duck' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Đua vịt cao tốc"
-            >
-              🦆 Đua vịt
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setGameMode('ufo');
-                cyberAudio.playClick();
-              }}
-              className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
-                gameMode === 'ufo' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-              }`}
-              title="UFO quét và bắt cóc"
-            >
-              🛸 UFO bắt cóc
-            </button>
+          <div className="flex items-center gap-1 sm:gap-1.5 bg-slate-950/70 p-1 rounded-xl border border-white/5 max-w-full overflow-x-auto scrollbar-thin">
+            {[
+              { id: 'card', label: '🃏 46 Thẻ bài', title: 'Lật 46 thẻ bài ma thuật' },
+              { id: 'wheel', label: '🎡 Vòng quay', title: 'Vòng quay kỳ diệu' },
+              { id: 'slot', label: '🎰 Xèng số', title: 'Quay số xèng tốc độ' },
+              { id: 'duck', label: '🦆 Đua vịt', title: 'Đua vịt cao tốc' },
+              { id: 'ufo', label: '🛸 UFO bắt cóc', title: 'UFO quét và bắt cóc' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => {
+                  setGameMode(tab.id as any);
+                  cyberAudio.playClick();
+                }}
+                className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap active:scale-95 ${
+                  gameMode === tab.id
+                    ? 'text-white font-semibold bg-white/10 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title={tab.title}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -364,8 +323,8 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
 
                 {/* Text Content */}
                 <div className="space-y-1 sm:space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] sm:text-[11px] font-bold font-mono tracking-wider uppercase">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
+                  <div className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-bold font-mono tracking-wider uppercase">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     <span>CHÚC MỪNG BẠN</span>
                   </div>
 
@@ -373,11 +332,12 @@ export const ClassLotteryModal: React.FC<ClassLotteryModalProps> = ({ isOpen, on
                     {winner.fullName}
                   </h3>
 
-                  <div className="flex items-center justify-center gap-1.5 pt-0.5">
-                    <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
-                      {winner.role || 'Học sinh'}
+                  <div className="flex items-center justify-center gap-2 pt-0.5 text-xs font-mono">
+                    <span className="text-blue-400 font-semibold">
+                      {winner.role || 'Thành viên'}
                     </span>
-                    <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">
+                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">
                       11A10 • Cát Tiên
                     </span>
                   </div>

@@ -396,8 +396,8 @@ export const RandomGamePage: React.FC = () => {
 
                 {/* Text Content */}
                 <div className="space-y-1.5 sm:space-y-2">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs font-bold font-mono tracking-wider uppercase">
-                    <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
+                  <div className="inline-flex items-center gap-1.5 text-amber-400 text-xs font-bold font-mono tracking-wider uppercase">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     <span>CHÚC MỪNG BẠN</span>
                   </div>
 
@@ -405,11 +405,12 @@ export const RandomGamePage: React.FC = () => {
                     {winner.fullName}
                   </h2>
 
-                  <div className="flex items-center justify-center gap-1.5 sm:gap-2 pt-0.5">
-                    <span className="text-[10px] sm:text-xs font-mono px-2 sm:px-2.5 py-0.5 rounded-full bg-white/10 text-blue-300 border border-white/10">
-                      {winner.role || 'Học sinh'}
+                  <div className="flex items-center justify-center gap-2 pt-0.5 text-xs font-mono">
+                    <span className="text-blue-400 font-semibold">
+                      {winner.role || 'Thành viên'}
                     </span>
-                    <span className="text-[10px] sm:text-xs text-slate-400 font-mono">
+                    <span className="text-slate-500">•</span>
+                    <span className="text-slate-400">
                       Tập thể 11A10 • THPT Cát Tiên
                     </span>
                   </div>

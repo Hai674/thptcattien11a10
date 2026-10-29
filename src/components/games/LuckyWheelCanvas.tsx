@@ -403,7 +403,7 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
             {activeCandidate ? activeCandidate.fullName : "Sẵn sàng quay..."}
           </span>
         </div>
-        <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-white/10 text-slate-300 shrink-0 font-semibold">
+        <span className="text-[10px] font-mono text-slate-400 shrink-0 font-medium">
           {isSpinning ? "QUÉT..." : isWaitingSuspense ? "CHỐT! 🎉" : "11A10"}
         </span>
       </div>

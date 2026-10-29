@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+﻿import React, { useEffect, useRef } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Home,
@@ -14,7 +14,7 @@ import {
   PanelLeftOpen,
   Dices,
 } from 'lucide-react';
-import { TreeNav, TreeNavItem } from '@/components/ui/tree-nav';
+import { BounceSidebar, BounceSidebarItem } from '@/components/ui/bounce-sidebar';
 import { cn } from '@/utils/cn';
 
 interface SidebarProps {
@@ -35,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const { isAdmin } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const asideRef = useRef<HTMLElement>(null);
 
   // Xử lý thu hồi Sidebar về chỗ cũ khi click chọn bất kỳ mục điều hướng nào
@@ -78,18 +79,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Trang cá nhân', path: '/ca-nhan', icon: User },
   ];
 
-  const treeNavItems: TreeNavItem[] = [
-    { label: 'Trang chủ', href: '/', icon: Home },
-    { label: 'Bảng tin thông báo', href: '/thong-bao', icon: Bell },
-    { label: 'Danh sách học sinh', href: '/thanh-vien', icon: Users },
-    { label: 'Kỷ yếu & Ảnh lớp', href: '/thu-vien', icon: Image },
-    { label: 'Thời khóa biểu', href: '/thoi-khoa-bieu', icon: Calendar },
-    { label: 'Vòng quay gọi tên', href: '/vong-quay', icon: Dices },
-    { label: 'Trang cá nhân', href: '/ca-nhan', icon: User },
+  const bounceNavItems: BounceSidebarItem[] = [
+    { id: '/', label: 'Trang chủ', icon: <Home className="w-4 h-4" /> },
+    { id: '/thong-bao', label: 'Bảng tin thông báo', icon: <Bell className="w-4 h-4" /> },
+    { id: '/thanh-vien', label: 'Danh sách học sinh', icon: <Users className="w-4 h-4" /> },
+    { id: '/thu-vien', label: 'Kỷ yếu & Ảnh lớp', icon: <Image className="w-4 h-4" /> },
+    { id: '/thoi-khoa-bieu', label: 'Thời khóa biểu', icon: <Calendar className="w-4 h-4" /> },
+    { id: '/vong-quay', label: 'Vòng quay gọi tên', icon: <Dices className="w-4 h-4" /> },
+    { id: '/ca-nhan', label: 'Trang cá nhân', icon: <User className="w-4 h-4" /> },
   ];
 
-  const adminTreeNavItems: TreeNavItem[] = [
-    { label: 'Bảng điều khiển Admin', href: '/admin', icon: Shield },
+  const adminBounceNavItems: BounceSidebarItem[] = [
+    { id: '/admin', label: 'Bảng điều khiển Admin', icon: <Shield className="w-4 h-4" /> },
   ];
 
   return (
@@ -168,13 +169,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* Navigation Links: TreeNav khi mở rộng, Icon Rail khi thu gọn */}
+          {/* Navigation Links: BounceSidebar khi mở rộng, Icon Rail khi thu gọn */}
           {!isCollapsed ? (
             <div className="space-y-3">
-              <TreeNav
-                items={treeNavItems}
-                activeHref={location.pathname}
-                onSelect={handleNavSelect}
+              <BounceSidebar
+                items={bounceNavItems}
+                value={location.pathname}
+                onValueChange={(path: string) => {
+                  navigate(path);
+                  handleNavSelect();
+                }}
+                className="w-full"
+                listClassName="gap-1 pl-4"
+                itemClassName="text-xs text-slate-300 hover:text-white hover:bg-white/[0.06] rounded-xl py-2 px-2.5 transition-colors cursor-pointer"
+                indicatorClassName="bg-cyan-400 shadow-[0_0_10px_#06b6d4]"
               />
 
               {/* Admin Command Link nếu là Admin */}
@@ -188,10 +196,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       BAN CÁN SỰ
                     </span>
                   </div>
-                  <TreeNav
-                    items={adminTreeNavItems}
-                    activeHref={location.pathname}
-                    onSelect={handleNavSelect}
+                  <BounceSidebar
+                    items={adminBounceNavItems}
+                    value={location.pathname}
+                    onValueChange={(path: string) => {
+                      navigate(path);
+                      handleNavSelect();
+                    }}
+                    className="w-full"
+                    listClassName="gap-1 pl-4"
+                    itemClassName="text-xs text-slate-300 hover:text-amber-300 hover:bg-white/[0.06] rounded-xl py-2 px-2.5 transition-colors cursor-pointer"
+                    indicatorClassName="bg-amber-400 shadow-[0_0_10px_#f59e0b]"
                   />
                 </div>
               )}
