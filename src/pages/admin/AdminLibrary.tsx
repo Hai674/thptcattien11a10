@@ -130,8 +130,8 @@ export const AdminLibraryPage: React.FC = () => {
       </Card>
 
       <Card className="shadow-2xl overflow-hidden p-0 rounded-3xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="overflow-x-auto scrollbar-thin">
+          <table className="w-full text-left border-collapse text-xs min-w-[620px]">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.06] text-slate-300 uppercase font-semibold backdrop-blur-md">
                 <th className="p-4">Tên tài liệu / Tệp</th>

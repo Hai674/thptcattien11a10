@@ -30,3 +30,10 @@ Take the first option that fully works:
 Never cut: validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs, anything the user asked for.
 
 (Yes, this file also applies to agents working on the ponytail repo itself. Especially to them.)
+
+
+## Quy tắc bắt buộc: Tự động đẩy lên GitHub sau mỗi lần hoàn thành
+Mỗi khi kết thúc việc sửa đổi, thêm mới mã nguồn hoặc cấu hình:
+1. Chạy xác thực kiểu dữ liệu (`npx tsc --noEmit`).
+2. Tự động `git add` các tệp đã thay đổi, tạo `git commit` rõ ràng.
+3. Tự động chạy `git push origin main` để đồng bộ trực tiếp lên GitHub trước khi phản hồi người dùng.

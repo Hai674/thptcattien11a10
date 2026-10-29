@@ -5,7 +5,8 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   liquid?: boolean;
 }
 
-const glassCardStyles = `
+const glassCardStyles = '';
+const unusedGlassCardStyles = `
 @property --card-angle-1 { syntax: "<angle>"; inherits: false; initial-value: -75deg; }
 @property --card-angle-2 { syntax: "<angle>"; inherits: false; initial-value: -45deg; }
 

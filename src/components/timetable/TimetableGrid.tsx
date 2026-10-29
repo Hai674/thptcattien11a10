@@ -344,6 +344,12 @@ export const TimetableGrid: React.FC<TimetableGridProps> = ({
         )}
       </div>
 
+      {/* Gợi ý vuốt ngang trên thiết bị di động */}
+      <div className="md:hidden flex items-center justify-between px-2 text-[10px] text-cyan-300 font-mono">
+        <span>Thời khóa biểu chi tiết</span>
+        <span>← Vuốt ngang để xem đủ tuần →</span>
+      </div>
+
       {/* Bảng Thời khóa biểu Liquid Glass */}
       <Card className="rounded-3xl p-0 overflow-hidden">
         <div className="overflow-x-auto w-full scrollbar-thin">

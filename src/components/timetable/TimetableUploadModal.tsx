@@ -93,7 +93,7 @@ export const TimetableUploadModal: React.FC<TimetableUploadModalProps> = ({
       />
 
       <div
-        className="relative w-full max-w-xl rounded-3xl border border-white/15 bg-slate-950/95 p-6 sm:p-7 shadow-2xl backdrop-blur-2xl space-y-5 animate-in zoom-in-95 duration-200 text-left"
+        className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl border border-white/15 bg-slate-950/95 p-5 sm:p-7 shadow-2xl backdrop-blur-2xl space-y-4 sm:space-y-5 animate-in zoom-in-95 duration-200 text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Nút đóng */}
