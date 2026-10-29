@@ -306,8 +306,8 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
 
-      // Easing kịch tính tự nhiên (quay nhanh lúc đầu, giảm tốc thót tim về cuối)
-      const easeOut = 1 - Math.pow(1 - progress, 2.9);
+      // Easing mượt mà cao cấp (Quartic ease-out) giúp vòng quay lướt êm ái, giảm tốc thót tim
+      const easeOut = 1 - Math.pow(1 - progress, 3.6);
       const currentRotation = startAngle + totalAngleToRotate * easeOut;
 
       currentAngleRef.current = currentRotation;
@@ -330,11 +330,13 @@ export const LuckyWheel: React.FC<LuckyWheelProps> = ({
         }
         playTickSound();
 
+        // Kim rung mượt mà theo gia tốc thực tế, dùng rAF thay vì setTimeout chống nghẽn event-loop
         if (needleRef.current) {
-          needleRef.current.style.transform = "rotate(12deg)";
-          setTimeout(() => {
+          const deflectAngle = Math.max(4, Math.round(14 * (1 - progress)));
+          needleRef.current.style.transform = `rotate(${deflectAngle}deg)`;
+          requestAnimationFrame(() => {
             if (needleRef.current) needleRef.current.style.transform = "rotate(0deg)";
-          }, 35);
+          });
         }
       }
 

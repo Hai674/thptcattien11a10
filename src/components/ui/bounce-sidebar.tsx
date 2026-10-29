@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 // beui.dev/components/motion/bounce-sidebar
 
 import {
@@ -40,13 +40,12 @@ export interface BounceSidebarProps {
 
 const DOT_SIZE = 6;
 
-// A compact, lightly underdamped spring gives the dot a quick landing without
-// turning the sidebar into a playful toy. The sideways arc carries the bounce.
+// A silky, perfectly damped spring for butter-smooth trajectory without jittery twitch
 const BOUNCE_SPRING = {
   type: "spring",
-  stiffness: 280,
-  damping: 18,
-  mass: 0.3,
+  stiffness: 240,
+  damping: 24,
+  mass: 0.4,
 } as const;
 
 function quadraticBezier(
@@ -125,19 +124,20 @@ export function BounceSidebar({
       const distance = destinationY - startY;
       const travel = Math.abs(distance);
       const longJumpProgress = Math.min(1, Math.max(0, (travel - 48) / 120));
-      const controlX = -Math.min(40, Math.max(8, travel * 0.25));
-      const midpointY = (startY + destinationY) / 2;
-      const controlY =
-        destinationY + (midpointY - destinationY) * longJumpProgress;
+      // Giới hạn biên độ vòng cung vừa vặn (8px - 16px), tạo cảm giác nảy thanh thoát mượt mà
+      const maxArc = Math.min(16, Math.max(8, travel * 0.12));
 
       animationRef.current = animate(0, 1, {
         ...BOUNCE_SPRING,
-        stiffness: BOUNCE_SPRING.stiffness - 60 * longJumpProgress,
-        damping: BOUNCE_SPRING.damping + longJumpProgress,
-        mass: BOUNCE_SPRING.mass + 0.15 * longJumpProgress,
+        stiffness: Math.max(180, BOUNCE_SPRING.stiffness - 40 * longJumpProgress),
+        damping: BOUNCE_SPRING.damping + 2 * longJumpProgress,
+        mass: BOUNCE_SPRING.mass + 0.1 * longJumpProgress,
         onUpdate: (progress: number) => {
-          x.set(quadraticBezier(0, controlX, 0, progress));
-          y.set(quadraticBezier(startY, controlY, destinationY, progress));
+          // Chuẩn hóa progress mượt mà theo hàm Sin mượt, không bị méo góc khi qua mốc 1
+          const clamped = Math.max(0, Math.min(1, progress));
+          const lateralArc = -Math.sin(clamped * Math.PI) * maxArc;
+          x.set(lateralArc);
+          y.set(startY + (destinationY - startY) * progress);
         },
         onComplete: () => {
           x.set(0);
@@ -205,24 +205,37 @@ export function BounceSidebar({
         {items.map((item) => {
           const active = item.id === selectedValue;
           const content = (
-            <>
+            <span className="relative z-10 flex items-center gap-2.5 w-full">
               {item.icon ? (
-                <span aria-hidden="true" className="shrink-0">
+                <span aria-hidden="true" className="shrink-0 transition-transform duration-200 group-hover:scale-110">
                   {item.icon}
                 </span>
               ) : null}
-              <span>{item.label}</span>
-            </>
+              <span className="truncate">{item.label}</span>
+            </span>
           );
           const interactiveClasses = cn(
-            "flex min-h-9 w-full items-center gap-2 rounded-lg px-2 text-left text-sm font-medium outline-none transition-colors",
+            "group relative flex min-h-9 w-full items-center gap-2 rounded-xl px-2.5 text-left text-sm font-medium outline-none transition-all duration-200",
             "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             active
-              ? "text-foreground"
-              : "text-muted-foreground hover:text-foreground",
+              ? "text-white font-semibold"
+              : "text-slate-400 hover:text-white hover:bg-white/[0.04]",
             item.disabled ? "cursor-not-allowed opacity-40" : undefined,
             itemClassName,
           );
+
+          const activeIndicatorGlow = active ? (
+            <motion.div
+              layoutId={`bounce-active-pill-${ariaLabel.replace(/\s+/g, "-")}`}
+              className="absolute inset-0 rounded-xl bg-white/[0.08] border border-white/10 shadow-[0_0_14px_rgba(255,255,255,0.06)] pointer-events-none"
+              transition={{
+                type: "spring",
+                stiffness: 340,
+                damping: 28,
+                mass: 0.45,
+              }}
+            />
+          ) : null;
 
           return (
             <li
@@ -256,6 +269,7 @@ export function BounceSidebar({
                   }}
                   className={interactiveClasses}
                 >
+                  {activeIndicatorGlow}
                   {content}
                 </a>
               ) : (
@@ -267,6 +281,7 @@ export function BounceSidebar({
                   onClick={() => selectItem(item.id)}
                   className={interactiveClasses}
                 >
+                  {activeIndicatorGlow}
                   {content}
                 </button>
               )}

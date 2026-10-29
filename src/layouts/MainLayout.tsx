@@ -34,7 +34,7 @@ export const MainLayout: React.FC = () => {
     });
   }, []);
 
-  // Tự động thu hồi Sidebar về chỗ cũ và ẩn/hiện Header khi lướt trang
+  // Xử lý ẩn/hiện Header thông minh khi lướt trang (không can thiệp giật lag vào Sidebar)
   useEffect(() => {
     let ticking = false;
 
@@ -43,11 +43,6 @@ export const MainLayout: React.FC = () => {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
           const delta = currentScrollY - lastScrollY.current;
-
-          // Lướt trang (lướt lên hoặc lướt xuống với delta khác 0) -> tự động thu hồi Sidebar về chỗ cũ
-          if (Math.abs(delta) > 5) {
-            handleCollapse();
-          }
 
           // Nếu ở gần đỉnh (<= 25px), luôn hiển thị Header
           if (currentScrollY <= 25) {
@@ -70,45 +65,19 @@ export const MainLayout: React.FC = () => {
       }
     };
 
-    // Bắt sự kiện lăn chuột (wheel) để thu hồi ngay khi vừa lăn chuột
-    const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > 6) {
-        handleCollapse();
-      }
-    };
-
-    // Bắt sự kiện vuốt trên màn hình cảm ứng điện thoại / tablet
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isSidebarOpen) return;
-      const touchY = e.touches[0].clientY;
-      if (Math.abs(touchY - touchStartY) > 10) {
-        handleCollapse();
-      }
-    };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [handleCollapse, isSidebarOpen]);
+  }, []);
 
-  // Khi chuyển trang (route change), tự động thu hồi sidebar và đưa header về hiển thị
+  // Khi chuyển trang (route change), tự động đóng drawer mobile và đưa header về hiển thị
   useEffect(() => {
     setIsHeaderVisible(true);
-    handleCollapse();
+    setIsSidebarOpen(false);
     lastScrollY.current = window.scrollY;
-  }, [location.pathname, handleCollapse]);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 relative font-sans selection:bg-blue-600/30 selection:text-blue-200">

@@ -35,6 +35,12 @@
     --radius: 0.75rem;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     background-color: #060913;
     color: #f8fafc;

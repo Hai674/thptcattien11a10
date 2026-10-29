@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -38,27 +38,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
   const asideRef = useRef<HTMLElement>(null);
 
-  // Xử lý thu hồi Sidebar về chỗ cũ khi click chọn bất kỳ mục điều hướng nào
+  // Xử lý đóng menu trên mobile khi click chọn mục điều hướng (giữ nguyên desktop để trải nghiệm lướt mượt mà)
   const handleNavSelect = () => {
     onClose?.();
-    onCollapse?.();
   };
 
-  // Tự động thu hồi Sidebar về chỗ cũ khi click ra ngoài thanh menu
+  // Tự động đóng mobile drawer khi click ra ngoài
   useEffect(() => {
-    if (isCollapsed && !isOpen) return;
+    if (!isOpen) return;
 
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Nếu click bên trong aside thì không tính là click outside
       if (asideRef.current && asideRef.current.contains(target)) {
         return;
       }
+      if (target.closest('#mobile-sidebar-toggle') || target.closest('#desktop-sidebar-toggle')) {
+        return;
+      }
       onClose?.();
-      onCollapse?.();
     };
 
-    // Đợi 50ms để không bị bắt ngay sự kiện click vừa mở thanh menu
     const timer = setTimeout(() => {
       document.addEventListener('click', handleClickOutside);
     }, 50);
@@ -67,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       clearTimeout(timer);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [isCollapsed, isOpen, onCollapse, onClose]);
+  }, [isOpen, onClose]);
 
   const navItems = [
     { name: 'Trang chủ', path: '/', icon: Home },
